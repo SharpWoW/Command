@@ -39,6 +39,7 @@ function CET:HasValue(tbl, value)
 	return false
 end
 
+-- Thanks to ITSBTH for the table copy function
 function CET:Copy(tbl, cache)
 	if type(tbl) ~= "table" then return tbl end
 	cache = cache or {}
