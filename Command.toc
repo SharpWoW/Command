@@ -1,0 +1,14 @@
+## Interface: 40200
+## Version: Dev
+## Title: Command
+## Notes: Provides various !<command> style commands that can be sent in most chat channels.
+## Author: F16Gaming
+## SavedVariables: COMMAND
+
+# No libraries at the moment
+#embed.xml
+
+# !!LOCALE SUPPORT NOT ADDED!! #
+#locales\load.xml
+
+load.xml
