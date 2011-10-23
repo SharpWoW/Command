@@ -18,8 +18,14 @@
 --]]
 
 local C = Command
-local CES = C.Extensions.String
 
+--- Table holding all CommandManager methods.
+-- This is referenced "CM" in CommandManager.lua.
+-- @name Command.CommandManager
+-- @class table
+-- @field Slash List of slash commands to register.
+-- @field Commands Table holding all registered commands.
+--
 C.CommandManager = {
 	Slash = {
 		"command",
@@ -28,11 +34,16 @@ C.CommandManager = {
 	Commands = {}
 }
 
+
 local CM = C.CommandManager
 local PM = C.PlayerManager
 local QM = C.QueueManager
 local GT = C.GroupTools
+local CES = C.Extensions.String
 
+--- Initialize CommandManager.
+-- NOTE: Unused.
+--
 function CM:Init()
 	
 end
@@ -56,7 +67,7 @@ end
 
 --- Gets the callback for a command by name.
 -- @param command Name of the command to get.
--- @returns Callback for the command.
+-- @return Callback for the command.
 --
 function CM:GetCommand(command)
 	if self.Commands[command] then
@@ -70,8 +81,8 @@ end
 -- @param args Table with arguments for the command.
 -- @param isChat Is the command called from chat?
 -- @param player Player object of the calling player (if chat)
--- @returns If successfull, returns result, otherwise false.
--- @returns Error message if not successful, otherwise nil.
+-- @return If successfull, returns result, otherwise false.
+-- @return Error message if not successful, otherwise nil.
 --
 function CM:HandleCommand(command, args, isChat, player)
 	local cmd = self:GetCommand(command)

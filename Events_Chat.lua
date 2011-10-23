@@ -50,6 +50,12 @@ function C.Events.CHAT_MSG_CHANNEL(self, event, ...)
 end
 --]]
 
+--- Event handler for CHAT_MSG_GUILD.
+-- @name Command.Events.CHAT_MSG_GUILD
+-- @param self Reference to Command object.
+-- @param event Full name of event.
+-- @param ... Event arguments.
+--
 function C.Events.CHAT_MSG_GUILD(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
@@ -57,6 +63,12 @@ function C.Events.CHAT_MSG_GUILD(self, event, ...)
 	CM:HandleMessage(msg, sender, chan)
 end
 
+--- Event handler for CHAT_MSG_OFFICER.
+-- @name Command.Events.CHAT_MSG_OFFICER
+-- @param self Reference to Command object.
+-- @param event Full name of event.
+-- @param ... Event arguments.
+--
 function C.Events.CHAT_MSG_OFFICER(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
@@ -64,7 +76,12 @@ function C.Events.CHAT_MSG_OFFICER(self, event, ...)
 	CM:HandleMessage(msg, sender, chan)
 end
 
-
+--- Event handler for CHAT_MSG_PARTY.
+-- @name Command.Events.CHAT_MSG_PARTY
+-- @param self Reference to Command object.
+-- @param event Full name of event.
+-- @param ... Event arguments.
+--
 function C.Events.CHAT_MSG_PARTY(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
@@ -72,6 +89,12 @@ function C.Events.CHAT_MSG_PARTY(self, event, ...)
 	CM:HandleMessage(msg, sender, chan)
 end
 
+--- Event handler for CHAT_MSG_PARTY_LEADER.
+-- @name Command.Events.CHAT_MSG_PARTY_LEADER
+-- @param self Reference to Command object.
+-- @param event Full name of event.
+-- @param ... Event arguments.
+--
 function C.Events.CHAT_MSG_PARTY_LEADER(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
@@ -79,6 +102,12 @@ function C.Events.CHAT_MSG_PARTY_LEADER(self, event, ...)
 	CM:HandleMessage(msg, sender, chan)
 end
 
+--- Event handler for CHAT_MSG_RAID.
+-- @name Command.Events.CHAT_MSG_RAID
+-- @param self Reference to Command object.
+-- @param event Full name of event.
+-- @param ... Event arguments.
+--
 function C.Events.CHAT_MSG_RAID(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
@@ -86,6 +115,12 @@ function C.Events.CHAT_MSG_RAID(self, event, ...)
 	CM:HandleMessage(msg, sender, chan)
 end
 
+--- Event handler for CHAT_MSG_RAID_LEADER.
+-- @name Command.Events.CHAT_MSG_RAID_LEADER
+-- @param self Reference to Command object.
+-- @param event Full name of event.
+-- @param ... Event arguments.
+--
 function C.Events.CHAT_MSG_RAID_LEADER(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
@@ -93,6 +128,12 @@ function C.Events.CHAT_MSG_RAID_LEADER(self, event, ...)
 	CM:HandleMessage(msg, sender, chan)
 end
 
+--- Event handler for CHAT_MSG_RAID_WARNING.
+-- @name Command.Events.CHAT_MSG_RAID_WARNING
+-- @param self Reference to Command object.
+-- @param event Full name of event.
+-- @param ... Event arguments.
+--
 function C.Events.CHAT_MSG_RAID_WARNING(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
@@ -109,6 +150,12 @@ function C.Events.CHAT_MSG_SAY(self, event, ...)
 end
 --]]
 
+--- Event handler for CHAT_MSG_WHISPER.
+-- @name Command.Events.CHAT_MSG_WHISPER
+-- @param self Reference to Command object.
+-- @param event Full name of event.
+-- @param ... Event arguments.
+--
 function C.Events.CHAT_MSG_WHISPER(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))

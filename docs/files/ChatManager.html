@@ -1,0 +1,445 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
+</head>
+
+<body>
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+<div id="main">
+
+<div id="navigation">
+
+
+<h1>LuaDoc</h1>
+<ul>
+	
+	<li><a href="../index.html">Index</a></li>
+	
+</ul>
+
+
+<!-- Module list -->
+
+
+
+<!-- File list -->
+
+<h1>Files</h1>
+<ul>
+
+	<li><strong>ChatManager.lua</strong></li>
+	
+	<li>
+		<a href="../files/Command.html">Command.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/CommandManager.html">CommandManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/EventHandler.html">EventHandler.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Events.html">Events.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Events_Chat.html">Events_Chat.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/GroupTools.html">GroupTools.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Logger.html">Logger.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/PlayerManager.html">PlayerManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/QueueManager.html">QueueManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/String.html">String.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Table.html">Table.lua</a>
+	</li>
+
+</ul>
+
+
+
+
+
+
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h1>File <code>ChatManager.lua</code></h1>
+
+
+
+
+
+
+
+<h2>Functions</h2>
+<table class="function_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#CM:GetRespondChannelByEvent">CM:GetRespondChannelByEvent</a>&nbsp;(event)</td>
+	<td class="summary">Get the channel to be used as a response channel based on event name.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#CM:HandleMessage">CM:HandleMessage</a>&nbsp;(msg, sender, channel, target, isBN)</td>
+	<td class="summary">Handle a chat message.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#CM:Init">CM:Init</a>&nbsp;()</td>
+	<td class="summary">Initialize ChatManager.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#CM:IsCommand">CM:IsCommand</a>&nbsp;(msg)</td>
+	<td class="summary">Check if a string is a command.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#CM:LoadSavedVars">CM:LoadSavedVars</a>&nbsp;()</td>
+	<td class="summary">Load saved variables.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#CM:ParseCommand">CM:ParseCommand</a>&nbsp;(cmd)</td>
+	<td class="summary">Parse a command.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#CM:ParseMessage">CM:ParseMessage</a>&nbsp;(msg)</td>
+	<td class="summary">Parse a message.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#CM:SendMessage">CM:SendMessage</a>&nbsp;(msg, channel, target)</td>
+	<td class="summary">Send a chat message.</td>
+	</tr>
+
+</table>
+
+
+
+
+<h2>Tables</h2>
+<table class="table_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#Command.ChatManager">Command.ChatManager</a></td>
+	<td class="summary">Table holding all ChatManager methods.</td>
+	</tr>
+
+</table>
+
+
+
+<br/>
+<br/>
+
+
+
+
+<h2><a name="functions"></a>Functions</h2>
+<dl class="function">
+
+
+
+<dt><a name="CM:GetRespondChannelByEvent"></a><strong>CM:GetRespondChannelByEvent</strong>&nbsp;(event)</dt>
+<dd>
+Get the channel to be used as a response channel based on event name.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>event</em></code>: Full name of the event.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The channel to be used as response channel. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="CM:HandleMessage"></a><strong>CM:HandleMessage</strong>&nbsp;(msg, sender, channel, target, isBN)</dt>
+<dd>
+Handle a chat message.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>msg</em></code>: The message to handle.
+	</li>
+	
+	<li>
+	  <code><em>sender</em></code>: Player object of the player who sent the message.
+	</li>
+	
+	<li>
+	  <code><em>channel</em></code>: Channel the message was sent from.
+	</li>
+	
+	<li>
+	  <code><em>target</em></code>: Player or channel index.
+	</li>
+	
+	<li>
+	  <code><em>isBN</em></code>: True if battle.net message, false or nil otherwise. 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="CM:Init"></a><strong>CM:Init</strong>&nbsp;()</dt>
+<dd>
+Initialize ChatManager. 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="CM:IsCommand"></a><strong>CM:IsCommand</strong>&nbsp;(msg)</dt>
+<dd>
+Check if a string is a command.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>msg</em></code>: String to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if the string is a command, false otherwise. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="CM:LoadSavedVars"></a><strong>CM:LoadSavedVars</strong>&nbsp;()</dt>
+<dd>
+Load saved variables. 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="CM:ParseCommand"></a><strong>CM:ParseCommand</strong>&nbsp;(cmd)</dt>
+<dd>
+Parse a command.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>cmd</em></code>: Command to parse.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Parsed command (without the command char) </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="CM:ParseMessage"></a><strong>CM:ParseMessage</strong>&nbsp;(msg)</dt>
+<dd>
+Parse a message.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>msg</em></code>: The message to parse.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Table with the individual words. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="CM:SendMessage"></a><strong>CM:SendMessage</strong>&nbsp;(msg, channel, target)</dt>
+<dd>
+Send a chat message. Will echo the msg param locally if LOCAL_ONLY setting is true.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>msg</em></code>: The message to send.
+	</li>
+	
+	<li>
+	  <code><em>channel</em></code>: The channel to send to.
+	</li>
+	
+	<li>
+	  <code><em>target</em></code>: Player or channel index to send message to. 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+<h2><a name="tables"></a>Tables</h2>
+<dl class="table">
+
+<dt><a name="Command.ChatManager"></a><strong>Command.ChatManager</strong></dt>
+<dd>Table holding all ChatManager methods. This is referenced "CM" in ChatManager.lua.<br /><br />
+
+
+<h3>Fields:</h3>
+<ul>
+	
+	<li>
+	  <code><em>Settings</em></code>: Table holding all settings specific to ChatManager.
+	</li>
+	
+	<li>
+	  <code><em>Default</em></code>: Table containing default settings (used at initial setup) 
+	</li>
+	
+</ul>
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->	
+</body>
+</html>

@@ -19,6 +19,13 @@
 
 local C = Command
 
+--- Table holding all ChatManager methods.
+-- This is referenced "CM" in ChatManager.lua.
+-- @name Command.ChatManager
+-- @class table
+-- @field Settings Table holding all settings specific to ChatManager.
+-- @field Default Table containing default settings (used at initial setup)
+--
 C.ChatManager = {
 	Settings = {},
 	Default = {
@@ -34,7 +41,7 @@ local CES = C.Extensions.String
 
 --- Get the channel to be used as a response channel based on event name.
 -- @param event Full name of the event.
--- @returns The channel to be used as response channel.
+-- @return The channel to be used as response channel.
 --
 function CM:GetRespondChannelByEvent(event)
 	local respondChannel = "SAY"
@@ -110,7 +117,7 @@ end
 
 --- Parse a message.
 -- @param msg The message to parse.
--- @returns Table with the individual words.
+-- @return Table with the individual words.
 --
 function CM:ParseMessage(msg)
 	return CES:Split(msg)
@@ -118,7 +125,7 @@ end
 
 --- Parse a command.
 -- @param cmd Command to parse.
--- @returns Parsed command (without the command char)
+-- @return Parsed command (without the command char)
 --
 function CM:ParseCommand(cmd)
 	return cmd:sub(2, cmd:len())
@@ -126,7 +133,7 @@ end
 
 --- Check if a string is a command.
 -- @param msg String to check.
--- @returns True if the string is a command, false otherwise.
+-- @return True if the string is a command, false otherwise.
 --
 function CM:IsCommand(msg)
 	return CES:StartsWith(msg, self.Settings.CMD_CHAR)

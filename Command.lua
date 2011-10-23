@@ -17,8 +17,19 @@
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
+--- Table containing all Command methods.
+-- This is referenced "C" in Command.lua
+-- @name Command
+-- @class table
+-- @field Name AddOn name.
+-- @field Version AddOn version.
+-- @field VarVersion SavedVariables version.
+-- @field Enabled Enabled state.
+-- @field Global Contains the saved variables.
+-- @field Settings Contains settings specific to Command.
+-- @field Events Contains all registered event handlers.
+--
 Command = {
-	Logger = nil,
 	Name = "Command",
 	Version = GetAddOnMetadata("Command", "Version"),
 	VarVersion = 1,
@@ -34,7 +45,7 @@ local CM
 local PM
 local log
 
---- Initialize method.
+--- Initialize Command.
 --
 function C:Init()
 	Cmd = self.CommandManager

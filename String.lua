@@ -21,9 +21,19 @@ if type(Command.Extensions) ~= "table" then
 	Command.Extensions = {}
 end
 
-Command.Extensions.String = {}
+local C = Command
 
-local CES = Command.Extensions.String
+--- Table containing all String methods.
+-- This is referenced "CES" in String.lua.
+-- @name Command.Extentions.String
+-- @class table
+-- @field type No current use.
+--
+C.Extensions.String = {
+	type = "ext" -- For future use
+}
+
+local CES = C.Extensions.String
 
 --- Check if a string starts with a specific string.
 -- @param s String to be checked.
@@ -43,7 +53,7 @@ end
 
 --- Trim a string, removing whitespace at the beginning of it.
 -- @param s String to be trimmed.
--- @returns The trimmed string.
+-- @return The trimmed string.
 --
 function CES:Trim(s)
 	return (s:gsub("^%s*(.-)%s*$", "%1"))
@@ -51,7 +61,7 @@ end
 
 --- Split a string with space as delimiter.
 -- @param s String to be split.
--- @returns Table containing the individual words.
+-- @return Table containing the individual words.
 --
 function CES:Split(s)
 	local t = {}

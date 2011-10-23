@@ -1,0 +1,1092 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
+</head>
+
+<body>
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+<div id="main">
+
+<div id="navigation">
+
+
+<h1>LuaDoc</h1>
+<ul>
+	
+	<li><a href="../index.html">Index</a></li>
+	
+</ul>
+
+
+<!-- Module list -->
+
+
+
+<!-- File list -->
+
+<h1>Files</h1>
+<ul>
+
+	<li>
+		<a href="../files/ChatManager.html">ChatManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Command.html">Command.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/CommandManager.html">CommandManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/EventHandler.html">EventHandler.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Events.html">Events.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Events_Chat.html">Events_Chat.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/GroupTools.html">GroupTools.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Logger.html">Logger.lua</a>
+	</li>
+
+	<li><strong>PlayerManager.lua</strong></li>
+	
+	<li>
+		<a href="../files/QueueManager.html">QueueManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/String.html">String.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Table.html">Table.lua</a>
+	</li>
+
+</ul>
+
+
+
+
+
+
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h1>File <code>PlayerManager.lua</code></h1>
+
+
+
+
+
+
+
+<h2>Functions</h2>
+<table class="function_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:BanUser">PM:BanUser</a>&nbsp;(player)</td>
+	<td class="summary">Ban player.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:GetAccess">PM:GetAccess</a>&nbsp;(player)</td>
+	<td class="summary">Get the current access level of supplied player.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:GetListMode">PM:GetListMode</a>&nbsp;()</td>
+	<td class="summary">Gets the current mode of the list.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:GetOrCreatePlayer">PM:GetOrCreatePlayer</a>&nbsp;(name)</td>
+	<td class="summary">Get or create a player.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:HasAccess">PM:HasAccess</a>&nbsp;(player, command)</td>
+	<td class="summary">Check if player has access to command.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:Init">PM:Init</a>&nbsp;()</td>
+	<td class="summary">Initialize the player manager.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:Invite">PM:Invite</a>&nbsp;(player, isSelf)</td>
+	<td class="summary">Invite a player to group.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:IsBNFriend">PM:IsBNFriend</a>&nbsp;(player)</td>
+	<td class="summary">Check if supplied player is on the player's BN friends list.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:IsFriend">PM:IsFriend</a>&nbsp;(player)</td>
+	<td class="summary">Check if supplied player is on the player's friends list.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:IsInGuild">PM:IsInGuild</a>&nbsp;(player)</td>
+	<td class="summary">Check if the supplied player is in the player's guild.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:Kick">PM:Kick</a>&nbsp;(player)</td>
+	<td class="summary">Kick a player from the group.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:ListAdd">PM:ListAdd</a>&nbsp;(command)</td>
+	<td class="summary">Add a command to the blacklist/whitelist.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:ListRemove">PM:ListRemove</a>&nbsp;(command)</td>
+	<td class="summary">Remove a command from the blacklist/whitelist.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:LoadSavedVars">PM:LoadSavedVars</a>&nbsp;()</td>
+	<td class="summary">Load saved variables.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:PlayerAccess">PM:PlayerAccess</a>&nbsp;(player, command, allow)</td>
+	<td class="summary">Modify the access of a command for a specific player.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:PlayerAccessRemove">PM:PlayerAccessRemove</a>&nbsp;(player, command)</td>
+	<td class="summary">Completely remove a command from a player's access list.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:PromoteToAssistant">PM:PromoteToAssistant</a>&nbsp;(player)</td>
+	<td class="summary">Promote player to assistant.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:PromoteToLeader">PM:PromoteToLeader</a>&nbsp;(player)</td>
+	<td class="summary">Promote a player to group leader.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:SetAccessGroup">PM:SetAccessGroup</a>&nbsp;(player, group)</td>
+	<td class="summary">Set the access group of supplied player.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:SetAdmin">PM:SetAdmin</a>&nbsp;(player)</td>
+	<td class="summary">Give player Admin access.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:SetListMode">PM:SetListMode</a>&nbsp;(mode)</td>
+	<td class="summary">Set the mode of the list.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:SetOp">PM:SetOp</a>&nbsp;(player)</td>
+	<td class="summary">Give player Op access.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:SetOwner">PM:SetOwner</a>&nbsp;(player)</td>
+	<td class="summary">Give player Owner access.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:SetUser">PM:SetUser</a>&nbsp;(player)</td>
+	<td class="summary">Give player User access.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:ToggleListMode">PM:ToggleListMode</a>&nbsp;()</td>
+	<td class="summary">Toggle the list between being a blacklist and being a whitelist.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:UpdatePlayer">PM:UpdatePlayer</a>&nbsp;(player)</td>
+	<td class="summary">Update a player and subsequently save them.</td>
+	</tr>
+
+</table>
+
+
+
+
+<h2>Tables</h2>
+<table class="table_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#Command.PlayerManager">Command.PlayerManager</a></td>
+	<td class="summary">Table containing all PlayerManager methods.</td>
+	</tr>
+
+</table>
+
+
+
+<br/>
+<br/>
+
+
+
+
+<h2><a name="functions"></a>Functions</h2>
+<dl class="function">
+
+
+
+<dt><a name="PM:BanUser"></a><strong>PM:BanUser</strong>&nbsp;(player)</dt>
+<dd>
+Ban player. What this really does is set the access level to "Banned", effectively blocking the player from using any commands. Unless there is a command that requires access level "Banned". (Could be used for appeal commands).
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player to modify.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating the result of the operation, false if error.</li>
+	
+	<li>Error message if unsuccessful, nil otherwise. </li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:GetAccess"></a><strong>PM:GetAccess</strong>&nbsp;(player)</dt>
+<dd>
+Get the current access level of supplied player.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Access level of the player. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:GetListMode"></a><strong>PM:GetListMode</strong>&nbsp;()</dt>
+<dd>
+Gets the current mode of the list. 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:GetOrCreatePlayer"></a><strong>PM:GetOrCreatePlayer</strong>&nbsp;(name)</dt>
+<dd>
+Get or create a player.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>name</em></code>: Name of player.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Player from list of players if exists, otherwise a new player object. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:HasAccess"></a><strong>PM:HasAccess</strong>&nbsp;(player, command)</dt>
+<dd>
+Check if player has access to command.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player object of the player to check.
+	</li>
+	
+	<li>
+	  <code><em>command</em></code>: Command object of the command to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if player has access, false otherwise. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:Init"></a><strong>PM:Init</strong>&nbsp;()</dt>
+<dd>
+Initialize the player manager. 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:Invite"></a><strong>PM:Invite</strong>&nbsp;(player, isSelf)</dt>
+<dd>
+Invite a player to group. Also sends a message to the invited player about the event.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player object of player to invite.
+	</li>
+	
+	<li>
+	  <code><em>isSelf</em></code>: True if player is inviting themselves, nil or false otherwise.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating the result of the invite, false if error.</li>
+	
+	<li>Error message if unsuccessful, nil otherwise. </li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:IsBNFriend"></a><strong>PM:IsBNFriend</strong>&nbsp;(player)</dt>
+<dd>
+Check if supplied player is on the player's BN friends list.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player object of the player to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if BN friend, false otherwise. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:IsFriend"></a><strong>PM:IsFriend</strong>&nbsp;(player)</dt>
+<dd>
+Check if supplied player is on the player's friends list.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player object of the player to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if friend, false otherwise. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:IsInGuild"></a><strong>PM:IsInGuild</strong>&nbsp;(player)</dt>
+<dd>
+Check if the supplied player is in the player's guild.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player object of the player to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if in guild, false otherwise. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:Kick"></a><strong>PM:Kick</strong>&nbsp;(player)</dt>
+<dd>
+Kick a player from the group.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player object of the player to kick.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating the result of the kick, false if error.</li>
+	
+	<li>Error message if unsuccessful, nil otherwise. </li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:ListAdd"></a><strong>PM:ListAdd</strong>&nbsp;(command)</dt>
+<dd>
+Add a command to the blacklist/whitelist.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>command</em></code>: Name of command to add. 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:ListRemove"></a><strong>PM:ListRemove</strong>&nbsp;(command)</dt>
+<dd>
+Remove a command from the blacklist/whitelist.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>command</em></code>: Name of command to remove. 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:LoadSavedVars"></a><strong>PM:LoadSavedVars</strong>&nbsp;()</dt>
+<dd>
+Load saved variables. 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:PlayerAccess"></a><strong>PM:PlayerAccess</strong>&nbsp;(player, command, allow)</dt>
+<dd>
+Modify the access of a command for a specific player.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player object of the player to modify.
+	</li>
+	
+	<li>
+	  <code><em>command</em></code>: Name of command to allow or deny.
+	</li>
+	
+	<li>
+	  <code><em>allow</em></code>: True to allow command, false to deny.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating the result, or false if error.</li>
+	
+	<li>Error message if unsuccessful, otherwise nil. </li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:PlayerAccessRemove"></a><strong>PM:PlayerAccessRemove</strong>&nbsp;(player, command)</dt>
+<dd>
+Completely remove a command from a player's access list. Removes from both the allow and deny list.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player object of the player to modify.
+	</li>
+	
+	<li>
+	  <code><em>command</em></code>: Name of command to remove. 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:PromoteToAssistant"></a><strong>PM:PromoteToAssistant</strong>&nbsp;(player)</dt>
+<dd>
+Promote player to assistant.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player object of the player to promote.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating the result of the promotion, false if error.</li>
+	
+	<li>Error message if unsuccessful, nil otherwise. </li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:PromoteToLeader"></a><strong>PM:PromoteToLeader</strong>&nbsp;(player)</dt>
+<dd>
+Promote a player to group leader.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player object of the player to promote.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating the result of the promotion, false if error.</li>
+	
+	<li>Error message if unsuccessful, nil otherwise. </li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:SetAccessGroup"></a><strong>PM:SetAccessGroup</strong>&nbsp;(player, group)</dt>
+<dd>
+Set the access group of supplied player.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player to modify.
+	</li>
+	
+	<li>
+	  <code><em>group</em></code>: Group name to set the player to.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating the result of the operation, false if error.</li>
+	
+	<li>Error message if unsuccessful, nil otherwise. </li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:SetAdmin"></a><strong>PM:SetAdmin</strong>&nbsp;(player)</dt>
+<dd>
+Give player Admin access.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player to modify.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating the result of the operation, false if error.</li>
+	
+	<li>Error message if unsuccessful, nil otherwise. </li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:SetListMode"></a><strong>PM:SetListMode</strong>&nbsp;(mode)</dt>
+<dd>
+Set the mode of the list.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>mode</em></code>: Mode to change to, MODE_WHITELIST for whitelist and MODE_BLACKLIST for blacklist.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>String stating what mode the list is in. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:SetOp"></a><strong>PM:SetOp</strong>&nbsp;(player)</dt>
+<dd>
+Give player Op access.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player to modify.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating the result of the operation, false if error.</li>
+	
+	<li>Error message if unsuccessful, nil otherwise. </li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:SetOwner"></a><strong>PM:SetOwner</strong>&nbsp;(player)</dt>
+<dd>
+Give player Owner access.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player to modify.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating the result of the operation, false if error.</li>
+	
+	<li>Error message if unsuccessful, nil otherwise. </li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:SetUser"></a><strong>PM:SetUser</strong>&nbsp;(player)</dt>
+<dd>
+Give player User access.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player to modify.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating the result of the operation, false if error.</li>
+	
+	<li>Error message if unsuccessful, nil otherwise. </li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:ToggleListMode"></a><strong>PM:ToggleListMode</strong>&nbsp;()</dt>
+<dd>
+Toggle the list between being a blacklist and being a whitelist.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>String stating what mode the list is in. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:UpdatePlayer"></a><strong>PM:UpdatePlayer</strong>&nbsp;(player)</dt>
+<dd>
+Update a player and subsequently save them.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player object to update. 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+<h2><a name="tables"></a>Tables</h2>
+<dl class="table">
+
+<dt><a name="Command.PlayerManager"></a><strong>Command.PlayerManager</strong></dt>
+<dd>Table containing all PlayerManager methods. This is referenced "PM" in PlayerManager.lua.<br /><br />
+
+
+<h3>Fields:</h3>
+<ul>
+	
+	<li>
+	  <code><em>Access</em></code>: Table containing all available access groups. 
+	</li>
+	
+</ul>
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->	
+</body>
+</html>

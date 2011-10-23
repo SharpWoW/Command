@@ -17,18 +17,28 @@
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-if type(Command.Extensions) ~= "table" then
-	Command.Extensions = {}
+local C = Command
+
+if type(C.Extensions) ~= "table" then
+	C.Extensions = {}
 end
 
-Command.Extensions.Table = {}
+--- Table containing all Table methods.
+-- This is referenced "CET" in Table.lua.
+-- @name Command.Extensions.Table
+-- @class table
+-- @field type No current use.
+--
+C.Extensions.Table = {
+	type = "ext"
+}
 
-local CET = Command.Extensions.Table
+local CET = C.Extensions.Table
 
 --- Check if a table has the supplied key.
 -- @param tbl Table to check.
 -- @param key Key to search for.
--- @returns True if the key was found, false otherwise.
+-- @return True if the key was found, false otherwise.
 --
 function CET:HasKey(tbl, key)
 	for k,_ in pairs(tbl) do
@@ -40,7 +50,7 @@ end
 --- Check if a table contains the supplied value.
 -- @param tbl Table to check.
 -- @param value Value to search for.
--- @returns True if the value was found, false otherwise.
+-- @return True if the value was found, false otherwise.
 function CET:HasValue(tbl, value)
 	for _,v in pairs(tbl) do
 		if v == value then return true end
@@ -52,7 +62,7 @@ end
 --- Create a copy of a table.
 -- @param tbl Table to copy.
 -- @param cache Cache used for recursion.
--- @returns A copy of the supplied table without references.
+-- @return A copy of the supplied table without references.
 --
 function CET:Copy(tbl, cache)
 	if type(tbl) ~= "table" then return tbl end

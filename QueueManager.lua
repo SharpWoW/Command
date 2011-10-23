@@ -19,6 +19,16 @@
 
 local C = Command
 
+--- Table containing all QueueManager methods.
+-- This is referenced "QM" in QueueManager.lua.
+-- @name Command.QueueManager
+-- @class table
+-- @field QueuedByCommand True if player has been queued by a command, false otherwise.
+-- @field Current The current dungeon for which the group is queued.
+-- @field Running True if announce is running, false otherwise.
+-- @field Time Total time since Announce was called.
+-- @field LastMode Last not-nil value returned by GetLFGMode.
+--
 C.QueueManager = {
 	QueuedByCommand = false,
 	Current = nil,
@@ -27,7 +37,26 @@ C.QueueManager = {
 	LastMode = nil
 }
 
-local types = {
+local QM = C.QueueManager
+
+--- Contains information about various dungeon types.
+-- Each entry has an Alias table and an Id field.
+-- The Alias table contains names that this dungeon may be referenced by.
+-- The Id field is either a number or a function that gives the index for that dungeon type.
+-- @name Command.QueueManager.Types
+-- @class table
+-- @field ClassicRandom Random Classic Dungeon
+-- @field TBCRandom Random Burning Crusade Dungeon
+-- @field TBCHeroic Random Heroic Burning Crusade Dungeon
+-- @field LKRandom Random Wrath of the Lich king Dungeon
+-- @field LKHeroic Random Heroic Wrath of the Lich King Dungeon
+-- @field CataclysmRandom Random Cataclysm Dungeon
+-- @field CataclysmHeroic Random Heroic Cataclysm Dungeon
+-- @field Zandalari Random Rise of the Zandalari Dungeon
+-- @field Horseman The Headless Horseman Hallow's Eve dungeon
+-- @field BestChoice Let the server decide what dungeon is best for the player
+--
+QM.Types = {
 	ClassicRandom = {
 		Alias = {
 			"classic",
@@ -137,14 +166,12 @@ local types = {
 	}
 }
 
-local QM = C.QueueManager
-
 --- Gets the numeric index of a dungoen for use with SetLFGDungeon.
 -- @param alias Name/Alias of the dungeon.
--- @returns Index of the dungeon if dungeon was found, false otherwise.
+-- @return Index of the dungeon if dungeon was found, false otherwise.
 --
 function QM:GetIndex(alias)
-	for _,v in pairs(types) do
+	for _,v in pairs(self.Types) do
 		for _,d in pairs(v.Alias) do
 			if alias:lower() == d then
 				if type(v.Id) == "function" then
@@ -159,7 +186,7 @@ end
 
 --- Queue for the dungeon with supplied index.
 -- @param index Index of dungeon to queue for.
--- @returns String stating that rolecheck has started.
+-- @return String stating that rolecheck has started.
 --
 function QM:Queue(index)
 	local _, t, h, d = GetLFGRoles()
@@ -178,7 +205,7 @@ function QM:Queue(index)
 end
 
 --- Cancel the queueing/rolechecking.
--- @returns String stating that queue has been cancelled.
+-- @return String stating that queue has been cancelled.
 --
 function QM:Cancel()
 	self.QueuedByCommand = false
@@ -187,7 +214,7 @@ function QM:Cancel()
 end
 
 --- Causes player to accept a pending LFG invite.
--- @returns String stating that the invite was accepted.
+-- @return String stating that the invite was accepted.
 --
 function QM:Accept()
 	self.QueuedByCommand = false

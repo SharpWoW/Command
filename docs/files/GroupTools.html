@@ -1,0 +1,379 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
+</head>
+
+<body>
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+<div id="main">
+
+<div id="navigation">
+
+
+<h1>LuaDoc</h1>
+<ul>
+	
+	<li><a href="../index.html">Index</a></li>
+	
+</ul>
+
+
+<!-- Module list -->
+
+
+
+<!-- File list -->
+
+<h1>Files</h1>
+<ul>
+
+	<li>
+		<a href="../files/ChatManager.html">ChatManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Command.html">Command.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/CommandManager.html">CommandManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/EventHandler.html">EventHandler.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Events.html">Events.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Events_Chat.html">Events_Chat.lua</a>
+	</li>
+
+	<li><strong>GroupTools.lua</strong></li>
+	
+	<li>
+		<a href="../files/Logger.html">Logger.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/PlayerManager.html">PlayerManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/QueueManager.html">QueueManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/String.html">String.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Table.html">Table.lua</a>
+	</li>
+
+</ul>
+
+
+
+
+
+
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h1>File <code>GroupTools.lua</code></h1>
+
+
+
+
+
+
+
+<h2>Functions</h2>
+<table class="function_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#GT:IsGroup">GT:IsGroup</a>&nbsp;()</td>
+	<td class="summary">Check if player is in a group.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GT:IsGroupFull">GT:IsGroupFull</a>&nbsp;()</td>
+	<td class="summary">Check if the group is full.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GT:IsGroupLeader">GT:IsGroupLeader</a>&nbsp;(name)</td>
+	<td class="summary">Check if the unit is the group leader.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GT:IsInGroup">GT:IsInGroup</a>&nbsp;(name)</td>
+	<td class="summary">Check if the unit is in the player's group.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GT:IsLFGGroup">GT:IsLFGGroup</a>&nbsp;()</td>
+	<td class="summary">Check if the player is in an LFG group.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GT:IsRaid">GT:IsRaid</a>&nbsp;()</td>
+	<td class="summary">Check if player is in a raid.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GT:IsRaidAssistant">GT:IsRaidAssistant</a>&nbsp;(name)</td>
+	<td class="summary">Check if unit is raid assistant.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GT:IsRaidLeaderOrAssistant">GT:IsRaidLeaderOrAssistant</a>&nbsp;(name)</td>
+	<td class="summary">Check if the unit is raid leader or assistant.</td>
+	</tr>
+
+</table>
+
+
+
+
+
+
+<br/>
+<br/>
+
+
+
+
+<h2><a name="functions"></a>Functions</h2>
+<dl class="function">
+
+
+
+<dt><a name="GT:IsGroup"></a><strong>GT:IsGroup</strong>&nbsp;()</dt>
+<dd>
+Check if player is in a group.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if player is in group, false otherwise. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GT:IsGroupFull"></a><strong>GT:IsGroupFull</strong>&nbsp;()</dt>
+<dd>
+Check if the group is full. NOTE: Only checks for 5 players in a party and 40 players in a raid. DOES NOT respect 10 and 25 man raids.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if the group is full, false otherwise. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GT:IsGroupLeader"></a><strong>GT:IsGroupLeader</strong>&nbsp;(name)</dt>
+<dd>
+Check if the unit is the group leader.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>name</em></code>: Name/Unit to check, defaults to player.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if unit is group leader, false otherwise. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GT:IsInGroup"></a><strong>GT:IsInGroup</strong>&nbsp;(name)</dt>
+<dd>
+Check if the unit is in the player's group.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>name</em></code>: Unit/Player Name to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if the unit is in group, false otherwise. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GT:IsLFGGroup"></a><strong>GT:IsLFGGroup</strong>&nbsp;()</dt>
+<dd>
+Check if the player is in an LFG group.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if the player is in an LFG group, false otherwise. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GT:IsRaid"></a><strong>GT:IsRaid</strong>&nbsp;()</dt>
+<dd>
+Check if player is in a raid.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if the player is in a raid, false otherwise. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GT:IsRaidAssistant"></a><strong>GT:IsRaidAssistant</strong>&nbsp;(name)</dt>
+<dd>
+Check if unit is raid assistant.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>name</em></code>: Unit to check, defaults to player.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if assistant, false otherwise. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GT:IsRaidLeaderOrAssistant"></a><strong>GT:IsRaidLeaderOrAssistant</strong>&nbsp;(name)</dt>
+<dd>
+Check if the unit is raid leader or assistant.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>name</em></code>: Unit to check, defaults to player.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if the unit is raid leader or assistant, false otherwise. </ul>
+
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+
+
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->	
+</body>
+</html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
+</head>
+
+<body>
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+<div id="main">
+
+<div id="navigation">
+
+
+<h1>LuaDoc</h1>
+<ul>
+	
+	<li><a href="../index.html">Index</a></li>
+	
+</ul>
+
+
+<!-- Module list -->
+
+
+
+<!-- File list -->
+
+<h1>Files</h1>
+<ul>
+
+	<li>
+		<a href="../files/ChatManager.html">ChatManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Command.html">Command.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/CommandManager.html">CommandManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/EventHandler.html">EventHandler.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Events.html">Events.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Events_Chat.html">Events_Chat.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/GroupTools.html">GroupTools.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Logger.html">Logger.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/PlayerManager.html">PlayerManager.lua</a>
+	</li>
+
+	<li><strong>QueueManager.lua</strong></li>
+	
+	<li>
+		<a href="../files/String.html">String.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Table.html">Table.lua</a>
+	</li>
+
+</ul>
+
+
+
+
+
+
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h1>File <code>QueueManager.lua</code></h1>
+
+
+
+
+
+
+
+<h2>Functions</h2>
+<table class="function_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#QM:Accept">QM:Accept</a>&nbsp;()</td>
+	<td class="summary">Causes player to accept a pending LFG invite.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#QM:Announce">QM:Announce</a>&nbsp;(_, elapsed)</td>
+	<td class="summary">Announce the current status of LFG to group.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#QM:AnnounceStatus">QM:AnnounceStatus</a>&nbsp;()</td>
+	<td class="summary">Trigger method to announce status.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#QM:Cancel">QM:Cancel</a>&nbsp;()</td>
+	<td class="summary">Cancel the queueing/rolechecking.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#QM:GetIndex">QM:GetIndex</a>&nbsp;(alias)</td>
+	<td class="summary">Gets the numeric index of a dungoen for use with SetLFGDungeon.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#QM:Queue">QM:Queue</a>&nbsp;(index)</td>
+	<td class="summary">Queue for the dungeon with supplied index.</td>
+	</tr>
+
+</table>
+
+
+
+
+<h2>Tables</h2>
+<table class="table_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#Command.QueueManager">Command.QueueManager</a></td>
+	<td class="summary">Table containing all QueueManager methods.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#Command.QueueManager.Types">Command.QueueManager.Types</a></td>
+	<td class="summary">Contains information about various dungeon types.</td>
+	</tr>
+
+</table>
+
+
+
+<br/>
+<br/>
+
+
+
+
+<h2><a name="functions"></a>Functions</h2>
+<dl class="function">
+
+
+
+<dt><a name="QM:Accept"></a><strong>QM:Accept</strong>&nbsp;()</dt>
+<dd>
+Causes player to accept a pending LFG invite.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>String stating that the invite was accepted. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="QM:Announce"></a><strong>QM:Announce</strong>&nbsp;(_, elapsed)</dt>
+<dd>
+Announce the current status of LFG to group.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>_</em></code>: Not used
+	</li>
+	
+	<li>
+	  <code><em>elapsed</em></code>: Time elapsed since last time OnUpdate fired. 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="QM:AnnounceStatus"></a><strong>QM:AnnounceStatus</strong>&nbsp;()</dt>
+<dd>
+Trigger method to announce status. This is because the status of LFG is not available straight after LFG_UPDATE event is fired. 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="QM:Cancel"></a><strong>QM:Cancel</strong>&nbsp;()</dt>
+<dd>
+Cancel the queueing/rolechecking.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>String stating that queue has been cancelled. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="QM:GetIndex"></a><strong>QM:GetIndex</strong>&nbsp;(alias)</dt>
+<dd>
+Gets the numeric index of a dungoen for use with SetLFGDungeon.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>alias</em></code>: Name/Alias of the dungeon.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Index of the dungeon if dungeon was found, false otherwise. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="QM:Queue"></a><strong>QM:Queue</strong>&nbsp;(index)</dt>
+<dd>
+Queue for the dungeon with supplied index.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>index</em></code>: Index of dungeon to queue for.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>String stating that rolecheck has started. </ul>
+
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+<h2><a name="tables"></a>Tables</h2>
+<dl class="table">
+
+<dt><a name="Command.QueueManager"></a><strong>Command.QueueManager</strong></dt>
+<dd>Table containing all QueueManager methods. This is referenced "QM" in QueueManager.lua.<br /><br />
+
+
+<h3>Fields:</h3>
+<ul>
+	
+	<li>
+	  <code><em>QueuedByCommand</em></code>: True if player has been queued by a command, false otherwise.
+	</li>
+	
+	<li>
+	  <code><em>Current</em></code>: The current dungeon for which the group is queued.
+	</li>
+	
+	<li>
+	  <code><em>Running</em></code>: True if announce is running, false otherwise.
+	</li>
+	
+	<li>
+	  <code><em>Time</em></code>: Total time since Announce was called.
+	</li>
+	
+	<li>
+	  <code><em>LastMode</em></code>: Last not-nil value returned by GetLFGMode. 
+	</li>
+	
+</ul>
+
+
+</dd>
+
+
+<dt><a name="Command.QueueManager.Types"></a><strong>Command.QueueManager.Types</strong></dt>
+<dd>Contains information about various dungeon types. Each entry has an Alias table and an Id field. The Alias table contains names that this dungeon may be referenced by. The Id field is either a number or a function that gives the index for that dungeon type.<br /><br />
+
+
+<h3>Fields:</h3>
+<ul>
+	
+	<li>
+	  <code><em>ClassicRandom</em></code>: Random Classic Dungeon
+	</li>
+	
+	<li>
+	  <code><em>TBCRandom</em></code>: Random Burning Crusade Dungeon
+	</li>
+	
+	<li>
+	  <code><em>TBCHeroic</em></code>: Random Heroic Burning Crusade Dungeon
+	</li>
+	
+	<li>
+	  <code><em>LKRandom</em></code>: Random Wrath of the Lich king Dungeon
+	</li>
+	
+	<li>
+	  <code><em>LKHeroic</em></code>: Random Heroic Wrath of the Lich King Dungeon
+	</li>
+	
+	<li>
+	  <code><em>CataclysmRandom</em></code>: Random Cataclysm Dungeon
+	</li>
+	
+	<li>
+	  <code><em>CataclysmHeroic</em></code>: Random Heroic Cataclysm Dungeon
+	</li>
+	
+	<li>
+	  <code><em>Zandalari</em></code>: Random Rise of the Zandalari Dungeon
+	</li>
+	
+	<li>
+	  <code><em>Horseman</em></code>: The Headless Horseman Hallow's Eve dungeon
+	</li>
+	
+	<li>
+	  <code><em>BestChoice</em></code>: Let the server decide what dungeon is best for the player 
+	</li>
+	
+</ul>
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->	
+</body>
+</html>

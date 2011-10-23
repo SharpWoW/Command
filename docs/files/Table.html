@@ -1,0 +1,289 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
+</head>
+
+<body>
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+<div id="main">
+
+<div id="navigation">
+
+
+<h1>LuaDoc</h1>
+<ul>
+	
+	<li><a href="../index.html">Index</a></li>
+	
+</ul>
+
+
+<!-- Module list -->
+
+
+
+<!-- File list -->
+
+<h1>Files</h1>
+<ul>
+
+	<li>
+		<a href="../files/ChatManager.html">ChatManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Command.html">Command.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/CommandManager.html">CommandManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/EventHandler.html">EventHandler.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Events.html">Events.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Events_Chat.html">Events_Chat.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/GroupTools.html">GroupTools.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Logger.html">Logger.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/PlayerManager.html">PlayerManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/QueueManager.html">QueueManager.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/String.html">String.lua</a>
+	</li>
+
+	<li><strong>Table.lua</strong></li>
+	
+</ul>
+
+
+
+
+
+
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h1>File <code>Table.lua</code></h1>
+
+
+
+
+
+
+
+<h2>Functions</h2>
+<table class="function_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#CET:Copy">CET:Copy</a>&nbsp;(tbl, cache)</td>
+	<td class="summary">Create a copy of a table.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#CET:HasKey">CET:HasKey</a>&nbsp;(tbl, key)</td>
+	<td class="summary">Check if a table has the supplied key.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#CET:HasValue">CET:HasValue</a>&nbsp;(tbl, value)</td>
+	<td class="summary">Check if a table contains the supplied value.</td>
+	</tr>
+
+</table>
+
+
+
+
+<h2>Tables</h2>
+<table class="table_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#Command.Extensions.Table">Command.Extensions.Table</a></td>
+	<td class="summary">Table containing all Table methods.</td>
+	</tr>
+
+</table>
+
+
+
+<br/>
+<br/>
+
+
+
+
+<h2><a name="functions"></a>Functions</h2>
+<dl class="function">
+
+
+
+<dt><a name="CET:Copy"></a><strong>CET:Copy</strong>&nbsp;(tbl, cache)</dt>
+<dd>
+Create a copy of a table.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>tbl</em></code>: Table to copy.
+	</li>
+	
+	<li>
+	  <code><em>cache</em></code>: Cache used for recursion.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>A copy of the supplied table without references. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="CET:HasKey"></a><strong>CET:HasKey</strong>&nbsp;(tbl, key)</dt>
+<dd>
+Check if a table has the supplied key.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>tbl</em></code>: Table to check.
+	</li>
+	
+	<li>
+	  <code><em>key</em></code>: Key to search for.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if the key was found, false otherwise. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="CET:HasValue"></a><strong>CET:HasValue</strong>&nbsp;(tbl, value)</dt>
+<dd>
+Check if a table contains the supplied value.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>tbl</em></code>: Table to check.
+	</li>
+	
+	<li>
+	  <code><em>value</em></code>: Value to search for.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if the value was found, false otherwise.</ul>
+
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+<h2><a name="tables"></a>Tables</h2>
+<dl class="table">
+
+<dt><a name="Command.Extensions.Table"></a><strong>Command.Extensions.Table</strong></dt>
+<dd>Table containing all Table methods. This is referenced "CET" in Table.lua.<br /><br />
+
+
+<h3>Fields:</h3>
+<ul>
+	
+	<li>
+	  <code><em>type</em></code>: No current use. 
+	</li>
+	
+</ul>
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->	
+</body>
+</html>

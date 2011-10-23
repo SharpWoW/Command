@@ -28,22 +28,42 @@ function T.Events.CHAT_MSG_ADDON(event, ...)
 end
 --]]
 
+--- Event handler for ADDON_LOADED
+-- @name Command.Events.ADDON_LOADED
+-- @param self Reference to Command object.
+-- @param ... Event arguments.
+--
 function C.Events.ADDON_LOADED(self, ...)
 	local name = (select(1, ...))
 	if name:lower() ~= self.Name:lower() then return end
 	self:Init()
 end
 
+--- Event handler for LFG_UPDATE
+-- @name Command.Events.LFG_UPDATE
+-- @param self Reference to Command object.
+-- @param ... Event arguments.
+--
 function C.Events.LFG_UPDATE(self, ...)
 	if not QM.QueuedByCommand then return end
 	QM:AnnounceStatus()
 end
 
+--- Event handler for LFG_PROPOSAL_SHOW
+-- @name Command.Events.LFG_PROPOSAL_SHOW
+-- @param self Reference to Command object.
+-- @param ... Event arguments.
+--
 function C.Events.LFG_PROPOSAL_SHOW(self, ...)
 	if not QM.QueuedByCommand then return end
 	CM:SendMessage("Group has been found, type !accept to make me accept the invite.", "PARTY")
 end
 
+--- Event handler for LFG_PROPOSAL_FAILED
+-- @name Command.Events.LFG_PROPOSAL_FAILED
+-- @param self Reference to Command object.
+-- @param ... Event arguments.
+--
 function C.Events.LFG_PROPOSAL_FAILED(self, ...)
 	if not QM.QueuedByCommand then return end
 	QM.QueuedByCommand = false
