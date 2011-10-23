@@ -123,11 +123,9 @@ function QM:Announce(_, elapsed)
 	if self.Time >= 0.25 then
 		local mode = (select(1, GetLFGMode()))
 		if mode ~= nil then self.LastMode = mode end
-		print("Last mode set to: " .. tostring(self.LastMode))
 		if mode == "queued" then
 			Command.ChatManager:SendMessage(("Now queueing for %s, type !cancel to cancel."):format(QM.Current), "PARTY")
 		elseif not mode then
-			print("LastMode is: " .. tostring(self.LastMode))
 			local current = "Role check"
 			if self.LastMode ~= "rolecheck" then current = "LFG" end
 			Command.ChatManager:SendMessage(current .. " cancelled.", "PARTY")
