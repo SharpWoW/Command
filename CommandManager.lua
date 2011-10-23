@@ -217,6 +217,9 @@ CM:Register({"acceptlfg", "accept", "join"}, PM.Access.Groups.User.Level, functi
 end)
 
 CM:Register({"convert", "conv"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+	if GT:IsLFGGroup() then
+		return false, "LFG groups cannot be converted."
+	end
 	if not GT:IsGroup() then
 		return false, "Cannot convert if not in a group."
 	end

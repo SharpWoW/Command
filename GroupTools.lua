@@ -27,6 +27,9 @@ function GT:IsGroup()
 	return UnitExists("party1")
 end
 
+function GT:IsLFGGroup()
+	return (select(1, GetLFGMode())) == "lfgparty"
+
 function GT:IsRaid()
 	return UnitInRaid("player")
 end
