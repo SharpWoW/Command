@@ -23,22 +23,41 @@ C.GroupTools = {}
 
 local GT = C.GroupTools
 
+--- Check if player is in a group.
+-- @returns True if player is in group, false otherwise.
+--
 function GT:IsGroup()
 	return UnitExists("party1")
 end
 
+--- Check if the player is in an LFG group.
+-- @returns True if the player is in an LFG group, false otherwise.
+--
 function GT:IsLFGGroup()
 	return (select(1, GetLFGMode())) == "lfgparty"
+end
 
+--- Check if player is in a raid.
+-- @returns True if the player is in a raid, false otherwise.
+--
 function GT:IsRaid()
 	return UnitInRaid("player")
 end
 
+--- Check if the unit is the group leader.
+-- @param name Name/Unit to check, defaults to player.
+-- @returns True if unit is group leader, false otherwise.
+--
 function GT:IsGroupLeader(name)
 	name = name or "player"
 	return UnitIsPartyLeader(name) -- or (name == "player" and not self:IsGroup())
 end
 
+--- Check if the group is full.
+-- NOTE: Only checks for 5 players in a party and 40 players in a raid.
+-- DOES NOT respect 10 and 25 man raids.
+-- @returns True if the group is full, false otherwise.
+--
 function GT:IsGroupFull()
 	local num = 0
 	local max = 40
@@ -52,6 +71,10 @@ function GT:IsGroupFull()
 	return false
 end
 
+--- Check if the unit is raid leader or assistant.
+-- @param name Unit to check, defaults to player.
+-- @returns True if the unit is raid leader or assistant, false otherwise.
+--
 function GT:IsRaidLeaderOrAssistant(name)
 	name = name or "player"
 	if not self:IsRaid() then return false end
@@ -64,11 +87,19 @@ function GT:IsRaidLeaderOrAssistant(name)
 	return false
 end
 
+--- Check if unit is raid assistant.
+-- @param name Unit to check, defaults to player.
+-- @returns True if assistant, false otherwise.
+--
 function GT:IsRaidAssistant(name)
 	name = name or "player"
 	return UnitIsRaidOfficer(name)
 end
 
+--- Check if the unit is in the player's group.
+-- @param name Unit/Player Name to check.
+-- @returns True if the unit is in group, false otherwise.
+--
 function GT:IsInGroup(name)
 	if self:IsRaid() then
 		for i=1,GetNumRaidMembers() do

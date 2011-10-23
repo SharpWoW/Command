@@ -25,6 +25,11 @@ Command.Extensions.Table = {}
 
 local CET = Command.Extensions.Table
 
+--- Check if a table has the supplied key.
+-- @param tbl Table to check.
+-- @param key Key to search for.
+-- @returns True if the key was found, false otherwise.
+--
 function CET:HasKey(tbl, key)
 	for k,_ in pairs(tbl) do
 		if k == key then return true end
@@ -32,6 +37,10 @@ function CET:HasKey(tbl, key)
 	return false
 end
 
+--- Check if a table contains the supplied value.
+-- @param tbl Table to check.
+-- @param value Value to search for.
+-- @returns True if the value was found, false otherwise.
 function CET:HasValue(tbl, value)
 	for _,v in pairs(tbl) do
 		if v == value then return true end
@@ -40,6 +49,11 @@ function CET:HasValue(tbl, value)
 end
 
 -- Thanks to ITSBTH for the table copy function
+--- Create a copy of a table.
+-- @param tbl Table to copy.
+-- @param cache Cache used for recursion.
+-- @returns A copy of the supplied table without references.
+--
 function CET:Copy(tbl, cache)
 	if type(tbl) ~= "table" then return tbl end
 	cache = cache or {}

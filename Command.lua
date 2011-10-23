@@ -26,7 +26,6 @@ Command = {
 	Global = {},
 	Settings = {},
 	Events = {},
-	Modules = {}
 }
 
 local C = Command
@@ -35,6 +34,8 @@ local CM
 local PM
 local log
 
+--- Initialize method.
+--
 function C:Init()
 	Cmd = self.CommandManager
 	CM = self.ChatManager
@@ -44,6 +45,9 @@ function C:Init()
 	log.Settings.Debug = self.Settings.DEBUG
 end
 
+--- Load the saved variables.
+-- Also call Init() on modules that need it.
+--
 function C:LoadSavedVars()
 	if type(_G["COMMAND"]) ~= "table" then
 		_G["COMMAND"] = {}
@@ -67,35 +71,53 @@ function C:LoadSavedVars()
 	self.Global.VERSION = self.VarVersion
 end
 
+--- Control AddOn state.
+-- @param enabled Boolean indicating enabled or disabled state.
+--
 function C:SetEnabled(enabled)
 	self.Enabled = enabled
 end
 
+--- Enable AddOn.
+--
 function C:Enable()
 	self:SetEnabled(true)
 end
 
+--- Disable AddOn.
+--
 function C:Disable()
 	self:SetEnabled(false)
 end
 
+--- Toggle AddOn on and off.
+--
 function C:Toggle()
 	self:SetEnabled(not self.Enabled)
 end
 
+--- Control debugging state.
+-- @param enabled Boolean indicating enabled or disabled state.
+--
 function C:SetDebug(enabled)
 	self.Settings.DEBUG = enabled
 	log:SetDebug(enabled)
 end
 
+--- Enable debugging.
+--
 function C:EnableDebug()
 	self:SetDebug(true)
 end
 
+--- Disable debugging.
+--
 function C:DisableDebug()
 	self:SetDebug(false)
 end
 
+--- Toggle debugging.
+--
 function C:ToggleDebug()
 	self:SetDebug(not self.Settings.DEBUG)
 end

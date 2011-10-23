@@ -32,6 +32,10 @@ local PM = C.PlayerManager
 local CCM = C.CommandManager
 local CES = C.Extensions.String
 
+--- Get the channel to be used as a response channel based on event name.
+-- @param event Full name of the event.
+-- @returns The channel to be used as response channel.
+--
 function CM:GetRespondChannelByEvent(event)
 	local respondChannel = "SAY"
 	if event == "CHAT_MSG_BATTLEGROUND" then
@@ -68,10 +72,14 @@ function CM:GetRespondChannelByEvent(event)
 	return respondChannel
 end
 
+--- Initialize ChatManager.
+--
 function CM:Init()
 	self:LoadSavedVars()
 end
 
+--- Load saved variables.
+--
 function CM:LoadSavedVars()
 	if type(C.Settings.CHAT) ~= "table" then
 		C.Settings.CHAT = {}
@@ -85,6 +93,12 @@ function CM:LoadSavedVars()
 	end
 end
 
+--- Send a chat message.
+-- Will echo the msg param locally if LOCAL_ONLY setting is true.
+-- @param msg The message to send.
+-- @param channel The channel to send to.
+-- @param target Player or channel index to send message to.
+--
 function CM:SendMessage(msg, channel, target)
 	if not self.Settings.LOCAL_ONLY then
 		msg = ("[%s] %s"):format(C.Name, msg)
@@ -94,18 +108,37 @@ function CM:SendMessage(msg, channel, target)
 	end
 end
 
+--- Parse a message.
+-- @param msg The message to parse.
+-- @returns Table with the individual words.
+--
 function CM:ParseMessage(msg)
 	return CES:Split(msg)
 end
 
+--- Parse a command.
+-- @param cmd Command to parse.
+-- @returns Parsed command (without the command char)
+--
 function CM:ParseCommand(cmd)
 	return cmd:sub(2, cmd:len())
 end
 
+--- Check if a string is a command.
+-- @param msg String to check.
+-- @returns True if the string is a command, false otherwise.
+--
 function CM:IsCommand(msg)
 	return CES:StartsWith(msg, self.Settings.CMD_CHAR)
 end
 
+--- Handle a chat message.
+-- @param msg The message to handle.
+-- @param sender Player object of the player who sent the message.
+-- @param channel Channel the message was sent from.
+-- @param target Player or channel index.
+-- @param isBN True if battle.net message, false or nil otherwise.
+--
 function CM:HandleMessage(msg, sender, channel, target, isBN)
 	isBN = isBN or false
 	target = target or sender

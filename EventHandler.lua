@@ -20,6 +20,11 @@
 local C = Command
 local CES = C.Extensions.String
 
+--- Handles events.
+-- @param frame The frame on which the event was registered.
+-- @param event Full name of the event.
+-- @param ... Event arguments.
+--
 function C:OnEvent(frame, event, ...)
 	if not self.Events[event] then return end
 	if CES:StartsWith(event, "CHAT_MSG_") then

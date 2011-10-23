@@ -37,6 +37,11 @@ function CM:Init()
 	
 end
 
+--- Register a new command.
+-- @param command Table containing aliases for the command.
+-- @param access Number depicting the access level needed to execute command.
+-- @param func Function called to execute command. Called with params args, player and isChat.
+--
 function CM:Register(command, access, func)
 	if type(command) == "string" then
 		command = {command}
@@ -49,6 +54,10 @@ function CM:Register(command, access, func)
 	end
 end
 
+--- Gets the callback for a command by name.
+-- @param command Name of the command to get.
+-- @returns Callback for the command.
+--
 function CM:GetCommand(command)
 	if self.Commands[command] then
 		return self.Commands[command]
@@ -56,6 +65,14 @@ function CM:GetCommand(command)
 	return self.Commands.__DEFAULT__
 end
 
+--- Calls command with supplied args.
+-- @param command Command to call (name)
+-- @param args Table with arguments for the command.
+-- @param isChat Is the command called from chat?
+-- @param player Player object of the calling player (if chat)
+-- @returns If successfull, returns result, otherwise false.
+-- @returns Error message if not successful, otherwise nil.
+--
 function CM:HandleCommand(command, args, isChat, player)
 	local cmd = self:GetCommand(command)
 	if cmd then
@@ -142,7 +159,7 @@ CM:Register({"inviteme", "invme"}, PM.Access.Groups.User.Level, function(args, s
 	if not isChat then
 		return false, "This command can only be used from the chat."
 	end
-	return PM:Invite(sender)
+	return PM:Invite(sender, true)
 end)
 
 CM:Register({"kick"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
@@ -247,6 +264,13 @@ CM:Register({"convert", "conv"}, PM.Access.Groups.Op.Level, function(args, sende
 	end
 end)
 
+CM:Register({"toggle", "t"}, PM.Access.Local, function(args, sender, isChat)
+	if isChat then
+		return false, "This command is not allowed to be used from the chat."
+	end
+	return C:Toggle()
+end)
+
 for i,v in ipairs(CM.Slash) do
 	_G["SLASH_" .. C.Name:upper() .. i] = "/" .. v
 end
@@ -254,7 +278,7 @@ end
 SlashCmdList[C.Name:upper()] = function(msg, editBox)
 	msg = CES:Trim(msg)
 	local args = CES:Split(msg)
-	cmd = args[1]
+	local cmd = args[1]
 	local t = {}
 	if #args > 1 then
 		for i=2,#args do

@@ -25,18 +25,34 @@ Command.Extensions.String = {}
 
 local CES = Command.Extensions.String
 
+--- Check if a string starts with a specific string.
+-- @param s String to be checked.
+-- @param target String to search for at beginning of s.
+--
 function CES:StartsWith(s, target)
 	return s:sub(1, target:len()) == target
 end
 
+--- Check if a string ends with a specific string.
+-- @param s String to be checked.
+-- @param target Stromg to search for at end of s.
+--
 function CES:EndsWith(s, target)
 	return target == '' or s:sub(-target:len()) == target
 end
 
+--- Trim a string, removing whitespace at the beginning of it.
+-- @param s String to be trimmed.
+-- @returns The trimmed string.
+--
 function CES:Trim(s)
 	return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
+--- Split a string with space as delimiter.
+-- @param s String to be split.
+-- @returns Table containing the individual words.
+--
 function CES:Split(s)
 	local t = {}
 	for token in string.gmatch(s, "[^%s]+") do

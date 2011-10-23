@@ -83,12 +83,16 @@ local Player = {
 	}
 }
 
+--- Initialize the player manager.
+--
 function PM:Init()
 	log = C.Logger
 	CM = C.ChatManager
 	self:LoadSavedVars()
 end
 
+--- Load saved variables.
+--
 function PM:LoadSavedVars()
 	if type(C.Global["PLAYER_MANAGER"]) ~= "table" then
 		C.Global["PLAYER_MANAGER"] = {}
@@ -106,6 +110,10 @@ function PM:LoadSavedVars()
 	List = C.Global["PLAYER_MANAGER"]["LIST"]
 end
 
+--- Get or create a player.
+-- @param name Name of player.
+-- @returns Player from list of players if exists, otherwise a new player object.
+--
 function PM:GetOrCreatePlayer(name)
 	name = name:gsub("^%l", string.upper)
 	if CET:HasKey(Players, name) then
@@ -120,6 +128,11 @@ function PM:GetOrCreatePlayer(name)
 	end
 end
 
+--- Completely remove a command from a player's access list.
+-- Removes from both the allow and deny list.
+-- @param player Player object of the player to modify.
+-- @param command Name of command to remove.
+--
 function PM:PlayerAccessRemove(player, command)
 	if not command then return false, "No command specified" end
 	for i,v in pairs(player.Access.Allow) do
@@ -132,6 +145,13 @@ function PM:PlayerAccessRemove(player, command)
 	return ("%q removed from %s"):format(command, player.Info.Name)
 end
 
+--- Modify the access of a command for a specific player.
+-- @param player Player object of the player to modify.
+-- @param command Name of command to allow or deny.
+-- @param allow True to allow command, false to deny.
+-- @returns String stating the result, or false if error.
+-- @returns Error message if unsuccessful, otherwise nil.
+--
 function PM:PlayerAccess(player, command, allow)
 	if not command then return false, "No command specified" end
 	local mode = "allowed"
@@ -162,11 +182,18 @@ function PM:PlayerAccess(player, command, allow)
 	return ("%q is now %s for %q"):format(command, mode, player.Info.Name)
 end
 
+--- Update a player and subsequently save them.
+-- @param player Player object to update.
+--
 function PM:UpdatePlayer(player)
 	Players[player.Info.Name] = player
 	log:Normal(("Updated player %q."):format(player.Info.Name))
 end
 
+--- Check if supplied player is on the player's friends list.
+-- @param player Player object of the player to check.
+-- @return True if friend, false otherwise.
+--
 function PM:IsFriend(player)
 	if GetNumFriends() <= 0 then return false end
 	for i=1,GetNumFriends() do
@@ -176,6 +203,10 @@ function PM:IsFriend(player)
 	return false
 end
 
+--- Check if supplied player is on the player's BN friends list.
+-- @param player Player object of the player to check.
+-- @return True if BN friend, false otherwise.
+--
 function PM:IsBNFriend(player)
 	if BNGetNumFriends() <= 0 then return false end
 	for i=1,BNGetNumFriends() do
@@ -185,6 +216,10 @@ function PM:IsBNFriend(player)
 	return false
 end
 
+--- Check if the supplied player is in the player's guild.
+-- @param player Player object of the player to check.
+-- @returns True if in guild, false otherwise.
+--
 function PM:IsInGuild(player)
 	if not IsInGuild() then return false end
 	if GetNumGuildMembers() <= 1 then return false end
@@ -195,10 +230,19 @@ function PM:IsInGuild(player)
 	return false
 end
 
+--- Get the current access level of supplied player.
+-- @param player Player to check.
+-- @returns Access level of the player.
+--
 function PM:GetAccess(player)
 	return self.Access.Groups[player.Info.Group].Level
 end
 
+--- Check if player has access to command.
+-- @param player Player object of the player to check.
+-- @param command Command object of the command to check.
+-- @returns True if player has access, false otherwise.
+--
 function PM:HasAccess(player, command)
 	if player.Info.Name == UnitName("player") then return true end
 	if (self:IsInGuild(player) or self:IsBNFriend(player) or GT:IsRaidAssistant(player.Info.Name)) and command.Access >= self.Access.Groups.Op.Level then
@@ -219,6 +263,12 @@ function PM:HasAccess(player, command)
 	return hasAccess
 end
 
+--- Set the access group of supplied player.
+-- @param player Player to modify.
+-- @param group Group name to set the player to.
+-- @returns String stating the result of the operation, false if error.
+-- @returns Error message if unsuccessful, nil otherwise.
+--
 function PM:SetAccessGroup(player, group)
 	group = group:gsub("^%l", string.upper)
 	if player.Info.Name == UnitName("player") then
@@ -232,27 +282,56 @@ function PM:SetAccessGroup(player, group)
 	return ("Set the access level of %q to %d (%s)"):format(player.Info.Name, PM:GetAccess(player), player.Info.Group)
 end
 
+--- Give player Owner access.
+-- @param player Player to modify.
+-- @see Command.PlayerManager.SetAccessGroup
+--
 function PM:SetOwner(player)
 	return self:SetAccessGroup(player, self.Access.Groups.Owner.Name)
 end
 
+--- Give player Admin access.
+-- @param player Player to modify.
+-- @see Command.PlayerManager.SetAccessGroup
+--
 function PM:SetAdmin(player)
 	return self:SetAccessGroup(player, self.Access.Groups.Admin.Name)
 end
 
+--- Give player Op access.
+-- @param player Player to modify.
+-- @see Command.PlayerManager.SetAccessGroup
+--
 function PM:SetOp(player)
 	return self:SetAccessGroup(player, self.Access.Groups.Op.Name)
 end
 
+--- Give player User access.
+-- @param player Player to modify.
+-- @see Command.PlayerManager.SetAccessGroup
+--
 function PM:SetUser(player)
 	return self:SetAccessGroup(player, self.Access.Groups.User.Name)
 end
 
+--- Ban player.
+-- What this really does is set the access level to "Banned", effectively blocking the player from using any commands.
+-- Unless there is a command that requires access level "Banned". (Could be used for appeal commands).
+-- @param player Player to modify.
+-- @see Command.PlayerManager.SetAccessGroup
+--
 function PM:BanUser(player)
 	return self:SetAccessGroup(player, self.Access.Groups.Banned.Name)
 end
 
-function PM:Invite(player)
+--- Invite a player to group.
+-- Also sends a message to the invited player about the event.
+-- @param player Player object of player to invite.
+-- @param isSelf True if player is inviting themselves, nil or false otherwise.
+-- @returns String stating the result of the invite, false if error.
+-- @returns Error message if unsuccessful, nil otherwise.
+--
+function PM:Invite(player, isSelf)
 	if player.Info.Name == UnitName("player") then
 		return false, "Cannot invite myself to group."
 	elseif GT:IsInGroup(player.Info.Name) then
@@ -262,12 +341,21 @@ function PM:Invite(player)
 	end
 	if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() or not GT:IsGroup() then
 		InviteUnit(player.Info.Name)
-		CM:SendMessage(("You have been invited to the group, %s."):format(player.Info.Name), "WHISPER", player.Info.Name)
-		return ("Invited %s to group."):format(player.Info.Name)
+		if isSelf then
+			return "Invited you to the group."
+		else
+			CM:SendMessage(("You have been invited to the group, %s."):format(player.Info.Name), "WHISPER", player.Info.Name)
+			return ("Invited %s to group."):format(player.Info.Name)
+		end
 	end
 	return false, ("Unable to invite %s to group. Not group leader or assistant."):format(player.Info.Name)
 end
 
+--- Kick a player from the group.
+-- @param player Player object of the player to kick.
+-- @returns String stating the result of the kick, false if error.
+-- @returns Error message if unsuccessful, nil otherwise.
+--
 function PM:Kick(player)
 	if player.Info.Name == UnitName("player") then
 		return false, "Cannot kick myself."
@@ -283,6 +371,11 @@ function PM:Kick(player)
 	return false, ("Unable to kick %s from group. Not group leader or assistant."):format(player.Info.Name)
 end
 
+--- Promote a player to group leader.
+-- @param player Player object of the player to promote.
+-- @returns String stating the result of the promotion, false if error.
+-- @returns Error message if unsuccessful, nil otherwise.
+--
 function PM:PromoteToLeader(player)
 	if player.Info.Name == UnitName("player") then
 		return false, "Cannot promote myself to leader."
@@ -298,6 +391,11 @@ function PM:PromoteToLeader(player)
 	return false, "Unknown error occurred."
 end
 
+--- Promote player to assistant.
+-- @param player Player object of the player to promote.
+-- @returns String stating the result of the promotion, false if error.
+-- @returns Error message if unsuccessful, nil otherwise.
+--
 function PM:PromoteToAssistant(player)
 	if player.Info.Name == UnitName("player") then
 		return false, "Cannot promote myself to assistant."
@@ -315,14 +413,23 @@ function PM:PromoteToAssistant(player)
 	return false, "Unknown error occurred"
 end
 
+--- Add a command to the blacklist/whitelist.
+-- @param command Name of command to add.
+--
 function PM:ListAdd(command)
 	List[command] = true
 end
 
+--- Remove a command from the blacklist/whitelist.
+-- @param command Name of command to remove.
+--
 function PM:ListRemove(command)
 	List[command] = false
 end
 
+--- Toggle the list between being a blacklist and being a whitelist.
+-- @see Command.PlayerManager.SetListMode
+--
 function PM:ToggleListMode()
 	if self:GetListMode() == MODE_BLACKLIST then
 		return self:SetListMode(MODE_WHITELIST)
@@ -331,6 +438,10 @@ function PM:ToggleListMode()
 	end
 end
 
+--- Set the mode of the list.
+-- @param mode Mode to change to, MODE_WHITELIST for whitelist and MODE_BLACKLIST for blacklist.
+-- @returns String stating what mode the list is in.
+--
 function PM:SetListMode(mode)
 	if mode == MODE_WHITELIST then
 		C.Global["PLAYER_MANAGER"]["LIST_MODE"] = MODE_WHITELIST
@@ -341,6 +452,8 @@ function PM:SetListMode(mode)
 	end
 end
 
+--- Gets the current mode of the list.
+--
 function PM:GetListMode()
 	return C.Global["PLAYER_MANAGER"]["LIST_MODE"]
 end

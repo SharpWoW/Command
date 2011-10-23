@@ -30,9 +30,59 @@ C.QueueManager = {
 local types = {
 	ClassicRandom = {
 		Alias = {
-			
-		}
-	}
+			"classic",
+			"vanilla",
+			"classicrandom",
+			"random"
+		},
+		Id = 258
+	},
+	TBCRandom = {
+		Alias = {
+			"tbc",
+			"burningcrusade",
+			"tbcrandom",
+			"burningcrusaderandom",
+			"theburningcrusade",
+			"randomtbc"
+		},
+		Id = 259
+	},
+	TBCHeroic = {
+		Alias = {
+			"tbchc",
+			"tbcheroic",
+			"tbcrandomhc",
+			"tbcrandomheroic",
+			"randomtbchc",
+			"randomtbcheroic"
+		},
+		Id = 260
+	},
+	LKRandom = {
+		Alias = {
+			"lk",
+			"wotlk",
+			"lkrandom",
+			"wotlkrandom",
+			"lichking",
+			"wrathofthelichking"
+		},
+		Id = 261
+	},
+	LKHeroic = {
+		Alias = {
+			"lkhc",
+			"wotlkhc",
+			"hclk",
+			"hcwotlk",
+			"lkhcrandom",
+			"hclkrandom",
+			"wotlkhcrandom",
+			"hcwotlkrandom"
+		},
+		Id = 262
+	},
 	CataclysmRandom = {
 		Alias = {
 			"cata",
@@ -71,18 +121,35 @@ local types = {
 			"hallowseve",
 			"hallows",
 			"hallow",
-			"halloweve"
+			"halloweve",
+			"halloween"
 		},
 		Id = 285
+	},
+	BestChoice = {
+		Alias = {
+			"best",
+			"bestchoice",
+			"auto",
+			"choice"
+		},
+		Id = function() return GetRandomDungeonBestChoice() end
 	}
 }
 
 local QM = C.QueueManager
 
+--- Gets the numeric index of a dungoen for use with SetLFGDungeon.
+-- @param alias Name/Alias of the dungeon.
+-- @returns Index of the dungeon if dungeon was found, false otherwise.
+--
 function QM:GetIndex(alias)
 	for _,v in pairs(types) do
 		for _,d in pairs(v.Alias) do
 			if alias:lower() == d then
+				if type(v.Id) == "function" then
+					return v.Id()
+				end
 				return v.Id
 			end
 		end
@@ -90,8 +157,12 @@ function QM:GetIndex(alias)
 	return false
 end
 
+--- Queue for the dungeon with supplied index.
+-- @param index Index of dungeon to queue for.
+-- @returns String stating that rolecheck has started.
+--
 function QM:Queue(index)
-	_, t, h, d = GetLFGRoles()
+	local _, t, h, d = GetLFGRoles()
 	if not t and not h and not d then
 		d = true
 	end
@@ -106,18 +177,28 @@ function QM:Queue(index)
 	return ("Starting queue for %s, please select your role(s)... Type !cancel to cancel."):format(tostring(QM.Current))
 end
 
+--- Cancel the queueing/rolechecking.
+-- @returns String stating that queue has been cancelled.
+--
 function QM:Cancel()
 	self.QueuedByCommand = false
 	LeaveLFG()
 	return "Left the LFG queue."
 end
 
+--- Causes player to accept a pending LFG invite.
+-- @returns String stating that the invite was accepted.
+--
 function QM:Accept()
 	self.QueuedByCommand = false
 	AcceptProposal()
 	return "Accepted LFG invite."
 end
 
+--- Announce the current status of LFG to group.
+-- @param _ Not used
+-- @param elapsed Time elapsed since last time OnUpdate fired.
+--
 function QM:Announce(_, elapsed)
 	self.Time = self.Time + elapsed
 	if self.Time >= 0.25 then
@@ -137,6 +218,9 @@ function QM:Announce(_, elapsed)
 	end
 end
 
+--- Trigger method to announce status.
+-- This is because the status of LFG is not available straight after LFG_UPDATE event is fired.
+--
 function QM:AnnounceStatus()
 	if self.Running then return end
 	self.Running = true
