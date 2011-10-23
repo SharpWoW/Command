@@ -107,8 +107,18 @@
 <table class="function_list">
 
 	<tr>
+	<td class="name" nowrap><a href="#PM:AllowInvites">PM:AllowInvites</a>&nbsp;(player)</td>
+	<td class="summary">Allow sending Command invites to player.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#PM:BanUser">PM:BanUser</a>&nbsp;(player)</td>
 	<td class="summary">Ban player.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:DenyInvites">PM:DenyInvites</a>&nbsp;(player)</td>
+	<td class="summary">Stop sending Command invites to player.</td>
 	</tr>
 
 	<tr>
@@ -137,7 +147,7 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#PM:Invite">PM:Invite</a>&nbsp;(player, isSelf)</td>
+	<td class="name" nowrap><a href="#PM:Invite">PM:Invite</a>&nbsp;(player, sender)</td>
 	<td class="summary">Invite a player to group.</td>
 	</tr>
 
@@ -264,6 +274,41 @@
 
 
 
+<dt><a name="PM:AllowInvites"></a><strong>PM:AllowInvites</strong>&nbsp;(player)</dt>
+<dd>
+Allow sending Command invites to player.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player object of the player.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating the result of the operation, false if error.</li>
+	
+	<li>Error message if unsuccessful, nil otherwise. </li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
 <dt><a name="PM:BanUser"></a><strong>PM:BanUser</strong>&nbsp;(player)</dt>
 <dd>
 Ban player. What this really does is set the access level to "Banned", effectively blocking the player from using any commands. Unless there is a command that requires access level "Banned". (Could be used for appeal commands).
@@ -274,6 +319,41 @@ Ban player. What this really does is set the access level to "Banned", effective
 	
 	<li>
 	  <code><em>player</em></code>: Player to modify.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating the result of the operation, false if error.</li>
+	
+	<li>Error message if unsuccessful, nil otherwise. </li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:DenyInvites"></a><strong>PM:DenyInvites</strong>&nbsp;(player)</dt>
+<dd>
+Stop sending Command invites to player.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Player object of the player.
 	</li>
 	
 </ul>
@@ -424,7 +504,7 @@ Initialize the player manager.
 
 
 
-<dt><a name="PM:Invite"></a><strong>PM:Invite</strong>&nbsp;(player, isSelf)</dt>
+<dt><a name="PM:Invite"></a><strong>PM:Invite</strong>&nbsp;(player, sender)</dt>
 <dd>
 Invite a player to group. Also sends a message to the invited player about the event.
 
@@ -437,7 +517,7 @@ Invite a player to group. Also sends a message to the invited player about the e
 	</li>
 	
 	<li>
-	  <code><em>isSelf</em></code>: True if player is inviting themselves, nil or false otherwise.
+	  <code><em>sender</em></code>: Player object of the inviting player.
 	</li>
 	
 </ul>
