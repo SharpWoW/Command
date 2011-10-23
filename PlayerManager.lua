@@ -503,6 +503,7 @@ function PM:SetListMode(mode)
 end
 
 --- Gets the current mode of the list.
+-- @return List mode, possible values: 0/1, as set by MODE_BLACKLIST and MODE_WHITELIST.
 --
 function PM:GetListMode()
 	return C.Global["PLAYER_MANAGER"]["LIST_MODE"]
