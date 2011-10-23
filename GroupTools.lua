@@ -20,11 +20,16 @@
 local C = Command
 
 --- Table containing all GroupTools methods.
--- This is referenced as "GT" in GroupTools.lua.
+-- This is referenced "GT" in GroupTools.lua.
 -- @name Command.GroupTools
 -- @class table
+-- @field PartyMax Defined max value for party members.
+-- @field RaidMax Defined max value for raid members.
 --
-C.GroupTools = {}
+C.GroupTools = {
+	PartyMax = 5,
+	RaidMax = 40
+}
 
 local GT = C.GroupTools
 
@@ -65,12 +70,12 @@ end
 --
 function GT:IsGroupFull()
 	local num = 0
-	local max = 40
+	local max = self.RaidMax
 	if self:IsRaid() then
 		num = GetNumRaidMembers()
 	elseif self:IsGroup() then
 		num = GetNumPartyMembers()
-		max = 5
+		max = self.PartyMax
 	end
 	if num >= max then return true end
 	return false
