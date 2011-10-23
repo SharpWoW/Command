@@ -87,6 +87,9 @@ local Player = {
 	Access = {
 		Allow = {},
 		Deny = {}
+	},
+	Settings = {
+		Invite = true
 	}
 }
 
@@ -253,7 +256,10 @@ end
 function PM:HasAccess(player, command)
 	if player.Info.Name == UnitName("player") then return true end
 	if (self:IsInGuild(player) or self:IsBNFriend(player) or GT:IsRaidAssistant(player.Info.Name)) and command.Access >= self.Access.Groups.Op.Level then
-		return true
+		if self:GetAccess(player) > self.Access.Groups.Banned.Level then
+			return true
+		end
+		return false
 	end
 	local hasAccess = self:GetAccess(player) <= command.Access
 	local group = self.Access.Groups[player.Info.Group]
@@ -339,11 +345,11 @@ end
 --- Invite a player to group.
 -- Also sends a message to the invited player about the event.
 -- @param player Player object of player to invite.
--- @param isSelf True if player is inviting themselves, nil or false otherwise.
+-- @param sender Player object of the inviting player.
 -- @return String stating the result of the invite, false if error.
 -- @return Error message if unsuccessful, nil otherwise.
 --
-function PM:Invite(player, isSelf)
+function PM:Invite(player, sender)
 	if player.Info.Name == UnitName("player") then
 		return false, "Cannot invite myself to group."
 	elseif GT:IsInGroup(player.Info.Name) then
@@ -353,14 +359,46 @@ function PM:Invite(player, isSelf)
 	end
 	if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() or not GT:IsGroup() then
 		InviteUnit(player.Info.Name)
-		if isSelf then
+		if player.Info.Name == sender.Info.Name then
 			return "Invited you to the group."
-		else
-			CM:SendMessage(("You have been invited to the group, %s."):format(player.Info.Name), "WHISPER", player.Info.Name)
+		elseif player.Settings.Invite then
+			CM:SendMessage(("%s invited you to the group, %s. Whisper !denyinvite to block these invites."):format(sender.Info.Name, player.Info.Name), "WHISPER", player.Info.Name)
 			return ("Invited %s to group."):format(player.Info.Name)
+		else
+			return false, ("%s does not wish to be invited."):format(player.Info.Name)
 		end
 	end
 	return false, ("Unable to invite %s to group. Not group leader or assistant."):format(player.Info.Name)
+end
+
+--- Stop sending Command invites to player.
+-- @param player Player object of the player.
+-- @return String stating the result of the operation, false if error.
+-- @return Error message if unsuccessful, nil otherwise.
+--
+function PM:DenyInvites(player)
+	if player.Settings.Invite then
+		player.Settings.Invite = false
+		self:UpdatePlayer(player)
+		CM:SendMessage("You are now blocking invites, whisper !allowinvite to receive them.", "WHISPER", player.Info.Name)
+		return ("%s is no longer receiving invites."):format(player.Info.Name)
+	end
+	return false, "You are already blocking invites."
+end
+
+--- Allow sending Command invites to player.
+-- @param player Player object of the player.
+-- @return String stating the result of the operation, false if error.
+-- @return Error message if unsuccessful, nil otherwise.
+--
+function PM:AllowInvites(player)
+	if player.Settings.Invite then
+		return false, "You are already allowing invites."
+	end
+	player.Settings.Invite = true
+	self:UpdatePlayer(player)
+	CM:SendMessage("You are now allowing invites, whisper !blockinvite to block them.", "WHISPER", player.Info.Name)
+	return ("%s is now receiving invites."):format(player.Info.Name)
 end
 
 --- Kick a player from the group.

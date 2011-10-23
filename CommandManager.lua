@@ -163,14 +163,28 @@ CM:Register({"invite", "inv"}, PM.Access.Groups.User.Level, function(args, sende
 		return false, "Missing argument: name"
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
-	return PM:Invite(player)
+	return PM:Invite(player, sender)
 end)
 
 CM:Register({"inviteme", "invme"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if not isChat then
 		return false, "This command can only be used from the chat."
 	end
-	return PM:Invite(sender, true)
+	return PM:Invite(sender, sender)
+end)
+
+CM:Register({"denyinvite", "blockinvite", "denyinvites", "blockinvites"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not isChat then
+		return false, "This command can only be used from the chat."
+	end
+	return PM:DenyInvites(sender)
+end)
+
+CM:Register({"allowinvite", "allowinvites"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not isChat then
+		return false, "This command can only be used from the chat."
+	end
+	return PM:AllowInvites(sender)
 end)
 
 CM:Register({"kick"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
