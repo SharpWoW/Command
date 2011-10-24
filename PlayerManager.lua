@@ -93,6 +93,35 @@ local Player = {
 	}
 }
 
+local KickName
+local KickSender
+local KickReason
+
+local function Kick(name, sender, reason)
+	UninviteUnit(name, reason)
+	if GT:IsGroup() then
+		CM:SendMessage(("%s has been kicked on %s's request."):format(name, sender), CM.LastChannel, CM.LastTarget)
+	else
+		CM:SendMessage(("%s was kicked on your request."):format(name), "WHISPER", sender)
+	end
+	CM:SendMessage(("You have been kicked out of the group by %s."):format(sender), "WHISPER", name)
+end
+
+local function KickCancelled(name, sender)
+	CM:SendMessage(("%s's request to kick %s has been denied."):format(sender, name), CM.LastChannel, CM.LastTarget)
+end
+
+StaticPopupDialogs["COMMAND_CONFIRMKICK"] = {
+	text = "%s wants to kick %s. Confirm?",
+	button1 = "Yes",
+	button2 = "No",
+	OnAccept = function() Kick(KickName, KickSender, KickReason) end,
+	OnCancel = function() KickCancelled(KickName, KickSender) end,
+	timeout = 10,
+	whileDead = true,
+	hideOnEscape = false
+}
+
 --- Initialize the player manager.
 --
 function PM:Init()
@@ -214,6 +243,8 @@ function PM:IsFriend(player)
 end
 
 --- Check if supplied player is on the player's BN friends list.
+-- Note: If the BN friend is currently offline, this will return false regardless.
+-- Which means, disconnected BN friends can be kicked.
 -- @param player Player object of the player to check.
 -- @return True if BN friend, false otherwise.
 --
@@ -256,10 +287,10 @@ end
 function PM:HasAccess(player, command)
 	if player.Info.Name == UnitName("player") then return true end
 	if (self:IsInGuild(player) or self:IsBNFriend(player) or GT:IsRaidAssistant(player.Info.Name)) and command.Access >= self.Access.Groups.Op.Level then
-		if self:GetAccess(player) > self.Access.Groups.Banned.Level then
-			return true
+		if self:GetAccess(player) >= self.Access.Groups.Banned.Level then
+			return false
 		end
-		return false
+		return true
 	end
 	local hasAccess = self:GetAccess(player) <= command.Access
 	local group = self.Access.Groups[player.Info.Group]
@@ -406,7 +437,7 @@ end
 -- @return String stating the result of the kick, false if error.
 -- @return Error message if unsuccessful, nil otherwise.
 --
-function PM:Kick(player)
+function PM:Kick(player, sender)
 	if player.Info.Name == UnitName("player") then
 		return false, "Cannot kick myself."
 	elseif self:IsFriend(player) or self:IsBNFriend(player) then
@@ -415,8 +446,11 @@ function PM:Kick(player)
 		return false, ("%s is not in the group."):format(player.Info.Name)
 	end
 	if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() then
-		UninviteUnit(player.Info.Name, "Command AddOn kick command.")
-		return ("Kicked %s from group."):format(player.Info.Name)
+		KickName = player.Info.Name
+		KickSender = sender.Info.Name
+		KickReason = ("%s used !kick command."):format(KickSender)
+		StaticPopup_Show("COMMAND_CONFIRMKICK", KickSender, KickName)
+		return ("Awaiting confirmation to kick %s..."):format(KickName)
 	end
 	return false, ("Unable to kick %s from group. Not group leader or assistant."):format(player.Info.Name)
 end

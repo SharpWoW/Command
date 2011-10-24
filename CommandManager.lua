@@ -192,7 +192,7 @@ CM:Register({"kick"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 		return false, "Missing argument: name"
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
-	return PM:Kick(player)
+	return PM:Kick(player, sender)
 end)
 
 CM:Register({"kingme", "givelead"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)

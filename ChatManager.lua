@@ -25,13 +25,17 @@ local C = Command
 -- @class table
 -- @field Settings Table holding all settings specific to ChatManager.
 -- @field Default Table containing default settings (used at initial setup)
+-- @field LastChannel Last channel argument passed to HandleMessage.
+-- @field LastTarget Last target argument passed to HandleMessage.
 --
 C.ChatManager = {
 	Settings = {},
 	Default = {
 		CmdChar = "!",
 		LocalOnly = false
-	}
+	},
+	LastChannel = nil,
+	LastTarget = nil
 }
 
 local CM = C.ChatManager
@@ -156,6 +160,8 @@ function CM:HandleMessage(msg, sender, channel, target, isBN)
 	msg = CES:Trim(msg)
 	local args = self:ParseMessage(msg)
 	if not self:IsCommand(args[1]) then return end
+	self.LastChannel = channel
+	self.LastTarget = target
 	local cmd = self:ParseCommand(args[1])
 	local t = {}
 	if #args > 1 then

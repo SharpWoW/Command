@@ -69,12 +69,13 @@ end
 -- @return True if the group is full, false otherwise.
 --
 function GT:IsGroupFull()
+	-- We need to add 1 to the number because it doesn't count the player.
 	local num = 0
 	local max = self.RaidMax
 	if self:IsRaid() then
-		num = GetNumRaidMembers()
+		num = GetNumRaidMembers() + 1
 	elseif self:IsGroup() then
-		num = GetNumPartyMembers()
+		num = GetNumPartyMembers() + 1
 		max = self.PartyMax
 	end
 	if num >= max then return true end
