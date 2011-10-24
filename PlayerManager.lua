@@ -434,6 +434,7 @@ end
 
 --- Kick a player from the group.
 -- @param player Player object of the player to kick.
+-- @param sender Player object of the player who requested the kick.
 -- @return String stating the result of the kick, false if error.
 -- @return Error message if unsuccessful, nil otherwise.
 --

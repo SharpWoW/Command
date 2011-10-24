@@ -167,7 +167,7 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#PM:Kick">PM:Kick</a>&nbsp;(player)</td>
+	<td class="name" nowrap><a href="#PM:Kick">PM:Kick</a>&nbsp;(player, sender)</td>
 	<td class="summary">Kick a player from the group.</td>
 	</tr>
 
@@ -548,7 +548,7 @@ Invite a player to group. Also sends a message to the invited player about the e
 
 <dt><a name="PM:IsBNFriend"></a><strong>PM:IsBNFriend</strong>&nbsp;(player)</dt>
 <dd>
-Check if supplied player is on the player's BN friends list.
+Check if supplied player is on the player's BN friends list. Note: If the BN friend is currently offline, this will return false regardless. Which means, disconnected BN friends can be kicked.
 
 
 <h3>Parameters:</h3>
@@ -633,7 +633,7 @@ Check if the supplied player is in the player's guild.
 
 
 
-<dt><a name="PM:Kick"></a><strong>PM:Kick</strong>&nbsp;(player)</dt>
+<dt><a name="PM:Kick"></a><strong>PM:Kick</strong>&nbsp;(player, sender)</dt>
 <dd>
 Kick a player from the group.
 
@@ -643,6 +643,10 @@ Kick a player from the group.
 	
 	<li>
 	  <code><em>player</em></code>: Player object of the player to kick.
+	</li>
+	
+	<li>
+	  <code><em>sender</em></code>: Player object of the player who requested the kick.
 	</li>
 	
 </ul>
