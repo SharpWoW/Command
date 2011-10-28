@@ -164,6 +164,7 @@ function CM:HandleMessage(msg, sender, channel, target, isBN)
 	self.LastChannel = channel
 	self.LastTarget = target
 	local cmd = self:ParseCommand(args[1])
+	if not CCM:HasCommand(cmd) then return end
 	local t = {}
 	if #args > 1 then
 		for i=2,#args do

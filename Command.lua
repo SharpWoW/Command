@@ -53,7 +53,6 @@ function C:Init()
 	PM = self.PlayerManager
 	log = self.Logger
 	self:LoadSavedVars()
-	log.Settings.Debug = self.Settings.DEBUG
 end
 
 --- Load the saved variables.
@@ -83,6 +82,7 @@ function C:LoadSavedVars()
 	CM:Init()
 	PM:Init()
 	Cmd:Init()
+	log:SetDebug(self.Settings.DEBUG)
 	self.Global.VERSION = self.VarVersion
 	self.Loaded = true
 end
@@ -113,7 +113,7 @@ end
 --- Toggle AddOn on and off.
 --
 function C:Toggle()
-	return self:SetEnabled(not self.Enabled)
+	return self:SetEnabled(not self.Settings.ENABLED)
 end
 
 --- Control debugging state.

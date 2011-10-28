@@ -65,6 +65,15 @@ function CM:Register(command, access, func)
 	end
 end
 
+--- Check whether or not a command is registered.
+-- This does NOT take aliases into account.
+-- @param command Command name to check.
+--
+function CM:HasCommand(command)
+	if self.Commands[command] then return true end
+	return false
+end
+
 --- Gets the callback for a command by name.
 -- @param command Name of the command to get.
 -- @return Callback for the command.
