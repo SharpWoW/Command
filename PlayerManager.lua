@@ -579,11 +579,22 @@ function PM:IsListed(command)
 	return List[command]
 end
 
+--- Set the state of an item on the list.
+-- @param command Command name to modify.
+-- @param list True to list it, false to not list it.
+--
+function PM:List(command, list)
+	if list then
+		return self:ListAdd(command)
+	end
+	return self:ListRemove(command)
+end
+
 --- Dynamically add or remove an item from the list.
 -- @param command Name of command to list.
 --
-function PM:List(command)
-	List[command] = not self:IsListed(command)
+function PM:ListToggle(command)
+	return self:List(command, not self:IsListed(command))
 end
 
 --- Add a command to the blacklist/whitelist.

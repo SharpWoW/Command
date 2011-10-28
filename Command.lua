@@ -32,6 +32,7 @@
 Command = {
 	Name = "Command",
 	Version = GetAddOnMetadata("Command", "Version"),
+	Loaded = false,
 	VarVersion = 2,
 	Global = {},
 	Settings = {},
@@ -83,6 +84,7 @@ function C:LoadSavedVars()
 	PM:Init()
 	Cmd:Init()
 	self.Global.VERSION = self.VarVersion
+	self.Loaded = true
 end
 
 --- Control AddOn state.
@@ -90,24 +92,28 @@ end
 --
 function C:SetEnabled(enabled)
 	self.Settings.ENABLED = enabled
+	if self.Settings.ENABLED then
+		return "AddOn \124cff00FF00enabled\124r."
+	end
+	return "AddOn \124cffFF0000disabled\124r."
 end
 
 --- Enable AddOn.
 --
 function C:Enable()
-	self:SetEnabled(true)
+	return self:SetEnabled(true)
 end
 
 --- Disable AddOn.
 --
 function C:Disable()
-	self:SetEnabled(false)
+	return self:SetEnabled(false)
 end
 
 --- Toggle AddOn on and off.
 --
 function C:Toggle()
-	self:SetEnabled(not self.Enabled)
+	return self:SetEnabled(not self.Enabled)
 end
 
 --- Control debugging state.
@@ -116,22 +122,26 @@ end
 function C:SetDebug(enabled)
 	self.Settings.DEBUG = enabled
 	log:SetDebug(enabled)
+	if self.Settings.DEBUG then
+		return "Debugging \124cff00FF00enabled\124r."
+	end
+	return "Debugging \124cffFF0000disabled\124r."
 end
 
 --- Enable debugging.
 --
 function C:EnableDebug()
-	self:SetDebug(true)
+	return self:SetDebug(true)
 end
 
 --- Disable debugging.
 --
 function C:DisableDebug()
-	self:SetDebug(false)
+	return self:SetDebug(false)
 end
 
 --- Toggle debugging.
 --
 function C:ToggleDebug()
-	self:SetDebug(not self.Settings.DEBUG)
+	return self:SetDebug(not self.Settings.DEBUG)
 end

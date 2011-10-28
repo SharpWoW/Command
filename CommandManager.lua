@@ -292,14 +292,18 @@ CM:Register({"convert", "conv"}, PM.Access.Groups.Op.Level, function(args, sende
 	end
 end)
 
-CM:Register({"list"}, PM.Access.Admin, function(args, sender, isChat)
+CM:Register({"list"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if not args[1] then
 		return false, "Missing argument: command name"
 	end
-	return PM:List(args[1]:lower())
+	return PM:ListToggle(args[1]:lower())
 end)
 
-CM:Register({"groupallow", "gallow"}, PM.Access.Admin, function(args, sender, isChat)
+CM:Register({"listmode", "lm", "lmode"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+	return PM:ToggleListMode()
+end)
+
+CM:Register({"groupallow", "gallow"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if #args <= 1 then
 		return false, "Usage: groupallow <groupname> <commandname>"
 	end
@@ -308,7 +312,7 @@ CM:Register({"groupallow", "gallow"}, PM.Access.Admin, function(args, sender, is
 	return PM:GroupAccess(group, cmd, true)
 end)
 
-CM:Register({"groupdeny", "deny"}, PM.Access.Admin, function(args, sender, isChat)
+CM:Register({"groupdeny", "deny"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if #args <= 1 then
 		return false, "Usage: groupdeny <groupname> <commandname>"
 	end
@@ -317,7 +321,7 @@ CM:Register({"groupdeny", "deny"}, PM.Access.Admin, function(args, sender, isCha
 	return PM:GroupAccess(group, cmd, false)
 end)
 
-CM:Register({"resetgroupaccess", "groupaccessreset", "removegroupaccess", "groupaccessremove", "rga", "gar"}, PM.Access.Admin, function(args, sender, isChat)
+CM:Register({"resetgroupaccess", "groupaccessreset", "removegroupaccess", "groupaccessremove", "rga", "gar"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if #args <= 1 then
 		return false, "Usage: resetgroupaccess <groupname> <commandname>"
 	end
@@ -326,7 +330,7 @@ CM:Register({"resetgroupaccess", "groupaccessreset", "removegroupaccess", "group
 	return PM:GroupAccessRemove(group, cmd)
 end)
 
-CM:Register({"userallow", "uallow"}, PM.Access.Admin, function(args, sender, isChat)
+CM:Register({"userallow", "uallow"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if #args <= 1 then
 		return false, "Usage: userallow <playername> <commandname>"
 	end
@@ -335,7 +339,7 @@ CM:Register({"userallow", "uallow"}, PM.Access.Admin, function(args, sender, isC
 	return PM:PlayerAccess(player, cmd, true)
 end)
 
-CM:Register({"userdeny", "udeny"}, PM.Access.Admin, function(args, sender, isChat)
+CM:Register({"userdeny", "udeny"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if #args <= 1 then
 		return false, "Usage: userdeny <playername> <commandname>"
 	end
