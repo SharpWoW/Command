@@ -137,6 +137,16 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#PM:GroupAccess">PM:GroupAccess</a>&nbsp;(group, command, allow)</td>
+	<td class="summary">Modify the access of a command for a specific group.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:GroupAccessRemove">PM:GroupAccessRemove</a>&nbsp;(group, command)</td>
+	<td class="summary">Completely remove a command from a group's access list.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#PM:HasAccess">PM:HasAccess</a>&nbsp;(player, command)</td>
 	<td class="summary">Check if player has access to command.</td>
 	</tr>
@@ -167,8 +177,18 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#PM:IsListed">PM:IsListed</a>&nbsp;(command)</td>
+	<td class="summary">Check if a certain command is on the blacklist/whitelist.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#PM:Kick">PM:Kick</a>&nbsp;(player, sender)</td>
 	<td class="summary">Kick a player from the group.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:List">PM:List</a>&nbsp;(command)</td>
+	<td class="summary">Dynamically add or remove an item from the list.</td>
 	</tr>
 
 	<tr>
@@ -457,6 +477,88 @@ Get or create a player.
 
 
 
+<dt><a name="PM:GroupAccess"></a><strong>PM:GroupAccess</strong>&nbsp;(group, command, allow)</dt>
+<dd>
+Modify the access of a command for a specific group.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>group</em></code>: Name of group to modify.
+	</li>
+	
+	<li>
+	  <code><em>command</em></code>: Name of command to allow or deny.
+	</li>
+	
+	<li>
+	  <code><em>allow</em></code>: True to allow command, false to deny.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating the result, or false if error.</li>
+	
+	<li>Error message if unsuccessful, otherwise nil. </li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:GroupAccessRemove"></a><strong>PM:GroupAccessRemove</strong>&nbsp;(group, command)</dt>
+<dd>
+Completely remove a command from a group's access list. Removed from both the allow and deny list.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>group</em></code>: Name of group to modify.
+	</li>
+	
+	<li>
+	  <code><em>command</em></code>: Name of command to remove.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating that the command has been removed or false if error.</li>
+	
+	<li>Error message is unsuccessful, otherwise nil. </li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
 <dt><a name="PM:HasAccess"></a><strong>PM:HasAccess</strong>&nbsp;(player, command)</dt>
 <dd>
 Check if player has access to command.
@@ -548,7 +650,7 @@ Invite a player to group. Also sends a message to the invited player about the e
 
 <dt><a name="PM:IsBNFriend"></a><strong>PM:IsBNFriend</strong>&nbsp;(player)</dt>
 <dd>
-Check if supplied player is on the player's BN friends list. Note: If the BN friend is currently offline, this will return false regardless. Which means, disconnected BN friends can be kicked.
+Check if supplied player is on the player's BN friends list. Note: If the BN friend is currently offline while his character is online, this will return false regardless. Which means, BN friends that are disconnected from Battle.Net but still in the group are treated as normal users.
 
 
 <h3>Parameters:</h3>
@@ -633,6 +735,32 @@ Check if the supplied player is in the player's guild.
 
 
 
+<dt><a name="PM:IsListed"></a><strong>PM:IsListed</strong>&nbsp;(command)</dt>
+<dd>
+Check if a certain command is on the blacklist/whitelist.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>command</em></code>: Name of command to check. 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="PM:Kick"></a><strong>PM:Kick</strong>&nbsp;(player, sender)</dt>
 <dd>
 Kick a player from the group.
@@ -672,6 +800,32 @@ Kick a player from the group.
 
 
 
+<dt><a name="PM:List"></a><strong>PM:List</strong>&nbsp;(command)</dt>
+<dd>
+Dynamically add or remove an item from the list.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>command</em></code>: Name of command to list. 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="PM:ListAdd"></a><strong>PM:ListAdd</strong>&nbsp;(command)</dt>
 <dd>
 Add a command to the blacklist/whitelist.
@@ -681,7 +835,7 @@ Add a command to the blacklist/whitelist.
 <ul>
 	
 	<li>
-	  <code><em>command</em></code>: Name of command to add. 
+	  <code><em>command</em></code>: Name of command to add.
 	</li>
 	
 </ul>
@@ -690,6 +844,9 @@ Add a command to the blacklist/whitelist.
 
 
 
+
+<h3>Return value:</h3>
+<ul>String stating that the command was added. </ul>
 
 
 
@@ -707,7 +864,7 @@ Remove a command from the blacklist/whitelist.
 <ul>
 	
 	<li>
-	  <code><em>command</em></code>: Name of command to remove. 
+	  <code><em>command</em></code>: Name of command to remove.
 	</li>
 	
 </ul>
@@ -716,6 +873,9 @@ Remove a command from the blacklist/whitelist.
 
 
 
+
+<h3>Return value:</h3>
+<ul>String stating that the command was removed. </ul>
 
 
 
@@ -797,7 +957,7 @@ Completely remove a command from a player's access list. Removes from both the a
 	</li>
 	
 	<li>
-	  <code><em>command</em></code>: Name of command to remove. 
+	  <code><em>command</em></code>: Name of command to remove.
 	</li>
 	
 </ul>
@@ -806,6 +966,15 @@ Completely remove a command from a player's access list. Removes from both the a
 
 
 
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>String stating that the command has been removed or false if error.</li>
+	
+	<li>Error message is unsuccessful, otherwise nil. </li>
+	
+</ol>
 
 
 

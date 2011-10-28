@@ -21,7 +21,7 @@ local C = Command
 local CES = C.Extensions.String
 
 --- Handles events.
--- @name Command:OnEvent
+-- @name Command.OnEvent
 -- @param frame The frame on which the event was registered.
 -- @param event Full name of the event.
 -- @param ... Event arguments.
