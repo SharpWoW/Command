@@ -187,8 +187,8 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#PM:List">PM:List</a>&nbsp;(command)</td>
-	<td class="summary">Dynamically add or remove an item from the list.</td>
+	<td class="name" nowrap><a href="#PM:List">PM:List</a>&nbsp;(command, list)</td>
+	<td class="summary">Set the state of an item on the list.</td>
 	</tr>
 
 	<tr>
@@ -199,6 +199,11 @@
 	<tr>
 	<td class="name" nowrap><a href="#PM:ListRemove">PM:ListRemove</a>&nbsp;(command)</td>
 	<td class="summary">Remove a command from the blacklist/whitelist.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#PM:ListToggle">PM:ListToggle</a>&nbsp;(command)</td>
+	<td class="summary">Dynamically add or remove an item from the list.</td>
 	</tr>
 
 	<tr>
@@ -800,16 +805,20 @@ Kick a player from the group.
 
 
 
-<dt><a name="PM:List"></a><strong>PM:List</strong>&nbsp;(command)</dt>
+<dt><a name="PM:List"></a><strong>PM:List</strong>&nbsp;(command, list)</dt>
 <dd>
-Dynamically add or remove an item from the list.
+Set the state of an item on the list.
 
 
 <h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  <code><em>command</em></code>: Name of command to list. 
+	  <code><em>command</em></code>: Command name to modify.
+	</li>
+	
+	<li>
+	  <code><em>list</em></code>: True to list it, false to not list it. 
 	</li>
 	
 </ul>
@@ -876,6 +885,32 @@ Remove a command from the blacklist/whitelist.
 
 <h3>Return value:</h3>
 <ul>String stating that the command was removed. </ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="PM:ListToggle"></a><strong>PM:ListToggle</strong>&nbsp;(command)</dt>
+<dd>
+Dynamically add or remove an item from the list.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>command</em></code>: Name of command to list. 
+	</li>
+	
+</ul>
+
+
+
+
+
 
 
 
