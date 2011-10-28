@@ -40,6 +40,7 @@ C.ChatManager = {
 
 local CM = C.ChatManager
 local PM = C.PlayerManager
+local GT = C.GroupTools
 local CCM = C.CommandManager
 local CES = C.Extensions.String
 
