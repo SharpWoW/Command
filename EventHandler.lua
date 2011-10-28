@@ -27,6 +27,7 @@ local CES = C.Extensions.String
 -- @param ... Event arguments.
 --
 function C:OnEvent(frame, event, ...)
+	if not self.Settings.ENABLED then return end
 	if not self.Events[event] then return end
 	if CES:StartsWith(event, "CHAT_MSG_") then
 		self.Events[event](self, event, ...)

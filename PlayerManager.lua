@@ -42,7 +42,7 @@ C.PlayerManager = {
 			Owner = {
 				Level = 0,
 				Name = "Owner",
-				Allow = {"*"},
+				Allow = {},
 				Deny = {}
 			},
 			Admin = {
@@ -67,7 +67,7 @@ C.PlayerManager = {
 				Level = 4,
 				Name = "Banned",
 				Allow = {},
-				Deny = {"*"}
+				Deny = {}
 			}
 		}
 	},
@@ -145,6 +145,25 @@ function PM:LoadSavedVars()
 	if type(C.Global["PLAYER_MANAGER"]["LIST"]) ~= "table" then
 		C.Global["PLAYER_MANAGER"]["LIST"] = {}
 	end
+	if type(C.Global["PLAYER_MANAGER"]["GROUP_PERMS"]) ~= "table" then
+		C.Global["PLAYER_MANAGER"]["GROUP_PERMS"] = {}
+		for k,v in pairs(self.Access.Groups) do
+			C.Global["PLAYER_MANAGER"]["GROUP_PERMS"][k] = {
+				Allow = {},
+				Deny = {}
+			}
+			for _,v in pairs(self.Access.Groups[k].Allow) do
+				table.insert(C.Global["PLAYER_MANAGER"]["GROUP_PERMS"][k].Allow, v)
+			end
+			for _,v in pairs(self.Access.Groups[k].Deny) do
+				table.insert(C.Global["PLAYER_MANAGER"]["GROUP_PERMS"][k].Deny, v)
+			end
+		end
+	end
+	for k,v in pairs(C.Global["PLAYER_MANAGER"]["GROUP_PERMS"]) do
+		self.Access.Groups[k].Allow = v.Allow
+		self.Access.Groups[k].Deny = v.Deny
+	end
 	Players = C.Global["PLAYER_MANAGER"]["PLAYERS"]
 	List = C.Global["PLAYER_MANAGER"]["LIST"]
 end
@@ -167,10 +186,67 @@ function PM:GetOrCreatePlayer(name)
 	end
 end
 
+--- Completely remove a command from a group's access list.
+-- Removed from both the allow and deny list.
+-- @param group Name of group to modify.
+-- @param command Name of command to remove.
+-- @return String stating that the command has been removed or false if error.
+-- @return Error message is unsuccessful, otherwise nil.
+--
+function PM:GroupAccessRemove(group, command)
+	group = group:gsub("^%l", string.upper)
+	if not command then return false, "No Command specified" end
+	for i,v in pairs(self.Access.Groups[k].Allow) do
+		if v == command then table.remove(self.Access.Groups[k].Allow, i) end
+	end
+	for i,v in pairs(self.Access.Groups[k].Deny) do
+		if v == command then table.remove(self.Access.Groups[k].Deny, i) end
+	end
+	return ("%q removed from group %s."):format(command, group)
+end
+
+--- Modify the access of a command for a specific group.
+-- @param group Name of group to modify.
+-- @param command Name of command to allow or deny.
+-- @param allow True to allow command, false to deny.
+-- @return String stating the result, or false if error.
+-- @return Error message if unsuccessful, otherwise nil.
+--
+function PM:GroupAccess(group, command, allow)
+	if not command then return false, "No command specified" end
+	local mode = "allowed"
+	if allow then
+		if CET:HasValue(self.Access.Groups[group].Deny, command) then
+			for i,v in ipairs(player.Access.Deny) do
+				if v == command then table.remove(player.Access.Deny, i) end
+			end
+		end
+		if CET:HasValue(self.Access.Groups[group].Allow, command) then
+			return false, ("%q already has that command on the allow list."):format(group)
+		end
+		table.insert(self.Access.Groups[group].Allow, command)
+		mode = "allowed"
+	else
+		if CET:HasValue(self.Access.Groups[group].Allow, command) then
+			for i,v in pairs(self.Access.Groups[group].Allow) do
+				if v == command then table.remove(self.Access.Groups[group].Allow, i) end
+			end
+		end
+		if CET:HasValue(self.Access.Groups[group].Deny, command) then
+			return false, ("%q already has that command on the deny list."):format(group)
+		end
+		table.insert(self.Access.Groups[group].Deny, command)
+		mode = "denied"
+	end
+	return ("%q is now %s for %s"):format(command, mode, group)
+end
+
 --- Completely remove a command from a player's access list.
 -- Removes from both the allow and deny list.
 -- @param player Player object of the player to modify.
 -- @param command Name of command to remove.
+-- @return String stating that the command has been removed or false if error.
+-- @return Error message is unsuccessful, otherwise nil.
 --
 function PM:PlayerAccessRemove(player, command)
 	if not command then return false, "No command specified" end
@@ -218,7 +294,7 @@ function PM:PlayerAccess(player, command, allow)
 		mode = "denied"
 	end
 	self:UpdatePlayer(player)
-	return ("%q is now %s for %q"):format(command, mode, player.Info.Name)
+	return ("%q is now %s for %s"):format(command, mode, player.Info.Name)
 end
 
 --- Update a player and subsequently save them.
@@ -243,8 +319,8 @@ function PM:IsFriend(player)
 end
 
 --- Check if supplied player is on the player's BN friends list.
--- Note: If the BN friend is currently offline, this will return false regardless.
--- Which means, disconnected BN friends can be kicked.
+-- Note: If the BN friend is currently offline while his character is online, this will return false regardless.
+-- Which means, BN friends that are disconnected from Battle.Net but still in the group are treated as normal users.
 -- @param player Player object of the player to check.
 -- @return True if BN friend, false otherwise.
 --
@@ -294,14 +370,12 @@ function PM:HasAccess(player, command)
 	end
 	local hasAccess = self:GetAccess(player) <= command.Access
 	local group = self.Access.Groups[player.Info.Group]
-	if CET:HasValue(group.Allow, command.Name) or CET:HasValue(player.Access.Allow, command.Name) then hasAccess = true end
-	if CET:HasValue(group.Deny, command.Name) or CET:HasValue(player.Access.Deny, command.Name) then hasAccess = false end
-	if CET:HasKey(List, command.Name) then
-		if (List[command.Name] and self:GetListMode() == MODE_BLACKLIST) or (not List[command.Name] and self:GetListMode() == MODE_WHITELIST) then
-			hasAccess = false
-		else
-			hasAccess = true
-		end
+	if CET:HasValue(group.Allow, command.Name) then hasAccess = true end
+	if CET:HasValue(group.Deny, command.Name) then hasAccess = false end
+	if CET:HasValue(player.Access.Allow, command.Name) then hasAccess = true end
+	if CET:HasValue(player.Access.Deny, command.Name) then hasAccess = false end
+	if (List[command.Name] and self:GetListMode() == MODE_BLACKLIST) or (not List[command.Name] and self:GetListMode() == MODE_WHITELIST) then
+		hasAccess = false
 	end
 	if player.Info.Name == UnitName("player") then hasAccess = true end
 	return hasAccess
@@ -498,18 +572,44 @@ function PM:PromoteToAssistant(player)
 	return false, "Unknown error occurred"
 end
 
+--- Check if a certain command is on the blacklist/whitelist.
+-- @param command Name of command to check.
+--
+function PM:IsListed(command)
+	return List[command]
+end
+
+--- Dynamically add or remove an item from the list.
+-- @param command Name of command to list.
+--
+function PM:List(command)
+	List[command] = not self:IsListed(command)
+end
+
 --- Add a command to the blacklist/whitelist.
 -- @param command Name of command to add.
+-- @return String stating that the command was added.
 --
 function PM:ListAdd(command)
 	List[command] = true
+	local mode = "blacklist"
+	if self:GetListMode() == MODE_WHITELIST then
+		mode = "whitelist"
+	end
+	return ("Added %s to %s."):format(command, mode)
 end
 
 --- Remove a command from the blacklist/whitelist.
 -- @param command Name of command to remove.
+-- @return String stating that the command was removed.
 --
 function PM:ListRemove(command)
 	List[command] = false
+	local mode = "blacklist"
+	if self:GetListMode() == MODE_WHITELIST then
+		mode = "whitelist"
+	end
+	return ("Removed %s from %s."):format(command, mode)
 end
 
 --- Toggle the list between being a blacklist and being a whitelist.

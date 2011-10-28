@@ -265,6 +265,9 @@ CM:Register({"convert", "conv"}, PM.Access.Groups.Op.Level, function(args, sende
 	if not GT:IsGroup() then
 		return false, "Cannot convert if not in a group."
 	end
+	if not GT:IsGroupLeader() then
+		return false, "Cannot convert group, not leader."
+	end
 	if #args <= 0 then
 		return false, "Usage: convert party||raid."
 	end
@@ -289,11 +292,79 @@ CM:Register({"convert", "conv"}, PM.Access.Groups.Op.Level, function(args, sende
 	end
 end)
 
+CM:Register({"list"}, PM.Access.Admin, function(args, sender, isChat)
+	if not args[1] then
+		return false, "Missing argument: command name"
+	end
+	return PM:List(args[1]:lower())
+end)
+
+CM:Register({"groupallow", "gallow"}, PM.Access.Admin, function(args, sender, isChat)
+	if #args <= 1 then
+		return false, "Usage: groupallow <groupname> <commandname>"
+	end
+	local group = args[1]:gsub("^%l", string.upper)
+	local cmd = args[2]:lower()
+	return PM:GroupAccess(group, cmd, true)
+end)
+
+CM:Register({"groupdeny", "deny"}, PM.Access.Admin, function(args, sender, isChat)
+	if #args <= 1 then
+		return false, "Usage: groupdeny <groupname> <commandname>"
+	end
+	local group = args[1]:gsub("^%1", string.upper)
+	local cmd = args[2]:lower()
+	return PM:GroupAccess(group, cmd, false)
+end)
+
+CM:Register({"resetgroupaccess", "groupaccessreset", "removegroupaccess", "groupaccessremove", "rga", "gar"}, PM.Access.Admin, function(args, sender, isChat)
+	if #args <= 1 then
+		return false, "Usage: resetgroupaccess <groupname> <commandname>"
+	end
+	local group = args[1]:gsub("^%1", string.upper)
+	local cmd = args[2]:lower()
+	return PM:GroupAccessRemove(group, cmd)
+end)
+
+CM:Register({"userallow", "uallow"}, PM.Access.Admin, function(args, sender, isChat)
+	if #args <= 1 then
+		return false, "Usage: userallow <playername> <commandname>"
+	end
+	local player = PM:GetOrCreatePlayer(args[1])
+	local cmd = args[2]:lower()
+	return PM:PlayerAccess(player, cmd, true)
+end)
+
+CM:Register({"userdeny", "udeny"}, PM.Access.Admin, function(args, sender, isChat)
+	if #args <= 1 then
+		return false, "Usage: userdeny <playername> <commandname>"
+	end
+	local player = PM:GetOrCreatePlayer(args[1])
+	local cmd = args[2]:lower()
+	return PM:PlayerAccess(player, cmd, false)
+end)
+
+CM:Register({"resetuseraccess", "useraccessreset", "removeuseraccess", "useraccessremvoe", "rua", "uar"}, PM.Access.Admin, function(args, sender, isChat)
+	if #args <= 1 then
+		return false, "Usage: resetuseraccess <playername> <commandname>."
+	end
+	local player = PM:GetOrCreatePlayer(args[1])
+	local cmd = args[2]:lower()
+	return PM:PlayerAccessRemove(player, cmd)
+end)
+
 CM:Register({"toggle", "t"}, PM.Access.Local, function(args, sender, isChat)
 	if isChat then
 		return false, "This command is not allowed to be used from the chat."
 	end
 	return C:Toggle()
+end)
+
+CM:Register({"toggledebug", "td", "debug", "d"}, PM.Access.Local, function(args, sender, isChat)
+	if isChat then
+		return false, "This command is not allowed to be used from the chat."
+	end
+	return C:ToggleDebug()
 end)
 
 for i,v in ipairs(CM.Slash) do

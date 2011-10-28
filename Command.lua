@@ -32,8 +32,7 @@
 Command = {
 	Name = "Command",
 	Version = GetAddOnMetadata("Command", "Version"),
-	VarVersion = 1,
-	Enabled = true,
+	VarVersion = 2,
 	Global = {},
 	Settings = {},
 	Events = {},
@@ -64,6 +63,7 @@ function C:LoadSavedVars()
 		_G["COMMAND"] = {}
 	elseif type(_G["COMMAND"]["VERSION"]) == "number" then
 		if _G["COMMAND"]["VERSION"] < self.VarVersion then
+			log:Normal("Saved Variables out of date, resetting...")
 			wipe(_G["COMMAND"])
 			_G["COMMAND"] = {}
 		end
@@ -76,6 +76,9 @@ function C:LoadSavedVars()
 	if type(self.Settings.DEBUG) ~= "boolean" then
 		self.Settings.DEBUG = false
 	end
+	if type(self.Settings.ENABLED) ~= "bolean" then
+		self.Settings.ENABLED = true
+	end
 	CM:Init()
 	PM:Init()
 	Cmd:Init()
@@ -86,7 +89,7 @@ end
 -- @param enabled Boolean indicating enabled or disabled state.
 --
 function C:SetEnabled(enabled)
-	self.Enabled = enabled
+	self.Settings.ENABLED = enabled
 end
 
 --- Enable AddOn.
