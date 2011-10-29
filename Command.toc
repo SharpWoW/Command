@@ -1,5 +1,5 @@
 ## Interface: 40200
-## Version: Dev
+## Version: v0.0.0-alpha
 ## Title: Command
 ## Notes: Provides various !<command> style commands that can be sent in most chat channels.
 ## Author: F16Gaming
