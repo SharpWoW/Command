@@ -117,6 +117,11 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#CM:HasCommand">CM:HasCommand</a>&nbsp;(command)</td>
+	<td class="summary">Check whether or not a command is registered.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#CM:Init">CM:Init</a>&nbsp;()</td>
 	<td class="summary">Initialize CommandManager.</td>
 	</tr>
@@ -222,6 +227,32 @@ Calls command with supplied args.
 	<li>Error message if not successful, otherwise nil. </li>
 	
 </ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="CM:HasCommand"></a><strong>CM:HasCommand</strong>&nbsp;(command)</dt>
+<dd>
+Check whether or not a command is registered. This does NOT take aliases into account.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>command</em></code>: Command name to check. 
+	</li>
+	
+</ul>
+
+
+
+
+
 
 
 
