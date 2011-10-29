@@ -53,6 +53,8 @@ function C:Init()
 	PM = self.PlayerManager
 	log = self.Logger
 	self:LoadSavedVars()
+	log:Normal("AddOn loaded! Use /cmd help or !help for help. !!NYI!!")
+	self.Loaded = true
 end
 
 --- Load the saved variables.
@@ -84,7 +86,6 @@ function C:LoadSavedVars()
 	Cmd:Init()
 	log:SetDebug(self.Settings.DEBUG)
 	self.Global.VERSION = self.VarVersion
-	self.Loaded = true
 end
 
 --- Control AddOn state.
