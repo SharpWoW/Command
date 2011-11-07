@@ -1,0 +1,6 @@
+package-as: Chocobo
+
+ignore:
+  - COPYING
+
+license-output: COPYING
