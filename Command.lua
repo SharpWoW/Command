@@ -48,6 +48,9 @@ local log
 --- Initialize Command.
 --
 function C:Init()
+	if self.Version == "@project-version@" then
+		self.Version = "Dev"
+	end
 	Cmd = self.CommandManager
 	CM = self.ChatManager
 	PM = self.PlayerManager
