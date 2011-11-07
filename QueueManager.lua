@@ -34,7 +34,8 @@ C.QueueManager = {
 	Current = nil,
 	Running = false,
 	Time = 0,
-	LastMode = nil
+	LastMode = nil,
+	Announced = false
 }
 
 local QM = C.QueueManager
@@ -201,6 +202,7 @@ function QM:Queue(index)
 	HideUIPanel(LFDParentFrame)
 	SetCVar("Sound_EnableSFX", 1)
 	self.Current = name
+	self.Announced = false
 	return ("Starting queue for %s, please select your role(s)... Type !cancel to cancel."):format(tostring(QM.Current))
 end
 
@@ -209,6 +211,7 @@ end
 --
 function QM:Cancel()
 	self.QueuedByCommand = false
+	self.Announced = false
 	LeaveLFG()
 	return "Left the LFG queue."
 end
@@ -218,6 +221,7 @@ end
 --
 function QM:Accept()
 	self.QueuedByCommand = false
+	self.Announced = false
 	AcceptProposal()
 	return "Accepted LFG invite."
 end
@@ -231,13 +235,15 @@ function QM:Announce(_, elapsed)
 	if self.Time >= 0.25 then
 		local mode = (select(1, GetLFGMode()))
 		if mode ~= nil then self.LastMode = mode end
-		if mode == "queued" then
+		if mode == "queued" and not self.Announced then
 			Command.ChatManager:SendMessage(("Now queueing for %s, type !cancel to cancel."):format(QM.Current), "PARTY")
+			self.Announced = true
 		elseif not mode then
 			local current = "Role check"
 			if self.LastMode ~= "rolecheck" then current = "LFG" end
 			Command.ChatManager:SendMessage(current .. " cancelled.", "PARTY")
 			self.QueuedByCommand = false
+			self.Announced = false
 		end
 		self.Time = 0
 		self.Frame:SetScript("OnUpdate", nil)
