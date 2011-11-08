@@ -455,6 +455,7 @@ end
 -- @return Error message if unsuccessful, nil otherwise.
 --
 function PM:Invite(player, sender)
+	if not sender then sender = self:GetOrCreatePlayer(UnitName("player")) end
 	if player.Info.Name == UnitName("player") then
 		return false, "Cannot invite myself to group."
 	elseif GT:IsInGroup(player.Info.Name) then
@@ -463,10 +464,11 @@ function PM:Invite(player, sender)
 		return false, "The group is already full."
 	end
 	if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() or not GT:IsGroup() then
-		InviteUnit(player.Info.Name)
 		if player.Info.Name == sender.Info.Name then
+			InviteUnit(player.Info.Name)
 			return "Invited you to the group."
 		elseif player.Settings.Invite then
+			InviteUnit(player.Info.Name)
 			CM:SendMessage(("%s invited you to the group, %s. Whisper !denyinvite to block these invites."):format(sender.Info.Name, player.Info.Name), "WHISPER", player.Info.Name)
 			return ("Invited %s to group."):format(player.Info.Name)
 		else
