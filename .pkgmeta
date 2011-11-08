@@ -1,4 +1,4 @@
-package-as: Chocobo
+package-as: Command
 
 ignore:
   - COPYING
