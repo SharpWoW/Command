@@ -40,6 +40,7 @@ local PM = C.PlayerManager
 local QM = C.QueueManager
 local GT = C.GroupTools
 local CES = C.Extensions.String
+local CET = C.Extensions.Table
 
 --- Initialize CommandManager.
 -- NOTE: Unused.
@@ -52,15 +53,20 @@ end
 -- @param command Table containing aliases for the command.
 -- @param access Number depicting the access level needed to execute command.
 -- @param func Function called to execute command. Called with params args, player and isChat.
+-- @param help Message describing how the command should be used.
 --
-function CM:Register(command, access, func)
-	if type(command) == "string" then
-		command = {command}
+function CM:Register(names, access, func, help)
+	help = help or "No help available."
+	if type(names) == "string" then
+		names = {names}
 	end
-	for _,v in pairs(command) do
-		if not self:GetCommand(v) then
-			if v ~= "__DEFAULT__" then v = v:lower() end
-			self.Commands[v] = {Name=v, Access=access, Call=func}
+	if names[1] ~= "__DEFAULT__" then
+		names[1] = names[1]:lower()
+	end
+	local entry = {Name=names[1], Access=access, Call=func, Help=help, Alias={}}
+	if #names > 1 then
+		for i=2 #names do
+			table.insert(entry.Alias, names[i]:lower())
 		end
 	end
 end
@@ -71,18 +77,32 @@ end
 --
 function CM:HasCommand(command)
 	if self.Commands[command] then return true end
+	for _,v in pairs(self.Commands) do
+		if CET:HasValue(v.Alias, command) then return true end
+	end
 	return false
 end
 
 --- Gets the callback for a command by name.
 -- @param command Name of the command to get.
--- @return Callback for the command.
+-- @return Callback for the command, nil if no command was found.
 --
 function CM:GetCommand(command)
 	if self.Commands[command] then
 		return self.Commands[command]
 	end
-	return self.Commands.__DEFAULT__
+	for _,v in pairs(self.Commands) do
+		if CET:HasValue(v.Alias, command) then return v end
+	end
+	return self.Commands.__DEFAULT__ or nil -- We don't really need "or nil" here.
+end
+
+function CM:GetRealName(name)
+	if self.Commands[name] then return name end
+	for k,v in pairs(self.Commands) do
+		if CET:HasValue(v.Alias, name) then return k end
+	end
+	return nil
 end
 
 --- Calls command with supplied args.
@@ -107,6 +127,14 @@ function CM:HandleCommand(command, args, isChat, player)
 	end
 end
 
+--- Prints all command names together with their help messages.
+function CM:AutoHelp()
+	for k,v in pairs(self.Commands) do
+		C.Logger:Normal(("/%s %s"):format(self.Slash[1], k))
+		C.Logger:Normal(("\t- %s"):format(v.Help))
+	end
+end
+
 CM:Register({"version", "ver", "v"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if args then
 		if #args > 0 then
@@ -114,7 +142,7 @@ CM:Register({"version", "ver", "v"}, PM.Access.Groups.User.Level, function(args,
 		end
 	end
 	return C.Version, nil
-end)
+end, "Print the version of Command")
 
 CM:Register({"setaccess"}, PM.Access.Local, function(args, sender, isChat)
 	if #args <= 1 then
@@ -122,7 +150,7 @@ CM:Register({"setaccess"}, PM.Access.Local, function(args, sender, isChat)
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
 	return PM:SetAccessGroup(player, args[2])
-end)
+end, "Set the access level of a user.")
 
 CM:Register({"owner"}, PM.Access.Local, function(args, sender, isChat)
 	if isChat then
@@ -130,7 +158,7 @@ CM:Register({"owner"}, PM.Access.Local, function(args, sender, isChat)
 	end
 	local player = PM:GetOrCreatePlayer(UnitName("player"))
 	return PM:SetOwner(player)
-end)
+end, "Promote a player to owner rank.")
 
 CM:Register({"admin"}, PM.Access.Groups.Owner.Level, function(args, sender, isChat)
 	if #args <= 0 then
@@ -141,7 +169,7 @@ CM:Register({"admin"}, PM.Access.Groups.Owner.Level, function(args, sender, isCh
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
 	return PM:SetAdmin(player)
-end)
+end, "Promote a player to admin rank.")
 
 CM:Register({"op"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if #args <= 0 then
@@ -149,7 +177,7 @@ CM:Register({"op"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
 	return PM:SetOp(player)
-end)
+end, "Promote a player to op rank.")
 
 CM:Register({"user"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	if #args <= 0 then
@@ -157,7 +185,7 @@ CM:Register({"user"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
 	return PM:SetUser(player)
-end)
+end, "Promote a player to user rank.")
 
 CM:Register({"ban"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if #args <= 0 then
@@ -165,7 +193,7 @@ CM:Register({"ban"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
 	return PM:BanUser(player)
-end)
+end, "Ban a player.")
 
 CM:Register({"invite", "inv"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if #args <= 0 then
@@ -173,28 +201,28 @@ CM:Register({"invite", "inv"}, PM.Access.Groups.User.Level, function(args, sende
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
 	return PM:Invite(player, sender)
-end)
+end, "Invite a player to group.")
 
 CM:Register({"inviteme", "invme"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if not isChat then
 		return false, "This command can only be used from the chat."
 	end
 	return PM:Invite(sender, sender)
-end)
+end, "Player who issued the command will be invited to group.")
 
 CM:Register({"denyinvite", "blockinvite", "denyinvites", "blockinvites"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if not isChat then
 		return false, "This command can only be used from the chat."
 	end
 	return PM:DenyInvites(sender)
-end)
+end, "Player issuing this command will no longer be sent invites from this AddOn.")
 
 CM:Register({"allowinvite", "allowinvites"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if not isChat then
 		return false, "This command can only be used from the chat."
 	end
 	return PM:AllowInvites(sender)
-end)
+end, "Player issuing this command will receive invites sent from this AddOn.")
 
 CM:Register({"kick"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	if #args <= 0 then
@@ -202,21 +230,21 @@ CM:Register({"kick"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
 	return PM:Kick(player, sender)
-end)
+end, "Kick a player from group (Requires confirmation).")
 
 CM:Register({"kingme", "givelead"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	if not isChat then
 		return false, "This command can only be used from the chat."
 	end
 	return PM:PromoteToLeader(sender)
-end)
+end, "Player issuing this command will be promoted to group leader.")
 
 CM:Register({"opme", "assistant", "assist"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	if not isChat then
 		return false, "This command can only be used from the chat."
 	end
 	return PM:PromoteToAssistant(sender)
-end)
+end, "Player issuing this command will be promoted to raid assistant.")
 
 CM:Register({"leader", "lead"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	if #args <= 0 then
@@ -224,7 +252,7 @@ CM:Register({"leader", "lead"}, PM.Access.Groups.Op.Level, function(args, sender
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
 	return PM:PromoteToLeader(player)
-end)
+end, "Promote a player to group leader.")
 
 CM:Register({"promote"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	if #args <= 0 then
@@ -232,7 +260,7 @@ CM:Register({"promote"}, PM.Access.Groups.Op.Level, function(args, sender, isCha
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
 	return PM:PromoteToAssistant(player)
-end)
+end, "Promote a player to raid assistant.")
 
 CM:Register({"queue", "q"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if #args <= 0 then
@@ -251,21 +279,21 @@ CM:Register({"queue", "q"}, PM.Access.Groups.User.Level, function(args, sender, 
 		return false, ("No such dungeon type: %q"):format(args[1])
 	end
 	return QM:Queue(index)
-end)
+end, "Enter the LFG queue for the specified category.")
 
 CM:Register({"leavelfg", "cancellfg", "cancel"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if not QM.QueuedByCommand then
 		return false, "Not queued by command, unable to cancel."
 	end
 	return QM:Cancel()
-end)
+end, "Leave the LFG queue.")
 
 CM:Register({"acceptlfg", "accept", "join"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if not QM.QueuedByCommand then
 		return false, "Not currently queued by command."
 	end
 	return QM:Accept()
-end)
+end, "Causes you to accept the LFG invite.")
 
 CM:Register({"convert", "conv"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	if GT:IsLFGGroup() then
@@ -299,18 +327,18 @@ CM:Register({"convert", "conv"}, PM.Access.Groups.Op.Level, function(args, sende
 			return "Converted party to raid."
 		end
 	end
-end)
+end, "Convert group to party or raid.")
 
 CM:Register({"list"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if not args[1] then
 		return false, "Missing argument: command name"
 	end
 	return PM:ListToggle(args[1]:lower())
-end)
+end, "Toggle status of a command on the blacklist/whitelist.")
 
 CM:Register({"listmode", "lm", "lmode"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	return PM:ToggleListMode()
-end)
+end, "Toggle list between being a blacklist and being a whitelist.")
 
 CM:Register({"groupallow", "gallow"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if #args <= 1 then
@@ -319,7 +347,7 @@ CM:Register({"groupallow", "gallow"}, PM.Access.Groups.Admin.Level, function(arg
 	local group = args[1]:gsub("^%l", string.upper)
 	local cmd = args[2]:lower()
 	return PM:GroupAccess(group, cmd, true)
-end)
+end, "Allow a group to use a specific command.")
 
 CM:Register({"groupdeny", "deny"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if #args <= 1 then
@@ -328,7 +356,7 @@ CM:Register({"groupdeny", "deny"}, PM.Access.Groups.Admin.Level, function(args, 
 	local group = args[1]:gsub("^%1", string.upper)
 	local cmd = args[2]:lower()
 	return PM:GroupAccess(group, cmd, false)
-end)
+end, "Deny a group to use a specific command.")
 
 CM:Register({"resetgroupaccess", "groupaccessreset", "removegroupaccess", "groupaccessremove", "rga", "gar"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if #args <= 1 then
@@ -337,7 +365,7 @@ CM:Register({"resetgroupaccess", "groupaccessreset", "removegroupaccess", "group
 	local group = args[1]:gsub("^%1", string.upper)
 	local cmd = args[2]:lower()
 	return PM:GroupAccessRemove(group, cmd)
-end)
+end, "Reset the group's access to a specific command.")
 
 CM:Register({"userallow", "uallow"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if #args <= 1 then
@@ -346,7 +374,7 @@ CM:Register({"userallow", "uallow"}, PM.Access.Groups.Admin.Level, function(args
 	local player = PM:GetOrCreatePlayer(args[1])
 	local cmd = args[2]:lower()
 	return PM:PlayerAccess(player, cmd, true)
-end)
+end, "Allow a user to use a specific command.")
 
 CM:Register({"userdeny", "udeny"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if #args <= 1 then
@@ -355,7 +383,7 @@ CM:Register({"userdeny", "udeny"}, PM.Access.Groups.Admin.Level, function(args, 
 	local player = PM:GetOrCreatePlayer(args[1])
 	local cmd = args[2]:lower()
 	return PM:PlayerAccess(player, cmd, false)
-end)
+end, "Deny a user to use a specific command.")
 
 CM:Register({"resetuseraccess", "useraccessreset", "removeuseraccess", "useraccessremvoe", "rua", "uar"}, PM.Access.Admin, function(args, sender, isChat)
 	if #args <= 1 then
@@ -364,21 +392,21 @@ CM:Register({"resetuseraccess", "useraccessreset", "removeuseraccess", "useracce
 	local player = PM:GetOrCreatePlayer(args[1])
 	local cmd = args[2]:lower()
 	return PM:PlayerAccessRemove(player, cmd)
-end)
+end, "Reset the user's access to a specific command.")
 
 CM:Register({"toggle", "t"}, PM.Access.Local, function(args, sender, isChat)
 	if isChat then
 		return false, "This command is not allowed to be used from the chat."
 	end
 	return C:Toggle()
-end)
+end, "Toggle AddOn on and off.")
 
 CM:Register({"toggledebug", "td", "debug", "d"}, PM.Access.Local, function(args, sender, isChat)
 	if isChat then
 		return false, "This command is not allowed to be used from the chat."
 	end
 	return C:ToggleDebug()
-end)
+end, "Toggle debugging mode on and off.")
 
 for i,v in ipairs(CM.Slash) do
 	_G["SLASH_" .. C.Name:upper() .. i] = "/" .. v

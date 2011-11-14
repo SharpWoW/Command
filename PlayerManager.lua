@@ -23,6 +23,7 @@ local MODE_WHITELIST = 1
 local C = Command
 local CM
 local GT = C.GroupTools
+local CCM
 local CET = C.Extensions.Table
 local log
 
@@ -93,9 +94,7 @@ local Player = {
 	}
 }
 
-local KickName
-local KickSender
-local KickReason
+local KickName, KickSender, KickReason
 
 local function Kick(name, sender, reason)
 	UninviteUnit(name, reason)
@@ -127,6 +126,7 @@ StaticPopupDialogs["COMMAND_CONFIRMKICK"] = {
 function PM:Init()
 	log = C.Logger
 	CM = C.ChatManager
+	CCM = C.CommandManager
 	self:LoadSavedVars()
 end
 
@@ -584,16 +584,34 @@ end
 --- Set the state of an item on the list.
 -- @param command Command name to modify.
 -- @param list True to list it, false to not list it.
+-- @return String stating that the command was added or removed, false if error.
+-- @return Error message if unsuccessful, nil otherwise.
 --
 function PM:List(command, list)
-	if list then
-		return self:ListAdd(command)
+	if not CCM:HasCommand(command) then
+		return false, ("%q is not a registered command."):format(command)
 	end
-	return self:ListRemove(command)
+	command = CCM:GetRealName(command)
+	if list then
+		List[command] = true
+		local mode = "blacklist"
+		if self:GetListMode() == MODE_WHITELIST then
+			mode = "whitelist"
+		end
+		return ("Added %s to %s."):format(command, mode)
+	end
+	List[command] = false
+	local mode = "blacklist"
+	if self:GetListMode() == MODE_WHITELIST then
+		mode = "whitelist"
+	end
+	return ("Removed %s from %s."):format(command, mode)
 end
 
 --- Dynamically add or remove an item from the list.
 -- @param command Name of command to list.
+-- @return String stating that the command was added or removed, false if error.
+-- @return Error message if unsuccessful, nil otherwise.
 --
 function PM:ListToggle(command)
 	return self:List(command, not self:IsListed(command))
@@ -601,28 +619,20 @@ end
 
 --- Add a command to the blacklist/whitelist.
 -- @param command Name of command to add.
--- @return String stating that the command was added.
+-- @return String stating that the command was added, false if error.
+-- @return Error message if unsuccessful, nil otherwise.
 --
 function PM:ListAdd(command)
-	List[command] = true
-	local mode = "blacklist"
-	if self:GetListMode() == MODE_WHITELIST then
-		mode = "whitelist"
-	end
-	return ("Added %s to %s."):format(command, mode)
+	return self:List(command, true)
 end
 
 --- Remove a command from the blacklist/whitelist.
 -- @param command Name of command to remove.
--- @return String stating that the command was removed.
+-- @return String stating that the command was removed, false if error.
+-- @return Error message if unsuccessful, nil otherwise.
 --
 function PM:ListRemove(command)
-	List[command] = false
-	local mode = "blacklist"
-	if self:GetListMode() == MODE_WHITELIST then
-		mode = "whitelist"
-	end
-	return ("Removed %s from %s."):format(command, mode)
+	return self:List(command, false)
 end
 
 --- Toggle the list between being a blacklist and being a whitelist.
