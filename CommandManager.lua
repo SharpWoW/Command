@@ -65,10 +65,11 @@ function CM:Register(names, access, func, help)
 	end
 	local entry = {Name=names[1], Access=access, Call=func, Help=help, Alias={}}
 	if #names > 1 then
-		for i=2 #names do
+		for i=2,#names do
 			table.insert(entry.Alias, names[i]:lower())
 		end
 	end
+	self.Commands[names[1]] = entry
 end
 
 --- Check whether or not a command is registered.
@@ -131,9 +132,14 @@ end
 function CM:AutoHelp()
 	for k,v in pairs(self.Commands) do
 		C.Logger:Normal(("/%s %s"):format(self.Slash[1], k))
-		C.Logger:Normal(("\t- %s"):format(v.Help))
+		C.Logger:Normal(("      - %s"):format(v.Help))
 	end
 end
+
+CM:Register({"__DEFAULT__", "help", "h"}, PM.Access.Local, function(args, sender, isChat)
+	CM:AutoHelp()
+	return "End of help message."
+end, "Prints this help message.")
 
 CM:Register({"version", "ver", "v"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if args then
