@@ -287,14 +287,14 @@ CM:Register({"queue", "q"}, PM.Access.Groups.User.Level, function(args, sender, 
 	return QM:Queue(index)
 end, "Enter the LFG queue for the specified category.")
 
-CM:Register({"leavelfg", "cancellfg", "cancel"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"leavelfg", "cancellfg", "cancel", "leavelfd", "cancellfd"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if not QM.QueuedByCommand then
 		return false, "Not queued by command, unable to cancel."
 	end
 	return QM:Cancel()
 end, "Leave the LFG queue.")
 
-CM:Register({"acceptlfg", "accept", "join"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"acceptlfg", "accept", "join", "acceptlfd"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if not QM.QueuedByCommand then
 		return false, "Not currently queued by command."
 	end
@@ -355,7 +355,7 @@ CM:Register({"groupallow", "gallow"}, PM.Access.Groups.Admin.Level, function(arg
 	return PM:GroupAccess(group, cmd, true)
 end, "Allow a group to use a specific command.")
 
-CM:Register({"groupdeny", "deny"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+CM:Register({"groupdeny", "gdeny", "deny"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if #args <= 1 then
 		return false, "Usage: groupdeny <groupname> <commandname>"
 	end
@@ -391,7 +391,7 @@ CM:Register({"userdeny", "udeny"}, PM.Access.Groups.Admin.Level, function(args, 
 	return PM:PlayerAccess(player, cmd, false)
 end, "Deny a user to use a specific command.")
 
-CM:Register({"resetuseraccess", "useraccessreset", "removeuseraccess", "useraccessremvoe", "rua", "uar"}, PM.Access.Admin, function(args, sender, isChat)
+CM:Register({"resetuseraccess", "useraccessreset", "removeuseraccess", "useraccessremove", "rua", "uar"}, PM.Access.Admin, function(args, sender, isChat)
 	if #args <= 1 then
 		return false, "Usage: resetuseraccess <playername> <commandname>."
 	end
