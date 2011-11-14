@@ -107,6 +107,11 @@
 <table class="function_list">
 
 	<tr>
+	<td class="name" nowrap><a href="#CM:AutoHelp">CM:AutoHelp</a>&nbsp;()</td>
+	<td class="summary">Prints all command names together with their help messages.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#CM:GetCommand">CM:GetCommand</a>&nbsp;(command)</td>
 	<td class="summary">Gets the callback for a command by name.</td>
 	</tr>
@@ -127,7 +132,7 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#CM:Register">CM:Register</a>&nbsp;(command, access, func)</td>
+	<td class="name" nowrap><a href="#CM:Register">CM:Register</a>&nbsp;(names, access, func, help, command)</td>
 	<td class="summary">Register a new command.</td>
 	</tr>
 
@@ -159,6 +164,23 @@
 
 
 
+<dt><a name="CM:AutoHelp"></a><strong>CM:AutoHelp</strong>&nbsp;()</dt>
+<dd>
+Prints all command names together with their help messages.
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="CM:GetCommand"></a><strong>CM:GetCommand</strong>&nbsp;(command)</dt>
 <dd>
 Gets the callback for a command by name.
@@ -179,7 +201,7 @@ Gets the callback for a command by name.
 
 
 <h3>Return value:</h3>
-<ul>Callback for the command. </ul>
+<ul>Callback for the command, nil if no command was found. </ul>
 
 
 
@@ -278,7 +300,7 @@ Initialize CommandManager. NOTE: Unused.
 
 
 
-<dt><a name="CM:Register"></a><strong>CM:Register</strong>&nbsp;(command, access, func)</dt>
+<dt><a name="CM:Register"></a><strong>CM:Register</strong>&nbsp;(names, access, func, help, command)</dt>
 <dd>
 Register a new command.
 
@@ -287,7 +309,7 @@ Register a new command.
 <ul>
 	
 	<li>
-	  <code><em>command</em></code>: Table containing aliases for the command.
+	  <code><em>names</em></code>: 
 	</li>
 	
 	<li>
@@ -295,7 +317,15 @@ Register a new command.
 	</li>
 	
 	<li>
-	  <code><em>func</em></code>: Function called to execute command. Called with params args, player and isChat. 
+	  <code><em>func</em></code>: Function called to execute command. Called with params args, player and isChat.
+	</li>
+	
+	<li>
+	  <code><em>help</em></code>: Message describing how the command should be used. 
+	</li>
+	
+	<li>
+	  <code><em>command</em></code>: Table containing aliases for the command.
 	</li>
 	
 </ul>
