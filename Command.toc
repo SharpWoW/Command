@@ -1,4 +1,4 @@
-## Interface: 40200
+## Interface: 40300
 ## Version: @project-version@
 ## Title: Command
 ## Notes: Provides various !<command> style commands that can be sent in most chat channels.
