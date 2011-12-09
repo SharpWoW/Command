@@ -134,14 +134,20 @@ QM.Types = {
 		},
 		Id = 301
 	},
-	Zandalari = {
+	HourOfTwilight = {
 		Alias = {
-			"zanda",
-			"zandalari",
-			"troll",
-			"zan"
+			"twilight",
+			"hour",
+			"houroftwilight",
+			"hourtwilight",
+			"twilighthour",
+			"twilite",
+			"twi",
+			"th",
+			"hot",
+			"ht"
 		},
-		Id = 341
+		Id = 434
 	},
 	Horseman = {
 		Alias = {
