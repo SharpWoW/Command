@@ -114,6 +114,15 @@ end
 function CM:SendMessage(msg, channel, target)
 	if not self.Settings.LOCAL_ONLY then
 		msg = ("[%s] %s"):format(C.Name, msg)
+		if channel == "SMART" then
+			if GT:IsRaid() then
+				channel = "RAID"
+			elseif GT:IsGroup() then
+				channel = "PARTY"
+			else
+				C.Logger:Normal(msg)
+			end
+		end
 		SendChatMessage(msg, channel, nil, target)
 	else
 		C.Logger:Normal(msg)
@@ -174,7 +183,13 @@ function CM:HandleMessage(msg, sender, channel, target, isBN)
 	local player = PM:GetOrCreatePlayer(sender)
 	local result, err = CCM:HandleCommand(cmd, t, true, player)
 	if result then
-		self:SendMessage(tostring(result), channel, target)
+		if type(result) == "table" then
+			for _,v in pairs(result) do
+				self:SendMessage(tostring(v), channel, target)
+			end
+		else
+			self:SendMessage(tostring(result), channel, target)
+		end
 	else
 		self:SendMessage(tostring(err), "WHISPER", sender)
 	end

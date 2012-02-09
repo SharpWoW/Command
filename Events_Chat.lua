@@ -20,6 +20,12 @@
 local C = Command
 local CM = C.ChatManager
 
+function C.Events.CHAT_MSG_SYSTEM(self, event, ...)
+	if C.RollManager.Running then
+		C.RollManager:ParseMessage((select(1, ...)))
+	end
+end
+
 --[[
 function C.Events.CHAT_MSG_BATTLEGROUND(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)

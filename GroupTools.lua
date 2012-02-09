@@ -63,6 +63,15 @@ function GT:IsGroupLeader(name)
 	return UnitIsPartyLeader(name) -- or (name == "player" and not self:IsGroup())
 end
 
+function GT:GetNumGroupMembers()
+	if not self:IsGroup() then return 0 end
+	if UnitInRaid("player") then
+		return GetNumRaidMembers()
+	else
+		return GetNumPartyMembers() + 1 -- We need to add one because it won't count the player
+	end
+end
+
 --- Check if the group is full.
 -- NOTE: Only checks for 5 players in a party and 40 players in a raid.
 -- DOES NOT respect 10 and 25 man raids.

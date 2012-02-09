@@ -69,3 +69,14 @@ function C.Events.LFG_PROPOSAL_FAILED(self, ...)
 	QM.QueuedByCommand = false
 	CM:SendMessage("LFG failed, use !queue <type> to requeue.", "PARTY")
 end
+
+function C.Events.READY_CHECK(self, ...)
+	if C.Data.ReadyCheckRunning then return end
+	C.Data.ReadyCheckRunning = true
+	local name = tostring(select(1, ...))
+	CM:SendMessage(name .. " issued a ready check, type !rc accept to make me accept it or !rc deny to deny it.", "SMART")
+end
+
+function C.Events.READY_CHECK_FINISHED(self, ...)
+	C.Data.ReadyCheckRunning = false
+end

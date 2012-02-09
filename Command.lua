@@ -37,12 +37,14 @@ Command = {
 	Global = {},
 	Settings = {},
 	Events = {},
+	Data = {}
 }
 
 local C = Command
 local Cmd
 local CM
 local PM
+local RM
 local log
 
 --- Initialize Command.
@@ -54,6 +56,7 @@ function C:Init()
 	Cmd = self.CommandManager
 	CM = self.ChatManager
 	PM = self.PlayerManager
+	RM = self.RollManager
 	log = self.Logger
 	self:LoadSavedVars()
 	log:Normal("AddOn loaded! Use /cmd help or !help for help. !!NYI!!")
@@ -86,6 +89,7 @@ function C:LoadSavedVars()
 	end
 	CM:Init()
 	PM:Init()
+	RM:Init()
 	Cmd:Init()
 	log:SetDebug(self.Settings.DEBUG)
 	self.Global.VERSION = self.VarVersion

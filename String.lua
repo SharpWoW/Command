@@ -64,9 +64,32 @@ end
 -- @return Table containing the individual words.
 --
 function CES:Split(s)
+	s = s or " "
 	local t = {}
 	for token in string.gmatch(s, "[^%s]+") do
 		table.insert(t, token)
+	end
+	return t
+end
+
+--- Cut a string into parts.
+-- @param s The String to cut.
+-- @param l Length of each string part.
+-- @return Table containing the different parts.
+--
+function CES:Cut(s, l)
+	if type(s) ~= "string" or type(l) ~= "number" then
+		error("Invalid parameters passed, expected [string, number], got: [" .. type(s) .. ", " .. type(l) .. "]!")
+		return
+	end
+	if s:len() <= l then return s end
+	local c = math.ceil(s:len() / l)
+	local pos = 1
+	local t = {}
+	for i = 1, c do
+		local part = s:sub(pos, l * i)
+		table.insert(t, part)
+		pos = l * i + 1
 	end
 	return t
 end

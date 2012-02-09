@@ -38,6 +38,7 @@ C.CommandManager = {
 local CM = C.CommandManager
 local PM = C.PlayerManager
 local QM = C.QueueManager
+local RM = C.RollManager
 local GT = C.GroupTools
 local CES = C.Extensions.String
 local CET = C.Extensions.Table
@@ -106,6 +107,19 @@ function CM:GetRealName(name)
 	return nil
 end
 
+function CM:GetCommands(all) -- NOTE: Only returns the NAMES, not the actual command function
+	local t = {}
+	for k,v in pairs(self.Commands) do
+		table.insert(t, k)
+		if all and #v.Alias > 0 then
+			for _,a in pairs(v.Alias) do
+				table.insert(t, a)
+			end
+		end
+	end
+	return t
+end
+
 --- Calls command with supplied args.
 -- @param command Command to call (name)
 -- @param args Table with arguments for the command.
@@ -141,6 +155,19 @@ CM:Register({"__DEFAULT__", "help", "h"}, PM.Access.Local, function(args, sender
 	return "End of help message."
 end, "Prints this help message.")
 
+CM:Register({"commands", "cmds", "cmdlist", "listcmds", "listcommands", "commandlist", PM.Access.Groups.User.Level, function(args, sender, isChat)
+	local all
+	if #args > 0 then
+		all = args[1] == "all"
+	end
+	local cmds = self:GetCommands(all)
+	local msg = ""
+	for _,v in pairs(cmds) do
+		msg = msg .. ", " .. v
+	end
+	return CES:Cut(msg, 200)
+end, "Print all registered commands.")
+
 CM:Register({"version", "ver", "v"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if args then
 		if #args > 0 then
@@ -149,6 +176,14 @@ CM:Register({"version", "ver", "v"}, PM.Access.Groups.User.Level, function(args,
 	end
 	return C.Version, nil
 end, "Print the version of Command")
+
+CM:Register({"getaccess"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if #args <= 0 then
+		return false, "Too few arguments. Usage: getaccess <player>"
+	end
+	local player = PM:GetOrCreatePlayer(args[1])
+	return tostring(PM.Access.Groups[player.Info.Group].Level) .. " (" .. tostring(player.Info.Group) .. ")"
+end, "Get the access level of a user.")
 
 CM:Register({"setaccess"}, PM.Access.Local, function(args, sender, isChat)
 	if #args <= 1 then
@@ -391,7 +426,7 @@ CM:Register({"userdeny", "udeny"}, PM.Access.Groups.Admin.Level, function(args, 
 	return PM:PlayerAccess(player, cmd, false)
 end, "Deny a user to use a specific command.")
 
-CM:Register({"resetuseraccess", "useraccessreset", "removeuseraccess", "useraccessremove", "rua", "uar"}, PM.Access.Admin, function(args, sender, isChat)
+CM:Register({"resetuseraccess", "useraccessreset", "removeuseraccess", "useraccessremove", "rua", "uar"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if #args <= 1 then
 		return false, "Usage: resetuseraccess <playername> <commandname>."
 	end
@@ -413,6 +448,98 @@ CM:Register({"toggledebug", "td", "debug", "d"}, PM.Access.Local, function(args,
 	end
 	return C:ToggleDebug()
 end, "Toggle debugging mode on and off.")
+
+CM:Register({"readycheck", "rc"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+	if #args <= 0 then
+		if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() then
+			C.Data.ReadyCheckRunning = true
+			local name = tostring(sender.Info.Name)
+			DoReadyCheck()
+			return name .. " issued a ready check!"
+		else
+			return false, "Can't initiate ready check when not leader or assistant."
+		end
+	end
+	local status = GetReadyCheckStatus("player")
+	if (status ~= "waiting" and status ~= nil) or GetReadyCheckTimeLeft() <= 0 or not C.Data.ReadyCheckRunning then
+		return false, "Ready check not running or I have already responded."
+	end
+	local arg = tostring(args[1]):lower()
+	if arg == "accept" or arg == "yes" then
+		C.Data.ReadyCheckRunning = false
+		if ReadyCheckFrameYesButton then
+			ReadyCheckFrameYesButton:Click()
+		end
+		ConfirmReadyCheck(true)
+		status = GetReadyCheckStatus("player")
+		return "Accepted ready check."
+	elseif arg == "decline" or arg == "no" then
+		C.Data.ReadyCheckRunning = false
+		if ReadyCheckFrameNoButton then
+			ReadyCheckFrameNoButton:Click()
+		end
+		ConfirmReadyCheck(false)
+		status = GetReadyCheckStatus("player")
+		return "Declined ready check."
+	else
+		return false, "Invalid argument: " .. arg
+	end
+	return false, "Failed to accept or decline ready check."
+end, "Respond to ready check or initate a new one.")
+
+CM:Register({"roll", "r"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+	if #args <= 0 then
+		return RM:StartRoll(sender.Info.Name)
+	end
+	args[1] = args[1]:lower()
+	if args[1] == "start" then
+		if #args < 2 then
+			return false, "Usage: roll start <[time] [item]>"
+		end
+		local time = tonumber(args[2])
+		local item
+		if not time then
+			item = args[2]
+		end
+		if #args >= 3 then
+			if item then
+				item = item .. " " .. args[3]
+			else
+				item = args[3]
+			end
+			if #args > 3 then
+				for i = 4, #args do
+					item = item .. " " .. args[i]
+				end
+			end
+		end
+		return RM:StartRoll(sender.Info.Name, item, time)
+	elseif args[1] == "stop" then
+		return RM:StopRoll()
+	elseif args[1] == "time" then
+		return RM:GetTime()
+	elseif args[1] == "do" then
+		local min, max
+		if #args >= 3 then
+			min = tonumber(args[2])
+			max = tonumber(args[3])
+		end
+		return RM:DoRoll(min, max)
+	elseif args[1] == "set" then
+		if #args < 3 then
+			return false, "Usage: roll set <min||max> <amount>"
+		end
+		args[2] = args[2]:lower()
+		if args[2] == "min" then
+			return RM:SetMin(tonumber(args[3]))
+		elseif args[2] == "max" then
+			return RM:SetMax(tonumber(args[3]))
+		else
+			return false, "Usage: roll set <min||max> <amount>"
+		end
+	end
+	return false, "Usage: roll [start||stop||time||do||set]"
+end, "Provides tools for managing or starting/stopping rolls.")
 
 for i,v in ipairs(CM.Slash) do
 	_G["SLASH_" .. C.Name:upper() .. i] = "/" .. v
