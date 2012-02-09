@@ -165,16 +165,11 @@ CM:Register({"commands", "cmds", "cmdlist", "listcmds", "listcommands", "command
 	for _,v in pairs(cmds) do
 		msg = msg .. ", " .. v
 	end
-	return CES:Cut(msg, 200)
+	return CES:Cut(msg, 240)
 end, "Print all registered commands.")
 
 CM:Register({"version", "ver", "v"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
-	if args then
-		if #args > 0 then
-			return false, "This is a test error"
-		end
-	end
-	return C.Version, nil
+	return C.Version
 end, "Print the version of Command")
 
 CM:Register({"getaccess"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
