@@ -133,7 +133,9 @@ function CM:HandleCommand(command, args, isChat, player)
 	local cmd = self:GetCommand(command)
 	if cmd then
 		if isChat then
-			if not PM:HasAccess(player, cmd) then
+			if not PM:IsCommandAllowed(cmd) and player.Info.Name ~= UnitName("player") then
+				return false, ("%s is not allowed to be used, %s."):format(cmd.Name, player.Info.Name)
+			elseif not PM:HasAccess(player, cmd) then
 				return false, ("You do not have permission to use that command, %s. Required access level: %d. Your access level: %d."):format(player.Info.Name, cmd.Access, PM:GetAccess(player))
 			end
 		end

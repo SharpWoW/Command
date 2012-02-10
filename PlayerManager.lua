@@ -377,8 +377,22 @@ function PM:HasAccess(player, command)
 	if (List[command.Name] and self:GetListMode() == MODE_BLACKLIST) or (not List[command.Name] and self:GetListMode() == MODE_WHITELIST) then
 		hasAccess = false
 	end
-	if player.Info.Name == UnitName("player") then hasAccess = true end
 	return hasAccess
+end
+
+function PM:IsCommandAllowed(command)
+	local name
+	if type(command) == "table" then
+		name = command.Name
+	elseif type(command) == "string" then
+		name = command
+	else
+		return false
+	end
+	if (List[command.Name] and self:GetListMode() == MODE_BLACKLIST) or (not List[command.Name] and self:GetListMode() == MODE_WHITELIST) then
+		return false
+	end
+	return true
 end
 
 --- Set the access group of supplied player.
