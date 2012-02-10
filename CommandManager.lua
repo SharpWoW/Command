@@ -34,7 +34,6 @@ C.CommandManager = {
 	Commands = {}
 }
 
-
 local CM = C.CommandManager
 local PM = C.PlayerManager
 local QM = C.QueueManager
@@ -110,7 +109,9 @@ end
 function CM:GetCommands(all) -- NOTE: Only returns the NAMES, not the actual command function
 	local t = {}
 	for k,v in pairs(self.Commands) do
-		table.insert(t, k)
+		if k ~= "__DEFAULT__" or all then
+			table.insert(t, k)
+		end
 		if all and #v.Alias > 0 then
 			for _,a in pairs(v.Alias) do
 				table.insert(t, a)
@@ -155,15 +156,15 @@ CM:Register({"__DEFAULT__", "help", "h"}, PM.Access.Local, function(args, sender
 	return "End of help message."
 end, "Prints this help message.")
 
-CM:Register({"commands", "cmds", "cmdlist", "listcmds", "listcommands", "commandlist", PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"commands", "cmds", "cmdlist", "listcmds", "listcommands", "commandlist"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	local all
 	if #args > 0 then
 		all = args[1] == "all"
 	end
-	local cmds = self:GetCommands(all)
+	local cmds = CM:GetCommands(all)
 	local msg = ""
 	for _,v in pairs(cmds) do
-		msg = msg .. ", " .. v
+		msg = msg .. v .. ", "
 	end
 	return CES:Cut(msg, 240)
 end, "Print all registered commands.")
@@ -529,6 +530,8 @@ CM:Register({"roll", "r"}, PM.Access.Groups.Op.Level, function(args, sender, isC
 			return RM:SetMin(tonumber(args[3]))
 		elseif args[2] == "max" then
 			return RM:SetMax(tonumber(args[3]))
+		elseif args[2] == "time" then
+			return RM:SetTime(tonumber(args[3]))
 		else
 			return false, "Usage: roll set <min||max> <amount>"
 		end
@@ -550,7 +553,7 @@ SlashCmdList[C.Name:upper()] = function(msg, editBox)
 			table.insert(t, args[i])
 		end
 	end
-	local result, err = CM:HandleCommand(cmd, t, false, nil)
+	local result, err = CM:HandleCommand(cmd, t, false, PM:GetOrCreatePlayer(UnitName("player")))
 	if result then
 		C.Logger:Normal(tostring(result))
 	else

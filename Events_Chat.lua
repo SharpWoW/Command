@@ -19,11 +19,20 @@
 
 local C = Command
 local CM = C.ChatManager
+local AC = C.AddonComm
 
 function C.Events.CHAT_MSG_SYSTEM(self, event, ...)
 	if C.RollManager.Running then
 		C.RollManager:ParseMessage((select(1, ...)))
 	end
+end
+
+function C.Events.CHAT_MSG_ADDON(self, event, ...)
+	local msgType = (select(1, ...))
+	local msg = (select(2, ...))
+	local channel = (select(3, ...))
+	local sender = (select(4, ...))
+	AC:Receive(msgType, msg, channel, sender)
 end
 
 --[[

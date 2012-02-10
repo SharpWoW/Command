@@ -108,6 +108,17 @@ function RM:SetMax(amount)
 	return "Sucessfully set maximum roll number to " .. amount .. "!"
 end
 
+function RM:SetTime(amount)
+	if type(amount) ~= "number" then
+		return false, "Invalid amount passed: " .. tostring(amount)
+	end
+	if amount <= 0 then
+		return false, "Amount must be larger than zero (0)."
+	end
+	self.Settings.DEFAULT_TIME = amount
+	return "Successfully set default roll time to " .. amount .. "!"
+end
+
 function RM:StartRoll(sender, item, time)
 	time = tonumber(time) or self.Settings.DEFAULT_TIME
 	RollTimer.Time = time

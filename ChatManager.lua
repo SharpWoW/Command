@@ -41,6 +41,7 @@ C.ChatManager = {
 local CM = C.ChatManager
 local PM = C.PlayerManager
 local GT = C.GroupTools
+local AC = C.AddonComm
 local CCM = C.CommandManager
 local CES = C.Extensions.String
 
@@ -167,6 +168,7 @@ function CM:HandleMessage(msg, sender, channel, target, isBN)
 		C.Logger:Normal("Battle.Net convos/whispers are not supported yet")
 		return
 	end
+	local raw = msg
 	msg = CES:Trim(msg)
 	local args = self:ParseMessage(msg)
 	if not self:IsCommand(args[1]) then return end
@@ -174,12 +176,24 @@ function CM:HandleMessage(msg, sender, channel, target, isBN)
 	self.LastTarget = target
 	local cmd = self:ParseCommand(args[1])
 	if not CCM:HasCommand(cmd) then return end
+	if channel ~= "WHISPER" and not AC:Handled(raw, sender, channel) then
+		C.Logger:Normal("Request already handled by another instance of Command, aborting...")
+		return
+	end
 	local t = {}
 	if #args > 1 then
 		for i=2,#args do
 			table.insert(t, args[i])
 		end
 	end
+	
+	--[[
+	if channel ~= "WHISPER" and AC:IsHandled(msg, sender) then
+		C.Logger:Normal("Request already handled by other instance of Command, aborting...")
+		return
+	end
+	]]
+	
 	local player = PM:GetOrCreatePlayer(sender)
 	local result, err = CCM:HandleCommand(cmd, t, true, player)
 	if result then

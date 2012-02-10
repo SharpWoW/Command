@@ -82,7 +82,7 @@ function GT:IsGroupFull()
 	local num = 0
 	local max = self.RaidMax
 	if self:IsRaid() then
-		num = GetNumRaidMembers() + 1
+		num = GetNumRaidMembers()
 	elseif self:IsGroup() then
 		num = GetNumPartyMembers() + 1
 		max = self.PartyMax

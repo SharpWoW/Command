@@ -27,6 +27,7 @@
 	<Script file="PlayerManager.lua" />
 	<Script file="QueueManager.lua" />
 	<Script file="RollManager.lua" />
+	<Script file="AddonComm.lua" />
 	<Script file="CommandManager.lua" />
 	<Script file="ChatManager.lua" />
 	<Script file="Events.lua" />

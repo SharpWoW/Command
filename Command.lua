@@ -32,6 +32,8 @@
 Command = {
 	Name = "Command",
 	Version = GetAddOnMetadata("Command", "Version"),
+	VersionNum = 1, -- Increment on every release
+	VersionChecked = false, -- Prevent spam of "New Version" notice
 	Loaded = false,
 	VarVersion = 2,
 	Global = {},
@@ -45,6 +47,7 @@ local Cmd
 local CM
 local PM
 local RM
+local AC
 local log
 
 --- Initialize Command.
@@ -57,6 +60,7 @@ function C:Init()
 	CM = self.ChatManager
 	PM = self.PlayerManager
 	RM = self.RollManager
+	AC = self.AddonComm
 	log = self.Logger
 	self:LoadSavedVars()
 	log:Normal("AddOn loaded! Use /cmd help or !help for help. !!NYI!!")
@@ -90,9 +94,19 @@ function C:LoadSavedVars()
 	CM:Init()
 	PM:Init()
 	RM:Init()
+	AC:Init()
 	Cmd:Init()
 	log:SetDebug(self.Settings.DEBUG)
 	self.Global.VERSION = self.VarVersion
+end
+
+function C:CheckVersion(ver)
+	if self.VersionChecked then return end
+	ver = ver or 0
+	if ver > self.VersionNum then
+		log:Normal("A new version of " .. self.Name .. " is available! Check the site you downloaded from for the updated version.")
+		self.VersionChecked = true
+	end
 end
 
 --- Control AddOn state.
