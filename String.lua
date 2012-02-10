@@ -61,13 +61,27 @@ end
 
 --- Split a string with space as delimiter.
 -- @param s String to be split.
+-- @param d Delimiter
 -- @return Table containing the individual words.
 --
-function CES:Split(s)
-	s = s or " "
+function CES:Split(s, d)
+	if not s then return nil end
 	local t = {}
-	for token in string.gmatch(s, "[^%s]+") do
-		table.insert(t, token)
+	if not d then
+		for token in s:gmatch("[^%s]+") do
+			table.insert(t, token)
+		end
+	else
+		if not s:find(d) then return {s} end
+		local p = "(.-)" .. d .. "()"
+		local nb = 0
+		local lastPos
+		for part,pos in s:gmatch(p) do
+			nb = nb + 1
+			t[nb] = part
+			lastPos = pos
+		end
+		t[nb + 1] = s:sub(lastPos)
 	end
 	return t
 end

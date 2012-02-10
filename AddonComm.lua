@@ -26,8 +26,7 @@ local CET = C.Extensions.Table
 local log = C.Logger
 
 C.AddonComm = {
-	GroupMaster = true, -- Whether or not we are currently the "master" instance in group
-	GuildMaster = true, -- Whether or not we are currently the "master" instance in guild
+	Halted = false,
 	Type = {
 		VersionUpdate = "COMM_VU",
 		HandleCommand = "COMM_DO"
@@ -57,22 +56,24 @@ function AC:LoadSavedVars()
 end
 
 function AC:Receive(msgType, msg, channel, sender)
+	if sender == UnitName("player") then return end
 	if msgType == self.Type.VersionUpdate then
-		local t = CES:Split(msg, ":")
-		if #t < 1 then return end
-		local ver = tonumber(t[1])
-		if type(t[1]) ~= "number" then return end
+		local ver = tonumber(msg)
+		if type(ver) ~= "number" then return end
 		C:CheckVersion(ver)
 	elseif msgType == self.Type.HandleCommand then
 		local t = CES:Split(msg, ";&")
+		for i,v in ipairs(t) do log:Normal(i .. ": " .. tostring(v)) end
 		if #t < 3 then return end
 		local name = tostring(t[1])
 		local sent = tostring(t[2])
 		local chan = tostring(t[3])
 		if type(t[1]) ~= "string" or type(t[2]) ~= "string" or type(t[3]) ~= "string" then return end
+		log:Normal("Received HandleCommand from " .. sender)
 		self.Last.Sender = name
 		self.Last.Message = sent
 		self.Last.Channel = chan
+		--self.Halted = true
 	end
 end
 
@@ -83,10 +84,14 @@ function AC:Send(msgType, msg, channel, target)
 		return
 	end
 	SendAddonMessage(msgType, msg, channel, target)
+	if msgType == self.Type.HandleCommand then
+		SendAddonMessage(self.Type.VersionUpdate, self.Format.VersionUpdate:format(C.VersionNum), channel)
+	end
 end
 
 function AC:Handled(msg, sender, channel)
-	if channel == "WHISPER" then return end
+	if self.Halted then return false end
+	if channel == "WHISPER" then return true end
 	if self:IsHandled(msg, sender, channel) then return false end
 	self:Send(self.Type.HandleCommand, self.Format.HandleCommand:format(sender, msg, channel), channel)
 	return true
@@ -98,4 +103,11 @@ function AC:IsHandled(msg, sender, channel)
 		return true
 	end
 	return false
+end
+
+function AC:Reset()
+	self.Last.Sender = nil
+	self.Last.Message = nil
+	self.Last.Channel = nil
+	self.Halted = false
 end

@@ -32,7 +32,7 @@
 Command = {
 	Name = "Command",
 	Version = GetAddOnMetadata("Command", "Version"),
-	VersionNum = 1, -- Increment on every release
+	VersionNum = 2, -- Increment on every release
 	VersionChecked = false, -- Prevent spam of "New Version" notice
 	Loaded = false,
 	VarVersion = 2,
@@ -104,7 +104,7 @@ function C:CheckVersion(ver)
 	if self.VersionChecked then return end
 	ver = ver or 0
 	if ver > self.VersionNum then
-		log:Normal("A new version of " .. self.Name .. " is available! Check the site you downloaded from for the updated version.")
+		log:Normal("\124cffFF0000A new version of \124cff00FFFF" .. self.Name .. "\124cffFF0000 is available! \124cffFFFF00Check the site you downloaded from for the updated version.")
 		self.VersionChecked = true
 	end
 end
