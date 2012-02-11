@@ -161,13 +161,10 @@ end
 -- @param target Player or channel index.
 -- @param isBN True if battle.net message, false or nil otherwise.
 --
-function CM:HandleMessage(msg, sender, channel, target, isBN)
+function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN)
 	isBN = isBN or false
 	target = target or sender
-	if isBN then
-		C.Logger:Normal("Battle.Net convos/whispers are not supported yet")
-		return
-	end
+	if isBN then return end
 	local raw = msg
 	msg = CES:Trim(msg)
 	local args = self:ParseMessage(msg)
@@ -176,8 +173,8 @@ function CM:HandleMessage(msg, sender, channel, target, isBN)
 	self.LastTarget = target
 	local cmd = self:ParseCommand(args[1])
 	if not CCM:HasCommand(cmd) then return end
-	if channel ~= "WHISPER" and not AC:Handled(raw, sender, channel) then
-		C.Logger:Normal("Request already handled by another instance of Command, aborting...")
+	if not AC:IsController(sourceChannel) then
+		C.Logger:Normal("Not controller instance for \124cff00FFFF" .. sourceChannel:lower() .. "\124r, aborting.")
 		return
 	end
 	local t = {}
@@ -186,13 +183,6 @@ function CM:HandleMessage(msg, sender, channel, target, isBN)
 			table.insert(t, args[i])
 		end
 	end
-	
-	--[[
-	if channel ~= "WHISPER" and AC:IsHandled(msg, sender) then
-		C.Logger:Normal("Request already handled by other instance of Command, aborting...")
-		return
-	end
-	]]
 	
 	local player = PM:GetOrCreatePlayer(sender)
 	local result, err = CCM:HandleCommand(cmd, t, true, player)

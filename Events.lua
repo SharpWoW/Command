@@ -21,6 +21,7 @@ local C = Command
 
 local CM = C.ChatManager
 local QM = C.QueueManager
+local AC = C.AddonComm
 
 --[[
 function T.Events.CHAT_MSG_ADDON(event, ...)
@@ -79,4 +80,24 @@ end
 
 function C.Events.READY_CHECK_FINISHED(self, ...)
 	C.Data.ReadyCheckRunning = false
+end
+
+function C.Events.RAID_ROSTER_UPDATE(self, ...)
+	if AC.GroupRunning then return end
+	AC:UpdateGroup()
+end
+
+function C.Events.PARTY_MEMBERS_CHANGED(self, ...)
+	if AC.GroupRunning then return end
+	AC:UpdateGroup()
+end
+
+function C.Events.PARTY_LEADER_CHANGED(self, ...)
+	if AC.GroupRunning then return end
+	AC:UpdateGroup()
+end
+
+function C.Events.GUILD_ROSTER_UPDATE(self, ...)
+	if AC.GuildRunning then return end
+	AC:UpdateGuild()
 end

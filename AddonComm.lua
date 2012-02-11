@@ -26,23 +26,58 @@ local CET = C.Extensions.Table
 local log = C.Logger
 
 C.AddonComm = {
-	Halted = false,
+	InGroup = false,
+	InGuild = false,
+	GroupMaster = true,
+	GuildMaster = true,
+	GroupChecked = false,
+	GuildChecked = false,
+	GroupRunning = false,
+	GuildRunning = false,
 	Type = {
 		VersionUpdate = "COMM_VU",
-		HandleCommand = "COMM_DO"
+		GroupUpdate = "COMM_GU",
+		GroupAdd = "COMM_GA",
+		GuildUpdate = "COMM_UG",
+		GuildAdd = "COMM_AG"
 	},
 	Format = {
 		VersionUpdate = "%s",
-		HandleCommand = "%s;&%s;&%s"
 	},
-	Last = {
-		Sender = nil,
-		Message = nil,
-		Channel = nil
-	}
+	GroupMembers = {},
+	GuildMembers = {}
 }
 
 local AC = C.AddonComm
+
+local CONTROLLER_WAIT = 5
+
+local GroupTimer = CreateFrame("Frame")
+local GuildTimer = CreateFrame("Frame")
+GroupTimer.Time = 0
+GuildTimer.Time = 0
+
+local function GroupTimerUpdate(frame, elapsed)
+	frame.Time = frame.Time + elapsed
+	if frame.Time >= CONTROLLER_WAIT then
+		frame.Time = 0
+		AC.GroupRunning = false
+		frame:SetScript("OnUpdate", nil)
+		log:Normal("No response from group, running updater...")
+		AC:UpdateGroup()
+	end
+end
+
+local function GuildTimerUpdate(frame, elapsed)
+	frame.Time = frame.Time + elapsed
+	if frame.Time >= CONTROLLER_WAIT then
+		frame.Time = 0
+		AC.GuildRunning = false
+		frame:SetScript("OnUpdate", nil)
+		log:Normal("No response from guild, running updater...")
+		AC:UpdateGuild()
+	end
+end
 
 function AC:Init()
 	--self:LoadSavedVars()
@@ -56,24 +91,57 @@ function AC:LoadSavedVars()
 end
 
 function AC:Receive(msgType, msg, channel, sender)
-	if sender == UnitName("player") then return end
+	if sender == UnitName("player") or not msg then return end
 	if msgType == self.Type.VersionUpdate then
 		local ver = tonumber(msg)
 		if type(ver) ~= "number" then return end
 		C:CheckVersion(ver)
-	elseif msgType == self.Type.HandleCommand then
-		local t = CES:Split(msg, ";&")
-		for i,v in ipairs(t) do log:Normal(i .. ": " .. tostring(v)) end
-		if #t < 3 then return end
-		local name = tostring(t[1])
-		local sent = tostring(t[2])
-		local chan = tostring(t[3])
-		if type(t[1]) ~= "string" or type(t[2]) ~= "string" or type(t[3]) ~= "string" then return end
-		log:Normal("Received HandleCommand from " .. sender)
-		self.Last.Sender = name
-		self.Last.Message = sent
-		self.Last.Channel = chan
-		--self.Halted = true
+	elseif msgType == self.Type.GroupUpdate then
+		if channel ~= "RAID" and channel ~= "PARTY" then return end
+		if self.GroupRunning then
+			GroupTimer:SetScript("OnUpdate", nil)
+			GroupTimer.Time = 0
+			self.GroupRunning = false
+		end
+		local t = CES:Split(msg, ";")
+		wipe(self.GroupMembers)
+		for _,v in ipairs(t) do
+			if v then
+				table.insert(self.GroupMembers, v)
+			end
+		end
+		log:Normal("Updated group members, controller: " .. self.GroupMembers[1])
+		self:UpdateGroup()
+	elseif msgType == self.Type.GroupAdd then
+		if channel ~= "WHISPER" or not GT:IsGroup() then return end
+		if self.GroupMembers[1] ~= UnitName("player") then return end
+		if not CET:HasValue(self.GroupMembers, msg) then
+			table.insert(self.GroupMembers, msg)
+		end
+		self:Send(self.Type.GroupUpdate, table.concat(self.GroupMembers, ";"), "RAID")
+	elseif msgType == self.Type.GuildUpdate then
+		if channel ~= "GUILD" then return end
+		if self.GuildRunning then
+			GuildTimer:SetScript("OnUpdate", nil)
+			GuildTimer.Time = 0
+			self.GuildRunning = false
+		end
+		local t = CES:Split(msg, ";")
+		wipe(self.GuildMembers)
+		for _,v in ipairs(t) do
+			if v then
+				table.insert(self.GuildMembers, v)
+			end
+		end
+		log:Normal("Updated guild members, controller: " .. self.GuildMembers[1])
+		self:UpdateGuild()
+	elseif msgType == self.Type.GuildAdd then
+		if channel ~= "WHISPER" then return end
+		if self.GuildMembers[1] ~= UnitName("player") then return end
+		if not CET:HasValue(self.GuildMembers, msg) then
+			table.insert(self.GuildMembers, msg)
+		end
+		self:Send(self.Type.GuildUpdate, table.concat(self.GuildMembers, ";"), "GUILD")
 	end
 end
 
@@ -84,30 +152,114 @@ function AC:Send(msgType, msg, channel, target)
 		return
 	end
 	SendAddonMessage(msgType, msg, channel, target)
-	if msgType == self.Type.HandleCommand then
+	if msgType ~= self.Type.VersionUpdate then
 		SendAddonMessage(self.Type.VersionUpdate, self.Format.VersionUpdate:format(C.VersionNum), channel)
 	end
 end
 
-function AC:Handled(msg, sender, channel)
-	if self.Halted then return false end
-	if channel == "WHISPER" then return true end
-	if self:IsHandled(msg, sender, channel) then return false end
-	self:Send(self.Type.HandleCommand, self.Format.HandleCommand:format(sender, msg, channel), channel)
-	return true
-end
-
-function AC:IsHandled(msg, sender, channel)
-	if channel == "WHISPER" then return false end
-	if tostring(msg) == self.Last.Message and tostring(sender) == self.Last.Sender and tostring(channel) == self.Last.Channel then
-		return true
+function AC:UpdateGroup()
+	if not GT:IsGroup() then
+		self.InGroup = false
+		self.GroupChecked = false
+		self.GroupMaster = true
+		wipe(self.GroupMembers)
+		return
 	end
-	return false
+	self:CheckGroupRoster()
+	if not self.InGroup then -- Just joined group
+		self.GroupMaster = false
+		if not self.GroupChecked then
+			self.GroupChecked = true
+			self.GroupRunning = true
+			log:Normal("Waiting for group response...")
+			GroupTimer:SetScript("OnUpdate", GroupTimerUpdate)
+			return
+		end
+		self.InGroup = true
+		if self.GroupMembers[1] == UnitName("player") or not self.GroupMembers[1] then
+			self.GroupMaster = true
+			self.GroupMembers[1] = UnitName("player")
+			self:Send(self.Type.GroupUpdate, table.concat(self.GroupMembers, ";"), "RAID")
+		else
+			self.GroupMaster = false
+			self:Send(self.Type.GroupAdd, UnitName("player"), "WHISPER", self.GroupMembers[1])
+		end
+	else -- Already in group
+		if self.GroupMembers[1] == UnitName("player") then
+			self.GroupMaster = true
+			self:Send(self.Type.GroupUpdate, table.concat(self.GroupMembers, ";"), "RAID")
+		else
+			self.GroupMaster = false
+		end
+	end
 end
 
-function AC:Reset()
-	self.Last.Sender = nil
-	self.Last.Message = nil
-	self.Last.Channel = nil
-	self.Halted = false
+function AC:UpdateGuild()
+	if not IsInGuild() then
+		self.InGuild = false
+		self.GuildChecked = false
+		self.GuildMaster = true
+		wipe(self.GuildMembers)
+		return
+	end
+	self:CheckGuildRoster()
+	if not self.InGuild then -- Probably logged in and is getting guild update for the first time
+		self.GuildMaster = false
+		if not self.GuildChecked then
+			self.GuildChecked = true
+			self.GuildRunning = true
+			log:Normal("Waiting for guild response...")
+			GuildTimer:SetScript("OnUpdate", GuildTimerUpdate)
+			return
+		end
+		self.InGuild = true
+		if self.GuildMembers[1] == UnitName("player") or not self.GuildMembers[1] then
+			self.GuildMaster = true
+			self.GuildMembers[1] = UnitName("player")
+			self:Send(self.Type.GuildUpdate, table.concat(self.GuildMembers, ";"), "GUILD")
+		else
+			self.GuildMaster = false
+			self:Send(self.Type.GuildAdd, UnitName("player"), "WHISPER", self.GuildMembers[1])
+		end
+	else -- Already in guild
+		if self.GuildMembers[1] == UnitName("player") then
+			self.GuildMaster = true
+			self:Send(self.Type.GuildUpdate, table.concat(self.GuildMembers, ";"), "GUILD")
+		else
+			self.GuildMaster = false
+		end
+	end
+end
+
+function AC:CheckGroupRoster()
+	for i,v in ipairs(self.GroupMembers) do
+		if not GT:IsInGroup(v) then
+			table.remove(self.GroupMembers, i)
+		end
+	end
+end
+
+function AC:CheckGuildRoster()
+	local g = {}
+	for i=1, (select(1, GetNumGuildMembers())) do
+		local name = tostring((select(1, GetGuildRosterInfo(i))))
+		local online = (select(9, GetGuildRosterInfo(i)))
+		g[name] = online
+	end
+	for i,v in pairs(self.GuildMembers) do
+		if not g[v] then
+			table.remove(self.GuildMembers, i)
+		end
+	end
+end
+
+function AC:IsController(channel)
+	if channel == "RAID" or channel == "PARTY" then
+		self:CheckGroupRoster()
+		return self.GroupMembers[1] == UnitName("player")
+	elseif channel == "GUILD" then
+		self:CheckGuildRoster()
+		return self.GuildMembers[1] == UnitName("player")
+	end
+	return true
 end

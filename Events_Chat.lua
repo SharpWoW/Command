@@ -75,7 +75,7 @@ function C.Events.CHAT_MSG_GUILD(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
 	local sender = (select(2, ...))
-	CM:HandleMessage(msg, sender, chan)
+	CM:HandleMessage(msg, sender, chan, nil, "GUILD")
 end
 
 --- Event handler for CHAT_MSG_OFFICER.
@@ -88,7 +88,7 @@ function C.Events.CHAT_MSG_OFFICER(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
 	local sender = (select(2, ...))
-	CM:HandleMessage(msg, sender, chan)
+	CM:HandleMessage(msg, sender, chan, nil, "GUILD")
 end
 
 --- Event handler for CHAT_MSG_PARTY.
@@ -101,7 +101,7 @@ function C.Events.CHAT_MSG_PARTY(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
 	local sender = (select(2, ...))
-	CM:HandleMessage(msg, sender, chan)
+	CM:HandleMessage(msg, sender, chan, nil, "PARTY")
 end
 
 --- Event handler for CHAT_MSG_PARTY_LEADER.
@@ -114,7 +114,7 @@ function C.Events.CHAT_MSG_PARTY_LEADER(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
 	local sender = (select(2, ...))
-	CM:HandleMessage(msg, sender, chan)
+	CM:HandleMessage(msg, sender, chan, nil, "PARTY")
 end
 
 --- Event handler for CHAT_MSG_RAID.
@@ -127,7 +127,7 @@ function C.Events.CHAT_MSG_RAID(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
 	local sender = (select(2, ...))
-	CM:HandleMessage(msg, sender, chan)
+	CM:HandleMessage(msg, sender, chan, nil, "RAID")
 end
 
 --- Event handler for CHAT_MSG_RAID_LEADER.
@@ -140,7 +140,7 @@ function C.Events.CHAT_MSG_RAID_LEADER(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
 	local sender = (select(2, ...))
-	CM:HandleMessage(msg, sender, chan)
+	CM:HandleMessage(msg, sender, chan, nil, "RAID")
 end
 
 --- Event handler for CHAT_MSG_RAID_WARNING.
@@ -153,7 +153,7 @@ function C.Events.CHAT_MSG_RAID_WARNING(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
 	local sender = (select(2, ...))
-	CM:HandleMessage(msg, sender, chan)
+	CM:HandleMessage(msg, sender, chan, nil, "RAID")
 end
 
 --[[
@@ -176,7 +176,7 @@ function C.Events.CHAT_MSG_WHISPER(self, event, ...)
 	local msg = (select(1, ...))
 	local sender = (select(2, ...))
 	local target = sender
-	CM:HandleMessage(msg, sender, chan, target)
+	CM:HandleMessage(msg, sender, chan, target, "WHISPER")
 end
 
 --[[
