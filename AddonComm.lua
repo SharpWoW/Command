@@ -152,13 +152,16 @@ function AC:Send(msgType, msg, channel, target)
 		return
 	end
 	SendAddonMessage(msgType, msg, channel, target)
-	if msgType ~= self.Type.VersionUpdate then
+	if msgType ~= self.Type.VersionUpdate and channel ~= "WHISPER" then
 		SendAddonMessage(self.Type.VersionUpdate, self.Format.VersionUpdate:format(C.VersionNum), channel)
 	end
 end
 
 function AC:UpdateGroup()
 	if not GT:IsGroup() then
+		if self.InGroup then
+			log:Normal("Left group, resetting group variables...")
+		end
 		self.InGroup = false
 		self.GroupChecked = false
 		self.GroupMaster = true
@@ -168,7 +171,7 @@ function AC:UpdateGroup()
 	self:CheckGroupRoster()
 	if not self.InGroup then -- Just joined group
 		self.GroupMaster = false
-		if not self.GroupChecked then
+		if not self.GroupChecked and not GT:IsGroupLeader() then
 			self.GroupChecked = true
 			self.GroupRunning = true
 			log:Normal("Waiting for group response...")
@@ -182,7 +185,9 @@ function AC:UpdateGroup()
 			self:Send(self.Type.GroupUpdate, table.concat(self.GroupMembers, ";"), "RAID")
 		else
 			self.GroupMaster = false
-			self:Send(self.Type.GroupAdd, UnitName("player"), "WHISPER", self.GroupMembers[1])
+			if not CET:HasValue(self.GroupMembers, UnitName("player")) and self.GroupMembers[1] then
+				self:Send(self.Type.GroupAdd, UnitName("player"), "WHISPER", self.GroupMembers[1])
+			end
 		end
 	else -- Already in group
 		if self.GroupMembers[1] == UnitName("player") then
@@ -234,6 +239,7 @@ end
 function AC:CheckGroupRoster()
 	for i,v in ipairs(self.GroupMembers) do
 		if not GT:IsInGroup(v) then
+			log:Normal("Detected that " .. v .. " is no longer in the group, removing and updating group members...")
 			table.remove(self.GroupMembers, i)
 		end
 	end
