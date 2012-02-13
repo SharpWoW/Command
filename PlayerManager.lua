@@ -179,7 +179,11 @@ function PM:GetOrCreatePlayer(name)
 	else
 		local player = CET:Copy(Player)
 		player.Info.Name = name
-		player.Info.Group = self.Access.Groups.User.Name
+		if player.Info.Name == UnitName("player") then
+			player.Info.Group = self.Access.Groups.Owner.Name
+		else
+			player.Info.Group = self.Access.Groups.User.Name
+		end
 		Players[player.Info.Name] = player
 		log:Normal(("Created player %q with default settings."):format(player.Info.Name))
 		return player

@@ -60,6 +60,7 @@ local function RollTimerUpdate(_, elapsed)
 	
 	RollTimer.Frame:SetScript("OnUpdate", nil)
 	RollTimer.Current = 0
+	RollTimer.LastWarning = 0
 	
 	RM:StopRoll(true, true)
 end
@@ -120,6 +121,9 @@ function RM:SetTime(amount)
 end
 
 function RM:StartRoll(sender, item, time)
+	if RM.Running then
+		return false, "A roll is already in progress, wait for it to complete or use roll stop."
+	end
 	time = tonumber(time) or self.Settings.DEFAULT_TIME
 	RollTimer.Time = time
 	if not sender then
