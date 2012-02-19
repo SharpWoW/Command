@@ -185,9 +185,7 @@ function AC:UpdateGroup()
 			self:Send(self.Type.GroupUpdate, table.concat(self.GroupMembers, ";"), "RAID")
 		else
 			self.GroupMaster = false
-			if not CET:HasValue(self.GroupMembers, UnitName("player")) and self.GroupMembers[1] then
-				self:Send(self.Type.GroupAdd, UnitName("player"), "WHISPER", self.GroupMembers[1])
-			end
+			self:CheckGroupMembers()
 		end
 	else -- Already in group
 		if self.GroupMembers[1] == UnitName("player") then
@@ -195,6 +193,7 @@ function AC:UpdateGroup()
 			self:Send(self.Type.GroupUpdate, table.concat(self.GroupMembers, ";"), "RAID")
 		else
 			self.GroupMaster = false
+			self:CheckGroupMembers()
 		end
 	end
 end
@@ -224,7 +223,7 @@ function AC:UpdateGuild()
 			self:Send(self.Type.GuildUpdate, table.concat(self.GuildMembers, ";"), "GUILD")
 		else
 			self.GuildMaster = false
-			self:Send(self.Type.GuildAdd, UnitName("player"), "WHISPER", self.GuildMembers[1])
+			self:CheckGuildMembers()
 		end
 	else -- Already in guild
 		if self.GuildMembers[1] == UnitName("player") then
@@ -232,7 +231,20 @@ function AC:UpdateGuild()
 			self:Send(self.Type.GuildUpdate, table.concat(self.GuildMembers, ";"), "GUILD")
 		else
 			self.GuildMaster = false
+			self:CheckGuildMembers()
 		end
+	end
+end
+
+function AC:CheckGroupMembers()
+	if not CET:HasValue(self.GroupMembers, UnitName("player")) and self.GroupMembers[1] then
+		self:Send(self.Type.GroupAdd, UnitName("player"), "WHISPER", self.GroupMembers[1])
+	end
+end
+
+function AC:CheckGuildMembers()
+	if not CET:HasValue(self.GuildMembers, UnitName("player")) and self.GuildMembers[1] then
+		self:Send(self.Type.GuildAdd, UnitName("player"), "WHISPER", self.GuildMembers[1])
 	end
 end
 

@@ -285,6 +285,13 @@ CM:Register({"opme", "assistant", "assist"}, PM.Access.Groups.Op.Level, function
 	return PM:PromoteToAssistant(sender)
 end, "Player issuing this command will be promoted to raid assistant.")
 
+CM:Register({"deopme", "deassistant", "deassist"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+	if not isChat then
+		return false, "This command can only be used from the chat."
+	end
+	return PM:DemoteAssistant(sender)
+end, "Player issuing this command will be demoted from assistant status.")
+
 CM:Register({"leader", "lead"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	if #args <= 0 then
 		return false, "Missing argument: name"
@@ -300,6 +307,14 @@ CM:Register({"promote"}, PM.Access.Groups.Op.Level, function(args, sender, isCha
 	local player = PM:GetOrCreatePlayer(args[1])
 	return PM:PromoteToAssistant(player)
 end, "Promote a player to raid assistant.")
+
+CM:Register({"demote"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+	if #args <= 0 then
+		return false, "Missing argument: name"
+	end
+	local player = PM:GetOrCreatePlayer(args[1])
+	return PM:DemoteAssistant(player)
+end, "Demote a player from assistant status.")
 
 CM:Register({"queue", "q"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if #args <= 0 then

@@ -37,7 +37,7 @@ local GT = C.GroupTools
 -- @return True if player is in group, false otherwise.
 --
 function GT:IsGroup()
-	return UnitExists("party1")
+	return UnitExists("party1") or GT:IsRaid() or self:IsLFGGroup()
 end
 
 --- Check if the player is in an LFG group.

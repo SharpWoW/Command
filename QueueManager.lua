@@ -149,6 +149,21 @@ QM.Types = {
 		},
 		Id = 434
 	},
+	CrownChemical = {
+		Alias = {
+			"thecrownchemicalco",
+			"crownchemical",
+			"valentine",
+			"valentineboss",
+			"valentinedungeon",
+			"love",
+			"loveboss",
+			"lovedungeon",
+			"loveisintheair",
+			"<3"
+		},
+		Id = 288
+	},
 	Horseman = {
 		Alias = {
 			"horseman",

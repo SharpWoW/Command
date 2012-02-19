@@ -45,6 +45,8 @@ RollTimer.Current = 0
 local function RollTimerUpdate(_, elapsed)
 	if not RM.Running then
 		RollTimer.Frame:SetScript("OnUpdate", nil)
+		RollTimer.LastWarning = 0
+		RollTimer.Current = 0
 	end
 	
 	RollTimer.Current = RollTimer.Current + elapsed
@@ -153,7 +155,6 @@ function RM:StartRoll(sender, item, time)
 end
 
 function RM:StopRoll(finished, expire)
-	
 	if finished then
 		self:AnnounceResult(expire)
 	else

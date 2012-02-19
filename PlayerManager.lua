@@ -563,9 +563,11 @@ function PM:PromoteToLeader(player)
 	elseif not GT:IsInGroup(player.Info.Name) then
 		return false, ("%s is not in the group."):format(player.Info.Name)
 	end
-	if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() then
+	if GT:IsGroupLeader() then
 		PromoteToLeader(player.Info.Name)
 		return ("Promoted %s to group leader."):format(player.Info.Name)
+	else
+		return false, ("Cannot promote %s to group leader, insufficient permissions."):format(player.Info.Name)
 	end
 	return false, "Unknown error occurred."
 end
@@ -588,8 +590,29 @@ function PM:PromoteToAssistant(player)
 	if GT:IsGroupLeader() then
 		PromoteToAssistant(player.Info.Name)
 		return ("Promoted %s to assistant."):format(player.Info.Name)
+	else
+		return false, ("Cannot promote %s to assistant, insufficient permissions."):format(player.Info.Name)
 	end
-	return false, "Unknown error occurred"
+	return false, "Unknown error occurred."
+end
+
+function PM:DemoteAssistant(player)
+	if player.Info.Name == UnitName("player") then
+		return false, "Cannot demote myself."
+	elseif not GT:IsRaidAssistant(player.Info.Name) then
+		return false, ("%s is not an assistant, can only demote assistants."):format(player.Info.Name)
+	elseif not GT:IsInGroup(player.Info.Name) then
+		return false, ("%s is not in the group."):format(player.Info.Name)
+	elseif not UnitInRaid("player") then
+		return false, "Cannot demote when not in a raid."
+	end
+	if GT:IsGroupLeader() then
+		DemoteAssistant(player.Info.Name)
+		return ("Demoted %s."):format(player.Info.Name)
+	else
+		return false, ("Cannot demote %s, insufficient permissions."):format(player.Info.Name)
+	end
+	return false, "Unknown error occurred."
 end
 
 --- Check if a certain command is on the blacklist/whitelist.
