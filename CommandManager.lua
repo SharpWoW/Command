@@ -265,11 +265,11 @@ end, "Player issuing this command will receive invites sent from this AddOn.")
 
 CM:Register({"kick"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	if #args <= 0 then
-		return false, "Missing argument: name"
+		return false, "Usage: kick <player> [reason]"
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
-	return PM:Kick(player, sender)
-end, "Kick a player from group (Requires confirmation).")
+	return PM:Kick(player, sender, args[2])
+end, "Kick a player from group with optional reason (Requires confirmation).")
 
 CM:Register({"kingme", "givelead"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	if not isChat then
@@ -330,6 +330,8 @@ CM:Register({"queue", "q"}, PM.Access.Groups.User.Level, function(args, sender, 
 		index = QM:GetIndex(args[1])
 	end
 	if not index then
+		HideUIPanel(LFDParentFrame)
+		SetCVar("Sound_EnableSFX", 1)
 		return false, ("No such dungeon type: %q"):format(args[1])
 	end
 	return QM:Queue(index)

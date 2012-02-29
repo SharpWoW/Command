@@ -53,9 +53,10 @@ local QM = C.QueueManager
 -- @field LKHeroic Random Heroic Wrath of the Lich King Dungeon
 -- @field CataclysmRandom Random Cataclysm Dungeon
 -- @field CataclysmHeroic Random Heroic Cataclysm Dungeon
--- @field Zandalari Random Rise of the Zandalari Dungeon
--- @field Horseman The Headless Horseman Hallow's Eve dungeon
--- @field BestChoice Let the server decide what dungeon is best for the player
+-- @field HourOfTwilight Random Hour of Twilight Dungeon
+-- @field CrownChemical Crown Chemical Co. Holiday Boss (Shadowfang Keep)
+-- @field Horseman The Headless Horseman Hallow's Eve Dungeon
+-- @field BestChoice Let the server decide what dungeon is best
 --
 QM.Types = {
 	ClassicRandom = {

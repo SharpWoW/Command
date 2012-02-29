@@ -99,7 +99,11 @@ local KickName, KickSender, KickReason
 local function Kick(name, sender, reason)
 	UninviteUnit(name, reason)
 	if GT:IsGroup() then
-		CM:SendMessage(("%s has been kicked on %s's request."):format(name, sender), CM.LastChannel, CM.LastTarget)
+		if type(reason) == "string" then
+			CM:SendMessage(("%s has been kicked on %s's request. (Reason: %s)"):format(name, sender, reason), CM.LastChannel, CM.LastTarget)
+		else
+			CM:SendMessage(("%s has been kicked on %s's request."):format(name, sender), CM.LastChannel, CM.LastTarget)
+		end
 	else
 		CM:SendMessage(("%s was kicked on your request."):format(name), "WHISPER", sender)
 	end
@@ -532,7 +536,7 @@ end
 -- @return String stating the result of the kick, false if error.
 -- @return Error message if unsuccessful, nil otherwise.
 --
-function PM:Kick(player, sender)
+function PM:Kick(player, sender, reason)
 	if player.Info.Name == UnitName("player") then
 		return false, "Cannot kick myself."
 	elseif self:IsFriend(player) or self:IsBNFriend(player) then
@@ -543,7 +547,7 @@ function PM:Kick(player, sender)
 	if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() then
 		KickName = player.Info.Name
 		KickSender = sender.Info.Name
-		KickReason = ("%s used !kick command."):format(KickSender)
+		KickReason = reason or ("%s used !kick command."):format(KickSender)
 		StaticPopup_Show("COMMAND_CONFIRMKICK", KickSender, KickName)
 		return ("Awaiting confirmation to kick %s..."):format(KickName)
 	end
