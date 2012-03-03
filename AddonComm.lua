@@ -38,11 +38,13 @@ C.AddonComm = {
 		VersionUpdate = "COMM_VU",
 		GroupUpdate = "COMM_GU",
 		GroupAdd = "COMM_GA",
+		GroupRequest = "COMM_GR",
 		GuildUpdate = "COMM_UG",
-		GuildAdd = "COMM_AG"
+		GuildAdd = "COMM_AG",
+		GuildRequest = "COMM_RG"
 	},
 	Format = {
-		VersionUpdate = "%s",
+		VersionUpdate = "%s"
 	},
 	GroupMembers = {},
 	GuildMembers = {}
@@ -82,7 +84,10 @@ end
 function AC:Init()
 	--self:LoadSavedVars()
 	for _,v in pairs(self.Type) do
-		RegisterAddonMessagePrefix(v)
+		if not RegisterAddonMessagePrefix(v) then
+			log:Error(("[FATAL] Failed to register Addon prefix %q. Maximum number of prefixes reached on client."):format(tostring(v)))
+			error(("[FATAL] Failed to register Addon prefix %q. Maximum number of prefixes reached on client."):format(tostring(v)))
+		end
 	end
 end
 
@@ -119,6 +124,10 @@ function AC:Receive(msgType, msg, channel, sender)
 			table.insert(self.GroupMembers, msg)
 		end
 		self:Send(self.Type.GroupUpdate, table.concat(self.GroupMembers, ";"), "RAID")
+	elseif msgType == self.Type.GroupRequest then
+		if self.GroupMembers[1] == UnitName("player") or self.GroupMaster then
+			self:UpdateGroup()
+		end
 	elseif msgType == self.Type.GuildUpdate then
 		if channel ~= "GUILD" then return end
 		if self.GuildRunning then
@@ -142,11 +151,19 @@ function AC:Receive(msgType, msg, channel, sender)
 			table.insert(self.GuildMembers, msg)
 		end
 		self:Send(self.Type.GuildUpdate, table.concat(self.GuildMembers, ";"), "GUILD")
+	elseif msgType == self.Type.GuildRequest then
+		if self.GuildMembers[1] == UnitName("player") or self.GuildMaster then
+			self:UpdateGuild()
+		end
 	end
 end
 
 function AC:Send(msgType, msg, channel, target)
 	channel = channel or "RAID"
+	if channel == "RAID" and not GT:IsRaid() then
+		if not GT:IsGroup() then return end
+		channel = "PARTY"
+	end
 	if not CET:HasValue(self.Type, msgType) then
 		error("Invalid Message Type specified: " .. tostring(msgType))
 		return
@@ -176,6 +193,7 @@ function AC:UpdateGroup()
 			self.GroupRunning = true
 			log:Normal("Waiting for group response...")
 			GroupTimer:SetScript("OnUpdate", GroupTimerUpdate)
+			self:Send(self.Type.GroupRequest, UnitName("player"), "RAID")
 			return
 		end
 		self.InGroup = true
@@ -253,6 +271,9 @@ function AC:CheckGroupRoster()
 		if not GT:IsInGroup(v) then
 			log:Normal("Detected that " .. v .. " is no longer in the group, removing and updating group members...")
 			table.remove(self.GroupMembers, i)
+			if self.GroupMembers[1] == UnitName("player") then
+				self.GroupMaster = true
+			end
 		end
 	end
 end
@@ -267,6 +288,9 @@ function AC:CheckGuildRoster()
 	for i,v in pairs(self.GuildMembers) do
 		if not g[v] then
 			table.remove(self.GuildMembers, i)
+		end
+		if self.GuildMembers[1] == UnitName("player") then
+			self.GuildMaster = true
 		end
 	end
 end
