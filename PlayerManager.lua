@@ -90,7 +90,8 @@ local Player = {
 		Deny = {}
 	},
 	Settings = {
-		Invite = true
+		Invite = true,
+		Locked = false
 	}
 }
 
@@ -258,6 +259,7 @@ end
 --
 function PM:PlayerAccessRemove(player, command)
 	if not command then return false, "No command specified" end
+	if self:IsLocked(player) then return false, "Target player is locked and cannot be modified." end
 	for i,v in pairs(player.Access.Allow) do
 		if v == command then table.remove(player.Access.Allow, i) end
 	end
@@ -277,6 +279,7 @@ end
 --
 function PM:PlayerAccess(player, command, allow)
 	if not command then return false, "No command specified" end
+	if self:IsLocked(player) then return false, "Target player is locked and cannot be modified." end
 	local mode = "allowed"
 	if allow then
 		if CET:HasValue(player.Access.Deny, command) then
@@ -311,6 +314,36 @@ end
 function PM:UpdatePlayer(player)
 	Players[player.Info.Name] = player
 	log:Normal(("Updated player %q."):format(player.Info.Name))
+end
+
+--- Check if provided player is locked.
+-- @param player Player object to check.
+--
+function PM:IsLocked(player)
+	if type(player) == "table" then
+		if player.Settings then
+			return player.Settings.Locked
+		else
+			return false
+		end
+	elseif type(player) == "string" then
+		return self:IsLocked(self:GetOrCreatePlayer(player))
+	end
+	return true
+end
+
+--- Set lock status on a player.
+-- @param player Player object to change.
+-- @param locked True for locked, False for unlocked.
+--
+function PM:SetLocked(player, locked)
+	if type(player) ~= "table" then
+		player = self:GetOrCreatePlayer(tostring(player))
+	end
+	player.Settings.Locked = locked
+	local mode = "locked"
+	if not locked then mode = "unlocked" end
+	return ("Player %s has been %s."):format(player.Info.Name, mode)
 end
 
 --- Check if supplied player is on the player's friends list.
@@ -417,6 +450,7 @@ function PM:SetAccessGroup(player, group)
 	if not CET:HasKey(self.Access.Groups, group) then
 		return false, ("No such access group: %q"):format(group)
 	end
+	if self:IsLocked(player) then return false, "Target player is locked and cannot be modified." end
 	player.Info.Group = group
 	self:UpdatePlayer(player)
 	return ("Set the access level of %q to %d (%s)"):format(player.Info.Name, PM:GetAccess(player), player.Info.Group)
@@ -568,6 +602,7 @@ function PM:PromoteToLeader(player)
 		return false, ("%s is not in the group."):format(player.Info.Name)
 	end
 	if GT:IsGroupLeader() then
+		if self:IsLocked(player) then return false, "Target player is locked and cannot be modified." end
 		PromoteToLeader(player.Info.Name)
 		return ("Promoted %s to group leader."):format(player.Info.Name)
 	else
@@ -592,6 +627,7 @@ function PM:PromoteToAssistant(player)
 		return false, "Cannot promote to assistant when not in a raid."
 	end
 	if GT:IsGroupLeader() then
+		if self:IsLocked(player) then return false, "Target player is locked and cannot be modified." end
 		PromoteToAssistant(player.Info.Name)
 		return ("Promoted %s to assistant."):format(player.Info.Name)
 	else
@@ -611,6 +647,7 @@ function PM:DemoteAssistant(player)
 		return false, "Cannot demote when not in a raid."
 	end
 	if GT:IsGroupLeader() then
+		if self:IsLocked(player) then return false, "Target player is locked and cannot be modified." end
 		DemoteAssistant(player.Info.Name)
 		return ("Demoted %s."):format(player.Info.Name)
 	else

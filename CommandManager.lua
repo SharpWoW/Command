@@ -175,6 +175,22 @@ CM:Register({"version", "ver", "v"}, PM.Access.Groups.User.Level, function(args,
 	return C.Version
 end, "Print the version of Command")
 
+CM:Register({"lock", "lockdown"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+	if #args <= 0 then
+		return false, "Too few arguments. Usage: lock <player>"
+	end
+	local player = PM:GetOrCreatePlayer(args[1])
+	return PM:SetLocked(player, true)
+end, "Lock a player.")
+
+CM:Register({"unlock", "open"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+	if #args <= 0 then
+		return false, "Too few arguments. Usage: lock <player>"
+	end
+	local player = PM:GetOrCreatePlayer(args[1])
+	return PM:SetLocked(player, false)
+end, "Unlock a player.")
+
 CM:Register({"getaccess"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if #args <= 0 then
 		return false, "Too few arguments. Usage: getaccess <player>"
@@ -529,6 +545,8 @@ CM:Register({"roll", "r"}, PM.Access.Groups.Op.Level, function(args, sender, isC
 			end
 		end
 		return RM:StartRoll(sender.Info.Name, item, time)
+	elseif args[1] == "pass" then
+		return RM:PassRoll(sender.Info.Name)
 	elseif args[1] == "stop" then
 		return RM:StopRoll()
 	elseif args[1] == "time" then
@@ -539,7 +557,11 @@ CM:Register({"roll", "r"}, PM.Access.Groups.Op.Level, function(args, sender, isC
 			min = tonumber(args[2])
 			max = tonumber(args[3])
 		end
-		return RM:DoRoll(min, max)
+		if not min and (args[2] == "pass" or args[2] == "p" or args[2] == "skip") then
+			return RM:PassRoll()
+		else
+			return RM:DoRoll(min, max)
+		end
 	elseif args[1] == "set" then
 		if #args < 3 then
 			return false, "Usage: roll set <min||max> <amount>"

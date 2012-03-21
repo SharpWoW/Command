@@ -142,10 +142,10 @@ function RM:StartRoll(sender, item, time)
 	if item then
 		self.Item = item
 		RollTimer.Frame:SetScript("OnUpdate", RollTimerUpdate)
-		return ("%s started a roll for %s, ends in %d seconds! Type /roll %d %d"):format(self.Sender, self.Item, time, self.Settings.MIN_ROLL, self.Settings.MAX_ROLL)
+		return ("%s started a roll for %s, ends in %d seconds! Type /roll %d %d. Type !roll pass to pass."):format(self.Sender, self.Item, time, self.Settings.MIN_ROLL, self.Settings.MAX_ROLL)
 	else
 		RollTimer.Frame:SetScript("OnUpdate", RollTimerUpdate)
-		return ("%s started a roll, ends in %d seconds! Type /roll %d %d"):format(self.Sender, time, self.Settings.MIN_ROLL, self.Settings.MAX_ROLL)
+		return ("%s started a roll, ends in %d seconds! Type /roll %d %d. Type !roll pass to pass."):format(self.Sender, time, self.Settings.MIN_ROLL, self.Settings.MAX_ROLL)
 	end
 	-- We shouldn't reach this place
 	self.Running = false
@@ -187,6 +187,17 @@ function RM:AddRoll(name, roll)
 	if RollCount >= self.NumGroupMembers then RM:StopRoll(true) end
 end
 
+function RM:PassRoll(name)
+	name = name or UnitName("player")
+	if CET:HasKey(Rollers, name) then
+		return false, ("%s has already rolled (%d)"):format(name, Rollers[name])
+	end
+	Rollers[name] = -1
+	RollCount = RollCount + 1
+	if RollCount >= self.NumGroupMembers then RM:StopRoll(true) end
+	return ("%s has passed on the roll."):format(name)
+end
+
 function RM:GetTime()
 	if self.Running then
 		return ("%d seconds remaining!"):format(max(ceil(RollTimer.Time - RollTimer.Current), 0))
@@ -214,7 +225,6 @@ function RM:AnnounceResult(expire)
 			roll = tonumber(v)
 			name = k
 			wipe(additional)
-			numAdditional = 0
 		elseif tonumber(v) == roll then
 			additional[k] = tonumber(v)
 			numAdditional = numAdditional + 1
