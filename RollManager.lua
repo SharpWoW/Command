@@ -58,13 +58,13 @@ local function RollTimerUpdate(_, elapsed)
 		RollTimer.LastWarning = ceil(RollTimer.Current)
 	end
 	
-	if RollTimer.Current < RollTimer.Time then return end
+	if RollTimer.Current < RollTimer.Time and RollCount < RM.NumGroupMembers then return end
 	
 	RollTimer.Frame:SetScript("OnUpdate", nil)
 	RollTimer.Current = 0
 	RollTimer.LastWarning = 0
 	
-	RM:StopRoll(true, true)
+	RM:StopRoll(true, RollCount < RM.NumGroupMembers)
 end
 
 function RM:Init()
@@ -184,7 +184,7 @@ function RM:AddRoll(name, roll)
 	Rollers[name] = tonumber(roll)
 	RollCount = RollCount + 1
 	CM:SendMessage(("%d/%d players have rolled!"):format(RollCount, self.NumGroupMembers), "SMART")
-	if RollCount >= self.NumGroupMembers then RM:StopRoll(true) end
+	--if RollCount >= self.NumGroupMembers then RM:StopRoll(true) end
 end
 
 function RM:PassRoll(name)
@@ -194,7 +194,7 @@ function RM:PassRoll(name)
 	end
 	Rollers[name] = -1
 	RollCount = RollCount + 1
-	if RollCount >= self.NumGroupMembers then RM:StopRoll(true) end
+	--if RollCount >= self.NumGroupMembers then RM:StopRoll(true) end
 	return ("%s has passed on the roll."):format(name)
 end
 
@@ -217,21 +217,29 @@ function RM:AnnounceResult(expire)
 		return
 	end
 	local name
-	local roll = 0
+	local roll = -1 -- Minimum roll is 0
 	local additional = {}
 	local numAdditional = 0
 	for k,v in pairs(Rollers) do
-		if tonumber(v) > roll then
-			roll = tonumber(v)
+		local r = tonumber(v)
+		if r > roll then
+			roll = r
 			name = k
 			wipe(additional)
-		elseif tonumber(v) == roll then
-			additional[k] = tonumber(v)
+		elseif r == roll and r ~= -1 then
+			additional[k] = r
 			numAdditional = numAdditional + 1
 		end
 	end
 	local msg
-	if numAdditional <= 0 then
+	if roll == -1 then
+		msg = "Everyone passed on the roll! There is no winner"
+		if self.Item then
+			msg = msg .. " for " .. self.Item
+		end
+		msg = msg .. "."
+		CM:SendMessage(msg, "SMART")
+	elseif numAdditional <= 0 then
 		msg = "The winner is: " .. name .. "! With a roll of " .. roll
 		if self.Item then
 			msg = msg .. " for " .. self.Item

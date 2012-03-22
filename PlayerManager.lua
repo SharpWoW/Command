@@ -178,7 +178,7 @@ end
 -- @return Player from list of players if exists, otherwise a new player object.
 --
 function PM:GetOrCreatePlayer(name)
-	name = name:gsub("^%l", string.upper)
+	name = name:lower():gsub("^%l", string.upper)
 	if CET:HasKey(Players, name) then
 		return Players[name]
 	else

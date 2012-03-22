@@ -32,7 +32,7 @@
 Command = {
 	Name = "Command",
 	Version = GetAddOnMetadata("Command", "Version"),
-	VersionNum = 4, -- Increment on every release
+	VersionNum = 5, -- Increment on every release
 	VersionChecked = false, -- Prevent spam of "New Version" notice
 	Loaded = false,
 	VarVersion = 2,

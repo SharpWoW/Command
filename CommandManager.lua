@@ -38,6 +38,7 @@ local CM = C.CommandManager
 local PM = C.PlayerManager
 local QM = C.QueueManager
 local RM = C.RollManager
+local LM = C.LootManager
 local GT = C.GroupTools
 local CES = C.Extensions.String
 local CET = C.Extensions.Table
@@ -77,6 +78,7 @@ end
 -- @param command Command name to check.
 --
 function CM:HasCommand(command)
+	command = command:lower()
 	if self.Commands[command] then return true end
 	for _,v in pairs(self.Commands) do
 		if CET:HasValue(v.Alias, command) then return true end
@@ -89,6 +91,7 @@ end
 -- @return Callback for the command, nil if no command was found.
 --
 function CM:GetCommand(command)
+	command = command:lower()
 	if self.Commands[command] then
 		return self.Commands[command]
 	end
@@ -99,6 +102,7 @@ function CM:GetCommand(command)
 end
 
 function CM:GetRealName(name)
+	name = name:lower()
 	if self.Commands[name] then return name end
 	for k,v in pairs(self.Commands) do
 		if CET:HasValue(v.Alias, name) then return k end
@@ -130,6 +134,7 @@ end
 -- @return Error message if not successful, otherwise nil.
 --
 function CM:HandleCommand(command, args, isChat, player)
+	command = command:lower()
 	local cmd = self:GetCommand(command)
 	if cmd then
 		if isChat then
@@ -154,6 +159,9 @@ function CM:AutoHelp()
 end
 
 CM:Register({"__DEFAULT__", "help", "h"}, PM.Access.Local, function(args, sender, isChat)
+	if isChat then
+		return "Type !commands for a listing of commands available."
+	end
 	CM:AutoHelp()
 	return "End of help message."
 end, "Prints this help message.")
@@ -164,11 +172,7 @@ CM:Register({"commands", "cmds", "cmdlist", "listcmds", "listcommands", "command
 		all = args[1] == "all"
 	end
 	local cmds = CM:GetCommands(all)
-	local msg = ""
-	for _,v in pairs(cmds) do
-		msg = msg .. v .. ", "
-	end
-	return CES:Cut(msg, 240)
+	return CES:Fit(cmds, 240, ", ") -- Max length is 255, "[Command] " takes up 10. This leaves us with 5 characters grace.
 end, "Print all registered commands.")
 
 CM:Register({"version", "ver", "v"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
@@ -176,35 +180,41 @@ CM:Register({"version", "ver", "v"}, PM.Access.Groups.User.Level, function(args,
 end, "Print the version of Command")
 
 CM:Register({"lock", "lockdown"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
-	if #args <= 0 then
-		return false, "Too few arguments. Usage: lock <player>"
+	if type(args[1]) == "string" then
+		return PM:SetLocked(PM:GetOrCreatePlayer(args[1]), true)
+	else
+		return PM:SetLocked(sender, true)
 	end
-	local player = PM:GetOrCreatePlayer(args[1])
-	return PM:SetLocked(player, true)
 end, "Lock a player.")
 
 CM:Register({"unlock", "open"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
-	if #args <= 0 then
-		return false, "Too few arguments. Usage: lock <player>"
+	if type(args[1]) == "string" then
+		return PM:SetLocked(PM:GetOrCreatePlayer(args[1]), false)
+	else
+		return PM:SetLocked(sender, false)
 	end
-	local player = PM:GetOrCreatePlayer(args[1])
-	return PM:SetLocked(player, false)
 end, "Unlock a player.")
 
 CM:Register({"getaccess"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
-	if #args <= 0 then
-		return false, "Too few arguments. Usage: getaccess <player>"
+	local msg = "%s's access is %d (%s)"
+	if type(args[1]) == "string" then
+		local player = PM:GetOrCreatePlayer(args[1])
+		return msg:format(player.Info.Name, PM.Access.Groups[player.Info.Group].Level, player.Info.Group)
+	else
+		return msg:format(sender.Info.Name, PM.Access.Groups[sender.Info.Group].Level, sender.Info.Group)
 	end
-	local player = PM:GetOrCreatePlayer(args[1])
-	return tostring(PM.Access.Groups[player.Info.Group].Level) .. " (" .. tostring(player.Info.Group) .. ")"
 end, "Get the access level of a user.")
 
 CM:Register({"setaccess"}, PM.Access.Local, function(args, sender, isChat)
-	if #args <= 1 then
-		return false, "Too few arguments. Usage: setaccess <player> <group>"
+	if #args < 1 then
+		return false, "Too few arguments. Usage: setaccess [player] <group>"
 	end
-	local player = PM:GetOrCreatePlayer(args[1])
-	return PM:SetAccessGroup(player, args[2])
+	if #args >= 2 then
+		local player = PM:GetOrCreatePlayer(args[1])
+		return PM:SetAccessGroup(player, args[2])
+	else
+		return PM:SetAccessGroup(sender, args[1])
+	end
 end, "Set the access level of a user.")
 
 CM:Register({"owner"}, PM.Access.Local, function(args, sender, isChat)
@@ -216,30 +226,32 @@ CM:Register({"owner"}, PM.Access.Local, function(args, sender, isChat)
 end, "Promote a player to owner rank.")
 
 CM:Register({"admin"}, PM.Access.Groups.Owner.Level, function(args, sender, isChat)
-	if #args <= 0 then
-		return false, "Missing argument: name"
-	end
 	if isChat then
 		return false, "This command is not allowed to be used from the chat."
+	end
+	if #args <= 0 then
+		return false, "Missing argument: name"
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
 	return PM:SetAdmin(player)
 end, "Promote a player to admin rank.")
 
 CM:Register({"op"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
-	if #args <= 0 then
-		return false, "Missing argument: name"
+	if type(args[1]) == "string" then
+		local player = PM:GetOrCreatePlayer(args[1])
+		return PM:SetOp(player)
+	else
+		return PM:SetOp(sender)
 	end
-	local player = PM:GetOrCreatePlayer(args[1])
-	return PM:SetOp(player)
 end, "Promote a player to op rank.")
 
 CM:Register({"user"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
-	if #args <= 0 then
-		return false, "Missing argument: name"
+	if type(args[1]) == "string" then
+		local player = PM:GetOrCreatePlayer(args[1])
+		return PM:SetUser(player)
+	else
+		return PM:SetUser(sender)
 	end
-	local player = PM:GetOrCreatePlayer(args[1])
-	return PM:SetUser(player)
 end, "Promote a player to user rank.")
 
 CM:Register({"ban"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
@@ -251,11 +263,12 @@ CM:Register({"ban"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat
 end, "Ban a player.")
 
 CM:Register({"invite", "inv"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
-	if #args <= 0 then
-		return false, "Missing argument: name"
+	if type(args[1]) == "string" then
+		local player = PM:GetOrCreatePlayer(args[1])
+		return PM:Invite(player, sender)
+	else
+		return PM:Invite(sender, sender)
 	end
-	local player = PM:GetOrCreatePlayer(args[1])
-	return PM:Invite(player, sender)
 end, "Invite a player to group.")
 
 CM:Register({"inviteme", "invme"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
@@ -496,7 +509,7 @@ CM:Register({"readycheck", "rc"}, PM.Access.Groups.Op.Level, function(args, send
 		return false, "Ready check not running or I have already responded."
 	end
 	local arg = tostring(args[1]):lower()
-	if arg == "accept" or arg == "yes" then
+	if arg:match("^[ay]") then -- Accept
 		C.Data.ReadyCheckRunning = false
 		if ReadyCheckFrameYesButton then
 			ReadyCheckFrameYesButton:Click()
@@ -504,7 +517,7 @@ CM:Register({"readycheck", "rc"}, PM.Access.Groups.Op.Level, function(args, send
 		ConfirmReadyCheck(true)
 		status = GetReadyCheckStatus("player")
 		return "Accepted ready check."
-	elseif arg == "decline" or arg == "no" then
+	elseif arg:match("^[dn]") then -- Decline
 		C.Data.ReadyCheckRunning = false
 		if ReadyCheckFrameNoButton then
 			ReadyCheckFrameNoButton:Click()
@@ -518,12 +531,52 @@ CM:Register({"readycheck", "rc"}, PM.Access.Groups.Op.Level, function(args, send
 	return false, "Failed to accept or decline ready check."
 end, "Respond to ready check or initate a new one.")
 
+CM:Register({"loot", "l"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+	local usage = "Usage: loot <type||threshold||master||pass>"
+	if #args <= 0 then
+		return false, usage
+	end
+	args[1] = args[1]:lower()
+	if args[1]:match("^ty") or args[1]:match("^me") or args[1] == "t" then
+		if #args < 2 then
+			return false, "No loot method specified."
+		end
+		local method = args[2]:lower()
+		return LM:SetLootMethod(method, args[3])
+	elseif args[1]:match("^th") or args[1]:match("^l") then
+		if #args < 2 then
+			return false, "No loot threshold specified."
+		end
+		return LM:SetLootThreshold(args[2])
+	elseif args[1]:match("^m") then
+		if #args < 2 then
+			return false, "No master looter specified."
+		end
+		return LM:SetLootMaster(args[2])
+	elseif args[1]:match("^p") then
+		local p = args[2]
+		if type(p) == "string" then
+			if p:lower():match("^[eay]") then
+				p = true
+			elseif p:lower():match("^[dn]") then
+				p = false
+			else
+				p = nil
+			end
+		else
+			p = nil
+		end
+		return LM:SetLootPass(p)
+	end
+	return false, usage
+end, "Provides various loot functions.")
+
 CM:Register({"roll", "r"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	if #args <= 0 then
 		return RM:StartRoll(sender.Info.Name)
 	end
 	args[1] = args[1]:lower()
-	if args[1] == "start" then
+	if args[1]:match("^sta") then
 		if #args < 2 then
 			return false, "Usage: roll start <[time] [item]>"
 		end
@@ -545,39 +598,39 @@ CM:Register({"roll", "r"}, PM.Access.Groups.Op.Level, function(args, sender, isC
 			end
 		end
 		return RM:StartRoll(sender.Info.Name, item, time)
-	elseif args[1] == "pass" then
+	elseif args[1]:match("^p") then
 		return RM:PassRoll(sender.Info.Name)
-	elseif args[1] == "stop" then
+	elseif args[1]:match("^sto") then
 		return RM:StopRoll()
-	elseif args[1] == "time" then
+	elseif args[1]:match("^t") then
 		return RM:GetTime()
-	elseif args[1] == "do" then
+	elseif args[1]:match("^d") then
 		local min, max
 		if #args >= 3 then
 			min = tonumber(args[2])
 			max = tonumber(args[3])
 		end
-		if not min and (args[2] == "pass" or args[2] == "p" or args[2] == "skip") then
+		if not min and args[2]:match("^[ps]") then
 			return RM:PassRoll()
 		else
 			return RM:DoRoll(min, max)
 		end
-	elseif args[1] == "set" then
+	elseif args[1]:match("^se") then
 		if #args < 3 then
-			return false, "Usage: roll set <min||max> <amount>"
+			return false, "Usage: roll set <min||max||time> <amount>"
 		end
 		args[2] = args[2]:lower()
-		if args[2] == "min" then
+		if args[2]:match("^mi") then
 			return RM:SetMin(tonumber(args[3]))
-		elseif args[2] == "max" then
+		elseif args[2]:match("^ma") then
 			return RM:SetMax(tonumber(args[3]))
-		elseif args[2] == "time" then
+		elseif args[2]:match("^t") then
 			return RM:SetTime(tonumber(args[3]))
 		else
-			return false, "Usage: roll set <min||max> <amount>"
+			return false, "Usage: roll set <min||max||time> <amount>"
 		end
 	end
-	return false, "Usage: roll [start||stop||time||do||set]"
+	return false, "Usage: roll [start||stop||pass||time||do||set]"
 end, "Provides tools for managing or starting/stopping rolls.")
 
 for i,v in ipairs(CM.Slash) do
@@ -596,7 +649,13 @@ SlashCmdList[C.Name:upper()] = function(msg, editBox)
 	end
 	local result, err = CM:HandleCommand(cmd, t, false, PM:GetOrCreatePlayer(UnitName("player")))
 	if result then
-		C.Logger:Normal(tostring(result))
+		if type(result) == "table" then
+			for _,v in ipairs(result) do
+				C.Logger:Normal(tostring(v))
+			end
+		else
+			C.Logger:Normal(tostring(result))
+		end
 	else
 		C.Logger:Error(tostring(err))
 	end

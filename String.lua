@@ -17,11 +17,11 @@
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-if type(Command.Extensions) ~= "table" then
-	Command.Extensions = {}
-end
-
 local C = Command
+
+if type(C.Extensions) ~= "table" then
+	C.Extensions = {}
+end
 
 --- Table containing all String methods.
 -- This is referenced "CES" in String.lua.
@@ -106,4 +106,37 @@ function CES:Cut(s, l)
 		pos = l * i + 1
 	end
 	return t
+end
+
+--- Split a string into parts to fit the length specified.
+-- Works like Cut() except keeps words together to make it more pretty.
+-- @param s The string to fit.
+-- @param l Max length of each part.
+-- @param d Delimiter to separate each word with.
+-- @return Table containing the parts.
+--
+function CES:Fit(s, l, d)
+	if (type(s) ~= "string" and type(s) ~= "table") or type(l) ~= "number" then
+		error("Invalid parameters passed, expected [string, number], got: [" .. type(s) .. ", " .. type(l) .. "]!")
+		return
+	end
+	d = d or " "
+	if type(s) == "table" then s = C.Extensions.Table:Join(s) end
+	if s:len() <= l then return s end
+	local words = self:Split(s)
+	local parts = {}
+	local part = ""
+	for i=1, #words do
+		part = part .. words[i]
+		if i >= #words then
+			table.insert(parts, part)
+			break
+		elseif (part .. words[i + 1]):len() >= l then
+			table.insert(parts, part)
+			part = ""
+		else
+			part = part .. d
+		end
+	end
+	return parts
 end

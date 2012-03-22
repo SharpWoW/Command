@@ -75,3 +75,24 @@ function CET:Copy(tbl, cache)
 	end
 	return copy
 end
+
+--- Join table values together to create a string.
+-- @param tbl Table to join.
+-- @param d Delimiter to use between values.
+-- @return String containing the joined values of the table.
+--
+function CET:Join(tbl, d)
+	if type(tbl) ~= "table" then
+		error("Expected argument of type [table], got [" .. type(tbl) .. "]!")
+		return
+	end
+	d = d or " "
+	if #tbl <= 0 then return "" end
+	local s = tostring(tbl[1])
+	if #tbl > 1 then
+		for i=2, #tbl do
+			s = s .. d .. tostring(tbl[i])
+		end
+	end
+	return s
+end
