@@ -40,6 +40,7 @@ local CES = C.Extensions.String
 -- @param target String to search for at beginning of s.
 --
 function CES:StartsWith(s, target)
+	if not s then return false end
 	return s:sub(1, target:len()) == target
 end
 

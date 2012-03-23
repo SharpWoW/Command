@@ -373,7 +373,7 @@ CM:Register({"leavelfg", "cancellfg", "cancel", "leavelfd", "cancellfd"}, PM.Acc
 	return QM:Cancel()
 end, "Leave the LFG queue.")
 
-CM:Register({"acceptlfg", "accept", "join", "acceptlfd"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"acceptlfg", "accept", "acceptlfd", "joinlfg", "joinlfd"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if not QM.QueuedByCommand then
 		return false, "Not currently queued by command."
 	end
@@ -394,17 +394,14 @@ CM:Register({"convert", "conv"}, PM.Access.Groups.Op.Level, function(args, sende
 		return false, "Usage: convert party||raid."
 	end
 	args[1] = args[1]:lower()
-	if args[1] ~= "party" and args[1] ~= "raid" then
-		return false, "Invalid group type, only \"party\" or \"raid\" allowed."
-	end
-	if args[1] == "party" then
+	if args[1]:match("^p") then
 		if GT:IsRaid() then
 			ConvertToParty()
 			return "Converted raid to party."
 		else
 			return false, "Group is already a party."
 		end
-	else
+	elseif args[1]:match("^r") then
 		if GT:IsRaid() then
 			return false, "Group is already a raid."
 		else
@@ -412,6 +409,7 @@ CM:Register({"convert", "conv"}, PM.Access.Groups.Op.Level, function(args, sende
 			return "Converted party to raid."
 		end
 	end
+	return false, "Invalid group type, only \"party\" or \"raid\" allowed."
 end, "Convert group to party or raid.")
 
 CM:Register({"list"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
