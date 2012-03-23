@@ -115,7 +115,7 @@ function AC:Receive(msgType, msg, channel, sender)
 				table.insert(self.GroupMembers, v)
 			end
 		end
-		log:Normal("Updated group members, controller: " .. self.GroupMembers[1])
+		log:Debug("Updated group members, controller: " .. self.GroupMembers[1])
 		self:UpdateGroup()
 	elseif msgType == self.Type.GroupAdd then
 		if channel ~= "WHISPER" or not GT:IsGroup() then return end
@@ -142,7 +142,7 @@ function AC:Receive(msgType, msg, channel, sender)
 				table.insert(self.GuildMembers, v)
 			end
 		end
-		log:Normal("Updated guild members, controller: " .. self.GuildMembers[1])
+		log:Debug("Updated guild members, controller: " .. self.GuildMembers[1])
 		self:UpdateGuild()
 	elseif msgType == self.Type.GuildAdd then
 		if channel ~= "WHISPER" then return end
@@ -184,9 +184,7 @@ function AC:UpdateGroup()
 		self.GroupMaster = true
 		wipe(self.GroupMembers)
 		return
-	end
-	self:CheckGroupRoster()
-	if not self.InGroup then -- Just joined group
+	elseif not self.InGroup then -- Just joined group
 		self.GroupMaster = false
 		if not self.GroupChecked and not GT:IsGroupLeader() then
 			self.GroupChecked = true
@@ -206,6 +204,8 @@ function AC:UpdateGroup()
 			self:CheckGroupMembers()
 		end
 	else -- Already in group
+		self:CheckGroupRoster()
+		self:SyncGroup()
 		if self.GroupMembers[1] == UnitName("player") then
 			self.GroupMaster = true
 			self:Send(self.Type.GroupUpdate, table.concat(self.GroupMembers, ";"), "RAID")
@@ -223,9 +223,7 @@ function AC:UpdateGuild()
 		self.GuildMaster = true
 		wipe(self.GuildMembers)
 		return
-	end
-	self:CheckGuildRoster()
-	if not self.InGuild then -- Probably logged in and is getting guild update for the first time
+	elseif not self.InGuild then -- Probably logged in and is getting guild update for the first time
 		self.GuildMaster = false
 		if not self.GuildChecked then
 			self.GuildChecked = true
@@ -244,6 +242,7 @@ function AC:UpdateGuild()
 			self:CheckGuildMembers()
 		end
 	else -- Already in guild
+		self:CheckGuildRoster()
 		if self.GuildMembers[1] == UnitName("player") then
 			self.GuildMaster = true
 			self:Send(self.Type.GuildUpdate, table.concat(self.GuildMembers, ";"), "GUILD")
@@ -291,6 +290,19 @@ function AC:CheckGuildRoster()
 		end
 		if self.GuildMembers[1] == UnitName("player") then
 			self.GuildMaster = true
+		end
+	end
+end
+
+function AC:SyncGroup()
+	if GT:IsInGroup() and GT:IsGroupLeader() then
+		if self.GroupMembers[1] ~= UnitName("player") or not self.GroupMaster then
+			-- Sync handler table
+			log:Normal("Detected group handlers out of date! Sending sync message...")
+			wipe(self.GroupMembers)
+			self.GroupMembers[1] = UnitName("player")
+			self.GroupMaster = true
+			self:UpdateGroup()
 		end
 	end
 end
