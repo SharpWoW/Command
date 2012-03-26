@@ -87,7 +87,22 @@ function C.Events.RAID_ROSTER_UPDATE(self, ...)
 	AC:UpdateGroup()
 end
 
+function C.Events.PARTY_INVITE_REQUEST(self, ...)
+	if not self.Settings.GROUP_INVITE_ANNOUNCE then return end
+	local sender = (select(1, ...))
+	local msg = "Type !acceptinvite to make me accept the group invite."
+	if self.Settings.GROUP_INVITE_ANNOUNCE_DELAY > 0 then
+		local f=CreateFrame("Frame")f.T=0;f.L=self.Settings.GROUP_INVITE_ANNOUNCE_DELAY;f.S=sender;f.M=msg
+		f:SetScript("OnUpdate",function(s,e)s.T=s.T+e;if(s.T>s.L)then s:SetScript("OnUpdate",nil)if(StaticPopup_Visible("PARTY_INVITE"))then CM:SendMessage(s.M,"WHISPER",s.S)end;end;end)
+	else
+		CM:SendMessage(msg, "WHISPER", sender)
+	end
+end
+
 function C.Events.PARTY_MEMBERS_CHANGED(self, ...)
+	if StaticPopup_Visible("PARTY_INVITE") then
+		StaticPopup_Hide("PARTY_INVITE")
+	end
 	if AC.GroupRunning then return end
 	AC:UpdateGroup()
 end

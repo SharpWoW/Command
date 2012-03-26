@@ -23,6 +23,7 @@
 	<Script file="Table.lua" />
 	<Script file="String.lua" />
 	<Script file="Logger.lua" />
+	<Script file="BattleNetTools.lua" />
 	<Script file="GroupTools.lua" />
 	<Script file="PlayerManager.lua" />
 	<Script file="QueueManager.lua" />

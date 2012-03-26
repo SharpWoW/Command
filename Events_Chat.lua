@@ -20,6 +20,7 @@
 local C = Command
 local CM = C.ChatManager
 local AC = C.AddonComm
+local BNT = C.BattleNetTools
 
 function C.Events.CHAT_MSG_SYSTEM(self, event, ...)
 	if C.RollManager.Running then
@@ -64,11 +65,11 @@ function C.Events.CHAT_MSG_BN_WHISPER(self, event, ...)
 	local chan = "BNET"
 	local msg = (select(1, ...))
 	local id = (select(13, ...))
-	local _, name, client, realm, _, faction, _, _, _, _, _, _, _, _ = BNGetToonInfo(id)
-	if not name or client:lower() ~= "wow" then return end
-	if faction == 0 then faction = "horde" elseif faction == 1 then faction = "alliance" end
-	if realm:lower() == GetRealmName():lower() and faction == (select(1, UnitFactionGroup("player"))):lower() then
-		CM:HandleMessage(msg, name, chan, id, chan, true, id)
+	local toon = BNT:GetToon(id)
+	if not toon then return end
+	if toon.Client ~= BNET_CLIENT_WOW then return end
+	if toon.Realm:lower() == GetRealmName():lower() and toon.FactionString:lower() == (select(1, UnitFactionGroup("player"))):lower() then
+		CM:HandleMessage(msg, toon.Name, chan, id, chan, true, id)
 	end
 end
 

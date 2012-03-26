@@ -191,7 +191,7 @@ function CM:SetCmdChar(char)
 	if type(char) ~= "string" then
 		return false, "Command char has to be of type string."
 	end
-	char = char:lower()
+	char = char:lower():sub(1, 1)
 	self.Settings.CMD_CHAR = char
 	return "Successfully set the command char to: " .. char
 end

@@ -180,7 +180,7 @@ CM:Register({"version", "ver", "v"}, PM.Access.Groups.User.Level, function(args,
 end, "Print the version of Command")
 
 CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
-	local usage = "Usage: set cmdchar"
+	local usage = "Usage: set cmdchar|groupinvite"
 	if #args <= 0 then
 		return false, usage
 	end
@@ -190,6 +190,20 @@ CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, i
 			return false, "No command character specified."
 		end
 		return Chat:SetCmdChar(args[2])
+	elseif args[1]:match("^g") then -- Group invite (announce)
+		if #args < 2 then
+			return false, "Usage: set groupinvite enable|disable|<time>"
+		end
+		args[2] = args[2]:lower()
+		local time = tonumber(args[2])
+		if time then
+			return C:SetGroupInviteDelay(time)
+		elseif args[2]:match("^[eay]") then -- Enable
+			return C:EnableGroupInvite()
+		elseif args[2]:match("^[dn]") then -- Disable
+			return C:DisableGroupInvite()
+		end
+		return false, "Usage: set groupinvite enable|disable|<time>"
 	end
 	return false, usage
 end, "Control the settings of Command.")
@@ -276,6 +290,16 @@ CM:Register({"ban"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat
 	local player = PM:GetOrCreatePlayer(args[1])
 	return PM:BanUser(player)
 end, "Ban a player.")
+
+CM:Register({"acceptinvite", "acceptinv", "join", "joingroup"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not StaticPopup_Visible("PARTY_INVITE") then
+		return false, "No pending invites active."
+	elseif GT:IsInGroup() then
+		return false, "I am already in a group." -- This shouldn't happen
+	end
+	AcceptGroup()
+	return "Accepted group invite!"
+end, "Accepts a pending group invite.")
 
 CM:Register({"invite", "inv"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if type(args[1]) == "string" then
@@ -657,7 +681,13 @@ CM:Register({"raidwarning", "rw", "raid_warning"}, PM.Access.Groups.User.Level, 
 	elseif #args <= 0 then
 		return false, "Usage: raidwarning <message>"
 	end
-	Chat:SendMessage(args[1], "RAID_WARNING")
+	local msg = args[1]
+	if #args > 1 then
+		for i = 2, #args do
+			msg = msg .. " " .. args[i]
+		end
+	end
+	Chat:SendMessage(msg, "RAID_WARNING")
 	return "Sent raid warning."
 end, "Sends a raid warning.")
 

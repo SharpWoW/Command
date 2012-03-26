@@ -32,7 +32,7 @@
 Command = {
 	Name = "Command",
 	Version = GetAddOnMetadata("Command", "Version"),
-	VersionNum = 6, -- Increment on every release
+	VersionNum = 7, -- Increment on every release
 	VersionChecked = false, -- Prevent spam of "New Version" notice
 	Loaded = false,
 	VarVersion = 2,
@@ -90,6 +90,12 @@ function C:LoadSavedVars()
 	end
 	if type(self.Settings.ENABLED) ~= "bolean" then
 		self.Settings.ENABLED = true
+	end
+	if type(self.Settings.GROUP_INVITE_ANNOUNCE) ~= "boolean" then
+		self.Settings.GROUP_INVITE_ANNOUNCE = false
+	end
+	if type(self.Settings.GROUP_INVITE_ANNOUNCE_DELAY) ~= "number" then
+		self.Settings.GROUP_INVITE_ANNOUNCE_DELAY = 0
 	end
 	CM:Init()
 	PM:Init()
@@ -166,4 +172,43 @@ end
 --
 function C:ToggleDebug()
 	return self:SetDebug(not self.Settings.DEBUG)
+end
+
+function C:SetGroupInvite(enabled)
+	self.Settings.GROUP_INVITE_ANNOUNCE = enabled
+	if self.Settings.GROUP_INVITE_ANNOUNCE then
+		return "Group Invite (Announce) enabled."
+	end
+	return "Group Invite (Announce) disabled."
+end
+
+function C:EnableGroupInvite()
+	return self:SetGroupInvite(true)
+end
+
+function C:DisableGroupInvite()
+	return self:SetGroupInvite(false)
+end
+
+function C:ToggleGroupInvite()
+	return self:SetGroupInvite(not self.Settings.GROUP_INVITE_ANNOUNCE)
+end
+
+function C:SetGroupInviteDelay(time)
+	if type(time) ~= "number" then
+		return false, "Delay has to be a number."
+	end
+	time = math.ceil(time)
+	if time > 50 then
+		return false, "Delay cannot be greater than 50 seconds."
+	end
+	self.Settings.GROUP_INVITE_ANNOUNCE_DELAY = time
+	if self.Settings.GROUP_INVITE_ANNOUNCE_DELAY > 0 then
+		return "Group Invite (Announce) delay set to " .. self.Settings.GROUP_INVITE_ANNOUNCE_DELAY .. " seconds."
+	end
+	return "Group Invite (Announce) delay disabled."
+end
+
+function C:DisableGroupInviteDelay()
+	return self:SetGroupInviteDelay(0)
 end

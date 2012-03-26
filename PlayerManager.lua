@@ -23,6 +23,7 @@ local MODE_WHITELIST = 1
 local C = Command
 local CM
 local GT = C.GroupTools
+local BNT = C.BattleNetTools
 local CCM
 local CET = C.Extensions.Table
 local log
@@ -366,11 +367,9 @@ end
 -- @return True if BN friend, false otherwise.
 --
 function PM:IsBNFriend(player)
-	if BNGetNumFriends() <= 0 then return false end
-	for i=1,BNGetNumFriends() do
-		local char, client = (select(4, BNGetFriendInfo(i))), (select(6, BNGetFriendInfo(i)))
-		if char == player.Info.Name and client == "WoW" then return true end
-	end
+	local friend = BNT:GetFriendByName(player.Info.Name)
+	if not friend then return false end
+	if friend.Client == BNET_CLIENT_WOW then return true end
 	return false
 end
 
