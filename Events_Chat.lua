@@ -50,18 +50,41 @@ function C.Events.CHAT_MSG_BATTLEGROUND_LEADER(self, event, ...)
 	CM:HandleMessage(msg, sender, chan)
 end
 
-function T.Events.CHAT_MSG_BN_CONVERSATION(self, event, ...)
+function C.Events.CHAT_MSG_BN_CONVERSATION(self, event, ...)
+end
+--]]
+
+--- Event handler for CHAT_MSG_BN_WHISPER.
+-- @name Command.Events.CHAT_MSG_BN_WHISPER
+-- @param self Reference to Command object.
+-- @param event Full name of event.
+-- @param ... Event arguments.
+--
+function C.Events.CHAT_MSG_BN_WHISPER(self, event, ...)
+	local chan = "BNET"
+	local msg = (select(1, ...))
+	local id = (select(13, ...))
+	local _, name, client, realm, _, faction, _, _, _, _, _, _, _, _ = BNGetToonInfo(id)
+	if not name or client:lower() ~= "wow" then return end
+	if faction == 0 then faction = "horde" elseif faction == 1 then faction = "alliance" end
+	if realm:lower() == GetRealmName():lower() and faction == (select(1, UnitFactionGroup("player"))):lower() then
+		CM:HandleMessage(msg, name, chan, id, chan, true, id)
+	end
 end
 
-function T.Events.CHAT_MSG_BN_WHISPER(self, event, ...)
-end
-
+--[[
+--- Event handler for CHAT_MSG_CHANNEL.
+-- @name Command.Events.CHAT_MSG_CHANNEL
+-- @param self Reference to Command object.
+-- @param event Full name of event.
+-- @param ... Event arguments.
+--
 function C.Events.CHAT_MSG_CHANNEL(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
 	local sender = (select(2, ...))
 	local target = (select(8, ...))
-	CM:HandleMessage(msg, sender, chan, target)
+	CM:HandleMessage(msg, sender, chan, nil, "CHANNEL")
 end
 --]]
 
@@ -156,14 +179,18 @@ function C.Events.CHAT_MSG_RAID_WARNING(self, event, ...)
 	CM:HandleMessage(msg, sender, chan, nil, "RAID")
 end
 
---[[
+--- Event handler for CHAT_MSG_SAY.
+-- @name Command.Events.CHAT_MSG_SAY
+-- @param self Reference to Command object.
+-- @param event Full name of event.
+-- @param ... Event arguments.
+--
 function C.Events.CHAT_MSG_SAY(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
 	local sender = (select(2, ...))
 	CM:HandleMessage(msg, sender, chan)
 end
---]]
 
 --- Event handler for CHAT_MSG_WHISPER.
 -- @name Command.Events.CHAT_MSG_WHISPER
@@ -179,11 +206,15 @@ function C.Events.CHAT_MSG_WHISPER(self, event, ...)
 	CM:HandleMessage(msg, sender, chan, target, "WHISPER")
 end
 
---[[
+--- Event handler for CHAT_MSG_YELL.
+-- @name Command.Events.CHAT_MSG_YELL
+-- @param self Reference to Command object.
+-- @param event Full name of event.
+-- @param ... Event arguments.
+--
 function C.Events.CHAT_MSG_YELL(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
 	local sender = (select(2, ...))
 	CM:HandleMessage(msg, sender, chan)
 end
---]]

@@ -44,7 +44,11 @@ end
 -- @return True if the player is in an LFG group, false otherwise.
 --
 function GT:IsLFGGroup()
-	return (select(1, GetLFGMode())) == "lfgparty"
+	local status, _ = GetLFGMode()
+	if status == "abandonedInDungeon" or status == "lfgparty" then
+		return true
+	end
+	return false
 end
 
 --- Check if player is in a raid.

@@ -40,14 +40,14 @@ local QM = C.QueueManager
 local RM = C.RollManager
 local LM = C.LootManager
 local GT = C.GroupTools
+local Chat
 local CES = C.Extensions.String
 local CET = C.Extensions.Table
 
 --- Initialize CommandManager.
--- NOTE: Unused.
 --
 function CM:Init()
-	
+	Chat = C.ChatManager
 end
 
 --- Register a new command.
@@ -178,6 +178,21 @@ end, "Print all registered commands.")
 CM:Register({"version", "ver", "v"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	return C.Version
 end, "Print the version of Command")
+
+CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+	local usage = "Usage: set cmdchar"
+	if #args <= 0 then
+		return false, usage
+	end
+	args[1] = args[1]:lower()
+	if args[1]:match("^c") then -- Command Char setting
+		if #args < 2 then
+			return false, "No command character specified."
+		end
+		return Chat:SetCmdChar(args[2])
+	end
+	return false, usage
+end, "Control the settings of Command.")
 
 CM:Register({"lock", "lockdown"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	if type(args[1]) == "string" then
@@ -530,6 +545,9 @@ CM:Register({"readycheck", "rc"}, PM.Access.Groups.Op.Level, function(args, send
 end, "Respond to ready check or initate a new one.")
 
 CM:Register({"loot", "l"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+	if GT:IsLFGGroup() then
+		return false, "Cannot use loot command in LFG group."
+	end
 	local usage = "Usage: loot <type||threshold||master||pass>"
 	if #args <= 0 then
 		return false, usage
@@ -630,6 +648,18 @@ CM:Register({"roll", "r"}, PM.Access.Groups.Op.Level, function(args, sender, isC
 	end
 	return false, "Usage: roll [start||stop||pass||time||do||set]"
 end, "Provides tools for managing or starting/stopping rolls.")
+
+CM:Register({"raidwarning", "rw", "raid_warning"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not GT:IsRaid() then
+		return false, "Cannot send raid warning when not in a raid group."
+	elseif not GT:IsRaidLeaderOrAssistant() then
+		return false, "Cannot send raid warning: Not raid leader or assistant."
+	elseif #args <= 0 then
+		return false, "Usage: raidwarning <message>"
+	end
+	Chat:SendMessage(args[1], "RAID_WARNING")
+	return "Sent raid warning."
+end, "Sends a raid warning.")
 
 for i,v in ipairs(CM.Slash) do
 	_G["SLASH_" .. C.Name:upper() .. i] = "/" .. v

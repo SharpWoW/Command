@@ -35,7 +35,22 @@ C.ChatManager = {
 		LocalOnly = false
 	},
 	LastChannel = nil,
-	LastTarget = nil
+	LastTarget = nil,
+	RespondChannel = {
+		CHAT_MSG_BATTLEGROUND			= "BATTLEGROUND",
+		CHAT_MSG_BATTLEGROUND_LEADER	= "BATTLEGROUND",
+		CHAT_MSG_CHANNEL				= "CHANNEL",
+		CHAT_MSG_GUILD					= "WHISPER",
+		CHAT_MSG_OFFICER				= "WHISPER",
+		CHAT_MSG_PARTY					= "PARTY",
+		CHAT_MSG_PARTY_LEADER			= "PARTY",
+		CHAT_MSG_RAID					= "RAID",
+		CHAT_MSG_RAID_LEADER			= "RAID",
+		CHAT_MSG_RAID_WARNING			= "RAID_WARNING",
+		CHAT_MSG_SAY					= "WHISPER",
+		CHAT_MSG_WHISPER				= "WHISPER",
+		CHAT_MSG_YELL					= "WHISPER"
+	}
 }
 
 local CM = C.ChatManager
@@ -45,11 +60,38 @@ local AC = C.AddonComm
 local CCM = C.CommandManager
 local CES = C.Extensions.String
 
+--- Initialize ChatManager.
+--
+function CM:Init()
+	self:LoadSavedVars()
+end
+
+--- Load saved variables.
+--
+function CM:LoadSavedVars()
+	if type(C.Settings.CHAT) ~= "table" then
+		C.Settings.CHAT = {}
+	end
+	self.Settings = C.Settings.CHAT
+	if type(self.Settings.CMD_CHAR) ~= "string" then
+		self.Settings.CMD_CHAR = self.Default.CmdChar
+	end
+	if type(self.Settings.LOCAL_ONLY) ~= "boolean" then
+		self.Settings.LOCAL_ONLY = self.Default.LocalOnly
+	end
+end
+
 --- Get the channel to be used as a response channel based on event name.
 -- @param event Full name of the event.
 -- @return The channel to be used as response channel.
 --
 function CM:GetRespondChannelByEvent(event)
+	if self.RespondChannel[event] then
+		return self.RespondChannel[event]
+	end
+	return "SAY"
+	
+	--[[
 	local respondChannel = "SAY"
 	if event == "CHAT_MSG_BATTLEGROUND" then
 		respondChannel = "BATTLEGROUND"
@@ -83,27 +125,7 @@ function CM:GetRespondChannelByEvent(event)
 		respondChannel = "YELL"
 	end
 	return respondChannel
-end
-
---- Initialize ChatManager.
---
-function CM:Init()
-	self:LoadSavedVars()
-end
-
---- Load saved variables.
---
-function CM:LoadSavedVars()
-	if type(C.Settings.CHAT) ~= "table" then
-		C.Settings.CHAT = {}
-	end
-	self.Settings = C.Settings.CHAT
-	if type(self.Settings.CMD_CHAR) ~= "string" then
-		self.Settings.CMD_CHAR = self.Default.CmdChar
-	end
-	if type(self.Settings.LOCAL_ONLY) ~= "boolean" then
-		self.Settings.LOCAL_ONLY = self.Default.LocalOnly
-	end
+	--]]
 end
 
 --- Send a chat message.
@@ -112,9 +134,10 @@ end
 -- @param channel The channel to send to.
 -- @param target Player or channel index to send message to.
 --
-function CM:SendMessage(msg, channel, target)
+function CM:SendMessage(msg, channel, target, isBN)
+	isBN = isBN or false
 	if not self.Settings.LOCAL_ONLY then
-		msg = ("[%s] %s"):format(C.Name, msg)
+		msg = ("[%s] %s"):format(C.Name, tostring(msg))
 		if channel == "SMART" then
 			if GT:IsRaid() then
 				channel = "RAID"
@@ -122,9 +145,19 @@ function CM:SendMessage(msg, channel, target)
 				channel = "PARTY"
 			else
 				C.Logger:Normal(msg)
+				return
+			end
+		elseif channel == "RAID_WARNING" then
+			if not GT:IsRaidLeaderOrAssistant() then
+				self:SendMessage(msg, "SMART", target, isBN)
+				return
 			end
 		end
-		SendChatMessage(msg, channel, nil, target)
+		if isBN then
+			BNSendWhisper(target, msg)
+		else
+			SendChatMessage(msg, channel, nil, target)
+		end
 	else
 		C.Logger:Normal(msg)
 	end
@@ -154,6 +187,15 @@ function CM:IsCommand(msg)
 	return CES:StartsWith(msg, self.Settings.CMD_CHAR)
 end
 
+function CM:SetCmdChar(char)
+	if type(char) ~= "string" then
+		return false, "Command char has to be of type string."
+	end
+	char = char:lower()
+	self.Settings.CMD_CHAR = char
+	return "Successfully set the command char to: " .. char
+end
+
 --- Handle a chat message.
 -- @param msg The message to handle.
 -- @param sender Player object of the player who sent the message.
@@ -161,10 +203,10 @@ end
 -- @param target Player or channel index.
 -- @param isBN True if battle.net message, false or nil otherwise.
 --
-function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN)
+function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID)
 	isBN = isBN or false
+	pID = pID or nil
 	target = target or sender
-	if isBN then return end
 	local raw = msg
 	msg = CES:Trim(msg)
 	local args = self:ParseMessage(msg)
@@ -183,18 +225,21 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN)
 			table.insert(t, args[i])
 		end
 	end
-	
 	local player = PM:GetOrCreatePlayer(sender)
 	local result, err = CCM:HandleCommand(cmd, t, true, player)
+	if isBN then
+		target = pID
+		sender = pID
+	end
 	if result then
 		if type(result) == "table" then
-			for _,v in pairs(result) do
-				self:SendMessage(tostring(v), channel, target)
+			for _,v in ipairs(result) do
+				self:SendMessage(tostring(v), channel, target, isBN)
 			end
 		else
-			self:SendMessage(tostring(result), channel, target)
+			self:SendMessage(tostring(result), channel, target, isBN)
 		end
 	else
-		self:SendMessage(tostring(err), "WHISPER", sender)
+		self:SendMessage(tostring(err), "WHISPER", sender, isBN)
 	end
 end
