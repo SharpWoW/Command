@@ -90,42 +90,6 @@ function CM:GetRespondChannelByEvent(event)
 		return self.RespondChannel[event]
 	end
 	return "SAY"
-	
-	--[[
-	local respondChannel = "SAY"
-	if event == "CHAT_MSG_BATTLEGROUND" then
-		respondChannel = "BATTLEGROUND"
-	elseif event == "CHAT_MSG_BATTLEGROUND_LEADER" then
-		respondChannel = "BATTLEGROUND"
-	elseif event == "CHAT_MSG_CHANNEL" then
-		respondChannel = "CHANNEL"
-	elseif event == "CHAT_MSG_GUILD" then
-		respondChannel = "WHISPER"
-	elseif event == "CHAT_MSG_OFFICER" then
-		respondChannel = "WHISPER"
-	elseif event == "CHAT_MSG_PARTY" then
-		respondChannel = "PARTY"
-	elseif event == "CHAT_MSG_PARTY_LEADER" then
-		respondChannel = "PARTY"
-	elseif event == "CHAT_MSG_RAID" then
-		respondChannel = "RAID"
-	elseif event == "CHAT_MSG_RAID_LEADER" then
-		respondChannel = "RAID"
-	elseif event == "CHAT_MSG_RAID_WARNING" then
-		if GT:IsRaidLeaderOrAssistant() then
-			respondChannel = "RAID_WARNING"
-		else
-			respondChannel = "RAID"
-		end
-	elseif event == "CHAT_MSG_SAY"then
-		respondChannel = "SAY"
-	elseif event == "CHAT_MSG_WHISPER" then
-		respondChannel = "WHISPER"
-	elseif event == "CHAT_MSG_YELL" then
-		respondChannel = "YELL"
-	end
-	return respondChannel
-	--]]
 end
 
 --- Send a chat message.
@@ -176,7 +140,7 @@ end
 -- @return Parsed command (without the command char)
 --
 function CM:ParseCommand(cmd)
-	return cmd:sub(2, cmd:len())
+	return cmd:sub(self.Settings.CMD_CHAR:len() + 1, cmd:len())
 end
 
 --- Check if a string is a command.
@@ -191,7 +155,7 @@ function CM:SetCmdChar(char)
 	if type(char) ~= "string" then
 		return false, "Command char has to be of type string."
 	end
-	char = char:lower():sub(1, 1)
+	char = char:lower() --:sub(1, 1)
 	self.Settings.CMD_CHAR = char
 	return "Successfully set the command char to: " .. char
 end
