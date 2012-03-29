@@ -196,6 +196,14 @@ function PM:GetOrCreatePlayer(name)
 	end
 end
 
+--- Update a player and subsequently save them.
+-- @param player Player object to update.
+--
+function PM:UpdatePlayer(player)
+	Players[player.Info.Name] = player
+	log:Normal(("Updated player %q."):format(player.Info.Name))
+end
+
 --- Completely remove a command from a group's access list.
 -- Removed from both the allow and deny list.
 -- @param group Name of group to modify.
@@ -307,14 +315,6 @@ function PM:PlayerAccess(player, command, allow)
 	end
 	self:UpdatePlayer(player)
 	return ("%q is now %s for %s"):format(command, mode, player.Info.Name)
-end
-
---- Update a player and subsequently save them.
--- @param player Player object to update.
---
-function PM:UpdatePlayer(player)
-	Players[player.Info.Name] = player
-	log:Normal(("Updated player %q."):format(player.Info.Name))
 end
 
 --- Check if provided player is locked.
