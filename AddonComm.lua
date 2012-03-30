@@ -1,5 +1,5 @@
---[[
-	* Copyright (c) 2011 by Adam Hellberg.
+﻿--[[
+	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
 	* 
@@ -18,6 +18,10 @@
 --]]
 
 local C = Command
+
+local function L(k)
+	return C.LocaleManager:GetActive()[k]
+end
 
 local GT = C.GroupTools
 local CES = C.Extensions.String
@@ -65,7 +69,7 @@ local function GroupTimerUpdate(frame, elapsed)
 		frame.Time = 0
 		AC.GroupRunning = false
 		frame:SetScript("OnUpdate", nil)
-		log:Normal("No response from group, running updater...")
+		log:Normal(L("AC_GROUP_NORESP"))
 		AC:UpdateGroup()
 	end
 end
@@ -76,7 +80,7 @@ local function GuildTimerUpdate(frame, elapsed)
 		frame.Time = 0
 		AC.GuildRunning = false
 		frame:SetScript("OnUpdate", nil)
-		log:Normal("No response from guild, running updater...")
+		log:Normal(L("AC_GUILD_NORESP"))
 		AC:UpdateGuild()
 	end
 end
@@ -85,8 +89,8 @@ function AC:Init()
 	--self:LoadSavedVars()
 	for _,v in pairs(self.Type) do
 		if not RegisterAddonMessagePrefix(v) then
-			log:Error(("[FATAL] Failed to register Addon prefix %q. Maximum number of prefixes reached on client."):format(tostring(v)))
-			error(("[FATAL] Failed to register Addon prefix %q. Maximum number of prefixes reached on client."):format(tostring(v)))
+			log:Error(L("AC_ERR_PREFIX"):format(tostring(v)))
+			error(L("AC_ERR_PREFIX"):format(tostring(v)))
 		end
 	end
 end
@@ -115,7 +119,7 @@ function AC:Receive(msgType, msg, channel, sender)
 				table.insert(self.GroupMembers, v)
 			end
 		end
-		log:Debug("Updated group members, controller: " .. self.GroupMembers[1])
+		log:Debug(L("AC_GROUP_R_UPDATE"):format(self.GroupMembers[1]))
 		self:UpdateGroup()
 	elseif msgType == self.Type.GroupAdd then
 		if channel ~= "WHISPER" or not GT:IsGroup() then return end
@@ -142,7 +146,7 @@ function AC:Receive(msgType, msg, channel, sender)
 				table.insert(self.GuildMembers, v)
 			end
 		end
-		log:Debug("Updated guild members, controller: " .. self.GuildMembers[1])
+		log:Debug(L("AC_GUILD_R_UPDATE"):format(self.GuildMembers[1]))
 		self:UpdateGuild()
 	elseif msgType == self.Type.GuildAdd then
 		if channel ~= "WHISPER" then return end
@@ -165,7 +169,7 @@ function AC:Send(msgType, msg, channel, target)
 		channel = "PARTY"
 	end
 	if not CET:HasValue(self.Type, msgType) then
-		error("Invalid Message Type specified: " .. tostring(msgType))
+		error(L("AC_ERR_MSGTYPE"):format(tostring(msgType)))
 		return
 	end
 	SendAddonMessage(msgType, msg, channel, target)
@@ -177,7 +181,7 @@ end
 function AC:UpdateGroup()
 	if not GT:IsGroup() then
 		if self.InGroup then
-			log:Normal("Left group, resetting group variables...")
+			log:Normal(L("AC_GROUP_LEFT"))
 		end
 		self.InGroup = false
 		self.GroupChecked = false
@@ -189,7 +193,7 @@ function AC:UpdateGroup()
 		if not self.GroupChecked and not GT:IsGroupLeader() then
 			self.GroupChecked = true
 			self.GroupRunning = true
-			log:Normal("Waiting for group response...")
+			log:Normal(L("AC_GROUP_WAIT"))
 			GroupTimer:SetScript("OnUpdate", GroupTimerUpdate)
 			self:Send(self.Type.GroupRequest, UnitName("player"), "RAID")
 			return
@@ -228,7 +232,7 @@ function AC:UpdateGuild()
 		if not self.GuildChecked then
 			self.GuildChecked = true
 			self.GuildRunning = true
-			log:Normal("Waiting for guild response...")
+			log:Normal(L("AC_GUILD_WAIT"))
 			GuildTimer:SetScript("OnUpdate", GuildTimerUpdate)
 			return
 		end
@@ -268,7 +272,7 @@ end
 function AC:CheckGroupRoster()
 	for i,v in ipairs(self.GroupMembers) do
 		if not GT:IsInGroup(v) then
-			log:Normal("Detected that " .. v .. " is no longer in the group, removing and updating group members...")
+			log:Normal(L("AC_GROUP_REMOVE"):format(v))
 			table.remove(self.GroupMembers, i)
 			if self.GroupMembers[1] == UnitName("player") then
 				self.GroupMaster = true
@@ -298,7 +302,7 @@ function AC:SyncGroup()
 	if GT:IsInGroup() and GT:IsGroupLeader() then
 		if self.GroupMembers[1] ~= UnitName("player") or not self.GroupMaster then
 			-- Sync handler table
-			log:Normal("Detected group handlers out of date! Sending sync message...")
+			log:Normal(L("AC_GROUP_SYNC"))
 			wipe(self.GroupMembers)
 			self.GroupMembers[1] = UnitName("player")
 			self.GroupMaster = true

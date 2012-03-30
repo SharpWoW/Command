@@ -1,5 +1,5 @@
---[[
-	* Copyright (c) 2011 by Adam Hellberg.
+﻿--[[
+	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
 	* 
@@ -27,6 +27,7 @@ local C = Command
 C.LootManager = {
 }
 
+local L = function(k) return C.LocaleManager:GetActive()[k] end
 local LM = C.LootManager
 local GT = C.GroupTools
 
@@ -45,6 +46,23 @@ local function ParseLootMethod(method)
 		return "roundrobin"
 	end
 	return "group"
+end
+
+local function PrettyMethod(method)
+	if type(method) ~= "string" then return L("LOOT_METHOD_GROUP") end
+	method = method:lower()
+	if method:match("^f") then
+		return L("LOOT_METHOD_FFA")
+	elseif method:match("^g") then
+		return L("LOOT_METHOD_GROUP")
+	elseif method:match("^m") then
+		return L("LOOT_METHOD_MASTER")
+	elseif method:match("^n") then
+		return L("LOOT_METHOD_NEEDGREED")
+	elseif method:match("^r") then
+		return L("LOOT_METHOD_ROUNDROBIN")
+	end
+	return method
 end
 
 local function ParseThreshold(threshold)
@@ -71,88 +89,86 @@ end
 
 local function PrettyThreshold(level)
 	if level == 2 then
-		return "Uncommon"
+		return L("LOOT_THRESHOLD_UNCOMMON")
 	elseif level == 3 then
-		return "Rare"
+		return L("LOOT_THRESHOLD_RARE")
 	elseif level == 4 then
-		return "Epic"
+		return L("LOOT_THRESHOLD_EPIC")
 	elseif level == 5 then
-		return "Legendary"
+		return L("LOOT_THRESHOLD_LEGENDARY")
 	elseif level == 6 then
-		return "Artifact"
+		return L("LOOT_THRESHOLD_ARTIFACT")
 	elseif level == 7 then
-		return "Heirloom"
+		return L("LOOT_THRESHOLD_HEIRLOOM")
 	end
-	return "Unknown"
+	return L("LOOT_THRESHOLD_UNKNOWN")
 end
 
 function LM:SetLootMethod(method, master)
 	if not GT:IsGroupLeader() then
-		return false, "Unable to change loot method, not group leader."
+		return false, "LOOT_SM_NOLEAD"
 	end
 	method = ParseLootMethod(method)
 	if method == GetLootMethod() then
-		return false, "The loot method is already set to " .. method .. "!"
+		return false, "LOOT_SM_DUPE", {PrettyMethod(method)}
 	elseif method == "master" then
 		if not master then
 			master = UnitName("player")
-			--return false, "A master looter must be specified when setting loot method to Master Loot."
 		elseif not GT:IsInGroup(master) then
-			return false, ("%q is not in the group and cannot be set as the master looter."):format(master)
+			return false, "LOOT_MASTER_NOEXIST", {master}
 		end
 		SetLootMethod(method, master)
-		return ("Successfully set the loot method to %s (%s)!"):format(method, master)
+		return "LOOT_SM_SUCCESSMASTER", {PrettyMethod(method), master}
 	end
 	SetLootMethod(method)
-	return ("Successfully set the loot method to %s!"):format(method)
+	return "LOOT_SM_SUCCESS", {PrettyMethod(method)}
 end
 
 function LM:SetLootMaster(master)
 	if not GT:IsGroupLeader() then
-		return false, "Unable to change master looter, not group leader."
+		return false, "LOOT_SLM_NOLEAD"
 	end
 	local method = GetLootMethod()
 	if method ~= "master" then
-		return false, "Cannot set master looter when loot method is set to " .. method
+		return false, "LOOT_SLM_METHOD", {method}
 	end
 	if not master then
-		return false, "Master looter not specified."
+		return false, "LOOT_SLM_SPECIFY"
 	elseif not GT:IsInGroup(master) then
-		return false, ("%q is not in the group and cannot be set as the master looter."):format(master)
+		return false, "LOOT_MASTER_NOEXIST", {master}
 	end
 	SetLootMethod("master", master)
-	return ("Successfully set %s as the master looter!"):format(master)
+	return "LOOT_SLM_SUCCESS", {master}
 end
 
 function LM:SetLootThreshold(threshold)
 	if not GT:IsGroupLeader() then
-		return false, "Unable to change loot threshold, not group leader."
+		return false, "LOOT_ST_NOLEAD"
 	end
 	threshold = ParseThreshold(threshold)
 	if threshold < 2 or threshold > 7 then
-		return false, "Invalid loot threshold specified, please specify a loot threshold between 2 and 7 (inclusive)."
+		return false, "LOOT_ST_INVALID"
 	end
 	SetLootThreshold(threshold)
-	return "Successfully set the loot threshold to " .. PrettyThreshold(threshold) .. "!"
+	return "LOOT_ST_SUCCESS", {PrettyThreshold(threshold)}
 end
 
 function LM:SetLootPass(pass)
-	local msg = UnitName("player") .. " is %s passing on loot."
+	local p = false
 	if type(pass) == "nil" then
 		local current = GetOptOutOfLoot()
 		SetOptOutOfLoot(not current)
-		if current then
-			msg = msg:format("not")
-		else
-			msg = msg:format("now")
+		if not current then
+			p = true
 		end
 	else
 		SetOptOutOfLoot(pass)
 		if pass then
-			msg = msg:format("now")
-		else
-			msg = msg:format("not")
+			p = true
 		end
 	end
-	return msg
+	if p then
+		return "LOOT_SP_PASS", {UnitName("player")}
+	end
+	return "LOOT_SP_ROLL", {UnitName("player")}
 end

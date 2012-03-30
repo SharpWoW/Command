@@ -1,5 +1,5 @@
---[[
-	* Copyright (c) 2011 by Adam Hellberg.
+﻿--[[
+	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
 	* 
@@ -37,7 +37,7 @@ local GT = C.GroupTools
 -- @return True if player is in group, false otherwise.
 --
 function GT:IsGroup()
-	return UnitExists("party1") or GT:IsRaid() or self:IsLFGGroup()
+	return UnitExists("party1") or self:IsRaid() or self:IsLFGGroup()
 end
 
 --- Check if the player is in an LFG group.
@@ -86,14 +86,9 @@ end
 --
 function GT:IsGroupFull()
 	-- We need to add 1 to the number because it doesn't count the player.
-	local num = 0
+	local num = self:GetNumGroupMembers()
 	local max = self.RaidMax
-	if self:IsRaid() then
-		num = GetNumRaidMembers()
-	elseif self:IsGroup() then
-		num = GetNumPartyMembers() + 1
-		max = self.PartyMax
-	end
+	if self:IsGroup() then max = self.PartyMax end
 	if num >= max then return true end
 	return false
 end

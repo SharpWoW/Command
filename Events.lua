@@ -1,5 +1,5 @@
---[[
-	* Copyright (c) 2011 by Adam Hellberg.
+﻿--[[
+	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
 	* 
@@ -19,6 +19,7 @@
 
 local C = Command
 
+local L = function(k) return C.LocaleManager:GetActive()[k] end
 local CM = C.ChatManager
 local QM = C.QueueManager
 local AC = C.AddonComm
@@ -57,7 +58,7 @@ end
 --
 function C.Events.LFG_PROPOSAL_SHOW(self, ...)
 	if not QM.QueuedByCommand then return end
-	CM:SendMessage("Group has been found, type !accept to make me accept the invite.", "PARTY")
+	CM:SendMessage(L("E_LFGPROPOSAL"), "PARTY")
 end
 
 --- Event handler for LFG_PROPOSAL_FAILED
@@ -68,14 +69,14 @@ end
 function C.Events.LFG_PROPOSAL_FAILED(self, ...)
 	if not QM.QueuedByCommand then return end
 	QM.QueuedByCommand = false
-	CM:SendMessage("LFG failed, use !queue <type> to requeue.", "PARTY")
+	CM:SendMessage(L("E_LFGFAIL"), "PARTY")
 end
 
 function C.Events.READY_CHECK(self, ...)
 	if C.Data.ReadyCheckRunning then return end
 	C.Data.ReadyCheckRunning = true
 	local name = tostring(select(1, ...))
-	CM:SendMessage(name .. " issued a ready check, type !rc accept to make me accept it or !rc deny to deny it.", "SMART")
+	CM:SendMessage(L("E_READYCHECK"):format(name), "SMART")
 end
 
 function C.Events.READY_CHECK_FINISHED(self, ...)
@@ -90,7 +91,8 @@ end
 function C.Events.PARTY_INVITE_REQUEST(self, ...)
 	if not self.Settings.GROUP_INVITE_ANNOUNCE then return end
 	local sender = (select(1, ...))
-	local msg = "Type !acceptinvite to make me accept the group invite."
+	local locale = C.PlayerManager:GetOrCreatePlayer(sender).Settings.Locale
+	local msg = C.LocaleManager:GetLocale(locale, true)["E_GROUPINVITE"]
 	if self.Settings.GROUP_INVITE_ANNOUNCE_DELAY > 0 then
 		local f=CreateFrame("Frame")f.T=0;f.L=self.Settings.GROUP_INVITE_ANNOUNCE_DELAY;f.S=sender;f.M=msg
 		f:SetScript("OnUpdate",function(s,e)s.T=s.T+e;if(s.T>s.L)then s:SetScript("OnUpdate",nil)if(StaticPopup_Visible("PARTY_INVITE"))then CM:SendMessage(s.M,"WHISPER",s.S)end;end;end)

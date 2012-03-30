@@ -1,5 +1,5 @@
---[[
-	* Copyright (c) 2011 by Adam Hellberg.
+﻿--[[
+	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
 	* 
@@ -21,6 +21,8 @@ local MODE_BLACKLIST = 0
 local MODE_WHITELIST = 1
 
 local C = Command
+local L = C.LocaleManager
+local GetL = function(k) return L:GetActive()[k] end
 local CM
 local GT = C.GroupTools
 local BNT = C.BattleNetTools
@@ -72,7 +74,7 @@ C.PlayerManager = {
 				Deny = {}
 			}
 		}
-	},
+	}
 }
 
 local Players = {}
@@ -102,24 +104,44 @@ local function Kick(name, sender, reason)
 	UninviteUnit(name, reason)
 	if GT:IsGroup() then
 		if type(reason) == "string" then
-			CM:SendMessage(("%s has been kicked on %s's request. (Reason: %s)"):format(name, sender, reason), CM.LastChannel, CM.LastTarget)
+			local msg
+			if CM.LastChannel == "WHISPER" or CM.LastChannel == "BNET" then
+				msg = L:GetLocale(PM:GetOrCreatePlayer(sender).Settings.Locale, true)["PM_KICK_REASON"]:format(name, sender, reason)
+			else
+				msg = GetL("PM_KICK_REASON"):format(name, sender, reason)
+			end
+			CM:SendMessage(msg, CM.LastChannel, CM.LastTarget)
 		else
-			CM:SendMessage(("%s has been kicked on %s's request."):format(name, sender), CM.LastChannel, CM.LastTarget)
+			local msg
+			if CM.LastChannel == "WHISPER" or CM.LastChannel == "BNET" then
+				msg = L:GetLocale(PM:GetOrCreatePlayer(sender).Settings.Locale, true)["PM_KICK"]:format(name, sender)
+			else
+				msg = GetL("PM_KICK"):format(name, sender)
+			end
+			CM:SendMessage(msg, CM.LastChannel, CM.LastTarget)
 		end
 	else
-		CM:SendMessage(("%s was kicked on your request."):format(name), "WHISPER", sender)
+		local msg = L:GetLocale(PM:GetOrCreatePlayer(sender).Settings.Locale, true)["PM_KICK_NOTIFY"]:format(name)
+		CM:SendMessage(msg, "WHISPER", sender)
 	end
-	CM:SendMessage(("You have been kicked out of the group by %s."):format(sender), "WHISPER", name)
+	local msg = L:GetLocale(PM:GetOrCreatePlayer(name).Settings.Locale, true)["PM_KICK_TARGET"]:format(sender)
+	CM:SendMessage(msg, "WHISPER", name)
 end
 
 local function KickCancelled(name, sender)
-	CM:SendMessage(("%s's request to kick %s has been denied."):format(sender, name), CM.LastChannel, CM.LastTarget)
+	local msg
+	if CM.LastTarget and (CM.LastChannel == "WHISPER" or CM.LastChannel == "BNET") then
+		msg = L:GetLocale(PM:GetOrCreatePlayer(CM.LastTarget).Settings.Locale, true)["PM_KICK_DENIED"]:format(sender, name)
+	else
+		msg = GetL("PM_KICK_DENIED"):format(sender, name)
+	end
+	CM:SendMessage(msg, CM.LastChannel, CM.LastTarget)
 end
 
 StaticPopupDialogs["COMMAND_CONFIRMKICK"] = {
-	text = "%s wants to kick %s. Confirm?",
-	button1 = "Yes",
-	button2 = "No",
+	text = "PM_KICK_POPUP",
+	button1 = "YES",
+	button2 = "NO",
 	OnAccept = function() Kick(KickName, KickSender, KickReason) end,
 	OnCancel = function() KickCancelled(KickName, KickSender) end,
 	timeout = 10,
@@ -142,36 +164,37 @@ function PM:LoadSavedVars()
 	if type(C.Global["PLAYER_MANAGER"]) ~= "table" then
 		C.Global["PLAYER_MANAGER"] = {}
 	end
-	if type(C.Global["PLAYER_MANAGER"]["PLAYERS"]) ~= "table" then
-		C.Global["PLAYER_MANAGER"]["PLAYERS"] = {}
+	self.Data = C.Global["PLAYER_MANAGER"]
+	if type(self.Data.PLAYERS) ~= "table" then
+		self.Data.PLAYERS = {}
 	end
-	if type(C.Global["PLAYER_MANAGER"]["LIST_MODE"]) ~= "number" then
-		C.Global["PLAYER_MANAGER"]["LIST_MODE"] = MODE_BLACKLIST
+	if type(self.Data.LIST_MODE) ~= "number" then
+		self.Data.LIST_MODE = MODE_BLACKLIST
 	end
-	if type(C.Global["PLAYER_MANAGER"]["LIST"]) ~= "table" then
-		C.Global["PLAYER_MANAGER"]["LIST"] = {}
+	if type(self.Data.LIST) ~= "table" then
+		self.Data.LIST = {}
 	end
-	if type(C.Global["PLAYER_MANAGER"]["GROUP_PERMS"]) ~= "table" then
-		C.Global["PLAYER_MANAGER"]["GROUP_PERMS"] = {}
+	if type(self.Data.GROUP_PERMS) ~= "table" then
+		self.Data.GROUP_PERMS = {}
 		for k,v in pairs(self.Access.Groups) do
-			C.Global["PLAYER_MANAGER"]["GROUP_PERMS"][k] = {
+			self.Data.GROUP_PERMS[k] = {
 				Allow = {},
 				Deny = {}
 			}
 			for _,v in pairs(self.Access.Groups[k].Allow) do
-				table.insert(C.Global["PLAYER_MANAGER"]["GROUP_PERMS"][k].Allow, v)
+				table.insert(self.Data.GROUP_PERMS[k].Allow, v)
 			end
 			for _,v in pairs(self.Access.Groups[k].Deny) do
-				table.insert(C.Global["PLAYER_MANAGER"]["GROUP_PERMS"][k].Deny, v)
+				table.insert(self.Data.GROUP_PERMS[k].Deny, v)
 			end
 		end
 	end
-	for k,v in pairs(C.Global["PLAYER_MANAGER"]["GROUP_PERMS"]) do
+	for k,v in pairs(self.Data.GROUP_PERMS) do
 		self.Access.Groups[k].Allow = v.Allow
 		self.Access.Groups[k].Deny = v.Deny
 	end
-	Players = C.Global["PLAYER_MANAGER"]["PLAYERS"]
-	List = C.Global["PLAYER_MANAGER"]["LIST"]
+	Players = self.Data.PLAYERS
+	List = self.Data.LIST
 end
 
 --- Get or create a player.
@@ -191,7 +214,7 @@ function PM:GetOrCreatePlayer(name)
 			player.Info.Group = self.Access.Groups.User.Name
 		end
 		Players[player.Info.Name] = player
-		log:Normal(("Created player %q with default settings."):format(player.Info.Name))
+		log:Normal(GetL("PM_PLAYER_CREATE"):format(player.Info.Name))
 		return player
 	end
 end
@@ -201,7 +224,7 @@ end
 --
 function PM:UpdatePlayer(player)
 	Players[player.Info.Name] = player
-	log:Normal(("Updated player %q."):format(player.Info.Name))
+	log:Normal(GetL("PM_PLAYER_UPDATE"):format(player.Info.Name))
 end
 
 --- Completely remove a command from a group's access list.
@@ -213,14 +236,14 @@ end
 --
 function PM:GroupAccessRemove(group, command)
 	group = group:gsub("^%l", string.upper)
-	if not command then return false, "No Command specified" end
+	if not command then return false, "PM_ERR_NOCOMMAND" end
 	for i,v in pairs(self.Access.Groups[k].Allow) do
 		if v == command then table.remove(self.Access.Groups[k].Allow, i) end
 	end
 	for i,v in pairs(self.Access.Groups[k].Deny) do
 		if v == command then table.remove(self.Access.Groups[k].Deny, i) end
 	end
-	return ("%q removed from group %s."):format(command, group)
+	return "PM_GA_REMOVED", {command, group}
 end
 
 --- Modify the access of a command for a specific group.
@@ -231,8 +254,8 @@ end
 -- @return Error message if unsuccessful, otherwise nil.
 --
 function PM:GroupAccess(group, command, allow)
-	if not command then return false, "No command specified" end
-	local mode = "allowed"
+	if not command then return false, "PM_ERR_NOCOMMAND" end
+	local mode = true
 	if allow then
 		if CET:HasValue(self.Access.Groups[group].Deny, command) then
 			for i,v in ipairs(player.Access.Deny) do
@@ -240,10 +263,9 @@ function PM:GroupAccess(group, command, allow)
 			end
 		end
 		if CET:HasValue(self.Access.Groups[group].Allow, command) then
-			return false, ("%q already has that command on the allow list."):format(group)
+			return false, "PM_GA_EXISTSALLOW", {group}
 		end
 		table.insert(self.Access.Groups[group].Allow, command)
-		mode = "allowed"
 	else
 		if CET:HasValue(self.Access.Groups[group].Allow, command) then
 			for i,v in pairs(self.Access.Groups[group].Allow) do
@@ -251,12 +273,15 @@ function PM:GroupAccess(group, command, allow)
 			end
 		end
 		if CET:HasValue(self.Access.Groups[group].Deny, command) then
-			return false, ("%q already has that command on the deny list."):format(group)
+			return false, "PM_GA_EXISTSDENY", {group}
 		end
 		table.insert(self.Access.Groups[group].Deny, command)
-		mode = "denied"
+		mode = false
 	end
-	return ("%q is now %s for %s"):format(command, mode, group)
+	if mode then
+		return "PM_ACCESS_ALLOWED", {command, group}
+	end
+	return "PM_ACCESS_DENIED", {command, group}
 end
 
 --- Completely remove a command from a player's access list.
@@ -267,8 +292,8 @@ end
 -- @return Error message is unsuccessful, otherwise nil.
 --
 function PM:PlayerAccessRemove(player, command)
-	if not command then return false, "No command specified" end
-	if self:IsLocked(player) then return false, "Target player is locked and cannot be modified." end
+	if not command then return false, "PM_ERR_NOCOMMAND" end
+	if self:IsLocked(player) then return false, "PM_ERR_LOCKED" end
 	for i,v in pairs(player.Access.Allow) do
 		if v == command then table.remove(player.Access.Allow, i) end
 	end
@@ -276,7 +301,7 @@ function PM:PlayerAccessRemove(player, command)
 		if v == command then table.remove(player.Access.Deny, i) end
 	end
 	self:UpdatePlayer(player)
-	return ("%q removed from %s"):format(command, player.Info.Name)
+	return "PM_PA_REMOVED", {command, player.Info.Name}
 end
 
 --- Modify the access of a command for a specific player.
@@ -287,9 +312,9 @@ end
 -- @return Error message if unsuccessful, otherwise nil.
 --
 function PM:PlayerAccess(player, command, allow)
-	if not command then return false, "No command specified" end
-	if self:IsLocked(player) then return false, "Target player is locked and cannot be modified." end
-	local mode = "allowed"
+	if not command then return false, "PM_ERR_NOCOMMAND" end
+	if self:IsLocked(player) then return false, "PM_ERR_LOCKED" end
+	local mode = true
 	if allow then
 		if CET:HasValue(player.Access.Deny, command) then
 			for i,v in ipairs(player.Access.Deny) do
@@ -297,10 +322,9 @@ function PM:PlayerAccess(player, command, allow)
 			end
 		end
 		if CET:HasValue(player.Access.Allow, command) then
-			return false, ("%q already has that command on the allow list."):format(player.Info.Name)
+			return false, "PM_PA_EXISTSALLOW", {player.Info.Name}
 		end
 		table.insert(player.Access.Allow, command)
-		mode = "allowed"
 	else
 		if CET:HasValue(player.Access.Allow, command) then
 			for i,v in pairs(player.Access.Allow) do
@@ -308,13 +332,16 @@ function PM:PlayerAccess(player, command, allow)
 			end
 		end
 		if CET:HasValue(player.Access.Deny, command) then
-			return false, ("%q already has that command on the deny list."):format(player.Info.Name)
+			return false, "PM_PA_EXISTSDENY", {player.Info.Name}
 		end
 		table.insert(player.Access.Deny, command)
-		mode = "denied"
+		mode = false
 	end
 	self:UpdatePlayer(player)
-	return ("%q is now %s for %s"):format(command, mode, player.Info.Name)
+	if mode then
+		return "PM_ACCESS_ALLOWED", {command, player.Info.Name}
+	end
+	return "PM_ACCESS_DENIED", {command, player.Info.Name}
 end
 
 --- Check if provided player is locked.
@@ -342,9 +369,12 @@ function PM:SetLocked(player, locked)
 		player = self:GetOrCreatePlayer(tostring(player))
 	end
 	player.Settings.Locked = locked
-	local mode = "locked"
-	if not locked then mode = "unlocked" end
-	return ("Player %s has been %s."):format(player.Info.Name, mode)
+	local mode = true
+	if not locked then mode = false end
+	if mode then
+		return "PM_LOCKED", {player.Info.Name}
+	end
+	return "PM_UNLOCKED", {player.Info.Name}
 end
 
 --- Check if supplied player is on the player's friends list.
@@ -444,15 +474,15 @@ end
 function PM:SetAccessGroup(player, group)
 	group = group:gsub("^%l", string.upper)
 	if player.Info.Name == UnitName("player") then
-		return false, "Cannot modify my own access level."
+		return false, "PM_SAG_SELF"
 	end
 	if not CET:HasKey(self.Access.Groups, group) then
-		return false, ("No such access group: %q"):format(group)
+		return false, "PM_SAG_NOEXIST", {group}
 	end
-	if self:IsLocked(player) then return false, "Target player is locked and cannot be modified." end
+	if self:IsLocked(player) then return false, "PM_ERR_LOCKED" end
 	player.Info.Group = group
 	self:UpdatePlayer(player)
-	return ("Set the access level of %q to %d (%s)"):format(player.Info.Name, PM:GetAccess(player), player.Info.Group)
+	return "PM_SAG_SET", {player.Info.Name, PM:GetAccess(player), player.Info.Group}
 end
 
 --- Give player Owner access.
@@ -512,25 +542,26 @@ end
 function PM:Invite(player, sender)
 	if not sender then sender = self:GetOrCreatePlayer(UnitName("player")) end
 	if player.Info.Name == UnitName("player") then
-		return false, "Cannot invite myself to group."
+		return false, "PM_INVITE_SELF"
 	elseif GT:IsInGroup(player.Info.Name) then
-		return false, ("%s is already in the group."):format(player.Info.Name)
+		return false, "PM_INVITE_INGROUP", {player.Info.Name}
 	elseif GT:IsGroupFull() then
-		return false, "The group is already full."
+		return false, "PM_INVITE_FULL"
 	end
 	if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() or not GT:IsGroup() then
 		if player.Info.Name == sender.Info.Name then
 			InviteUnit(player.Info.Name)
-			return "Invited you to the group."
+			return "PM_INVITE_NOTIFYTARGET"
 		elseif player.Settings.Invite then
 			InviteUnit(player.Info.Name)
-			CM:SendMessage(("%s invited you to the group, %s. Whisper !denyinvite to block these invites."):format(sender.Info.Name, player.Info.Name), "WHISPER", player.Info.Name)
-			return ("Invited %s to group."):format(player.Info.Name)
+			local msg = L:GetLocale(player.Settings.Locale, true)["PM_INVITE_NOTIFY"]:format(sender.Info.Name, player.Info.Name)
+			CM:SendMessage(msg, "WHISPER", player.Info.Name)
+			return "PM_INVITE_SUCCESS", {player.Info.Name}
 		else
-			return false, ("%s does not wish to be invited."):format(player.Info.Name)
+			return false, "PM_INVITE_BLOCKED", {player.Info.Name}
 		end
 	end
-	return false, ("Unable to invite %s to group. Not group leader or assistant."):format(player.Info.Name)
+	return false, "PM_INVITE_NOPRIV", {player.Info.Name}
 end
 
 --- Stop sending Command invites to player.
@@ -538,14 +569,18 @@ end
 -- @return String stating the result of the operation, false if error.
 -- @return Error message if unsuccessful, nil otherwise.
 --
-function PM:DenyInvites(player)
+function PM:DenyInvites(player, isWhisper)
 	if player.Settings.Invite then
 		player.Settings.Invite = false
 		self:UpdatePlayer(player)
-		CM:SendMessage("You are now blocking invites, whisper !allowinvite to receive them.", "WHISPER", player.Info.Name)
-		return ("%s is no longer receiving invites."):format(player.Info.Name)
+		if isWhisper then
+			return "PM_DI_BLOCKING"
+		end
+		local msg = L:GetLocale(player.Settings.Locale, true)["PM_DI_BLOCKING"]
+		CM:SendMessage(msg, "WHISPER", player.Info.Name)
+		return "PM_DI_SUCCESS", {player.Info.Name}
 	end
-	return false, "You are already blocking invites."
+	return false, "PM_DI_FAIL"
 end
 
 --- Allow sending Command invites to player.
@@ -553,14 +588,18 @@ end
 -- @return String stating the result of the operation, false if error.
 -- @return Error message if unsuccessful, nil otherwise.
 --
-function PM:AllowInvites(player)
+function PM:AllowInvites(player, isWhisper)
 	if player.Settings.Invite then
-		return false, "You are already allowing invites."
+		return false, "PM_AI_FAIL"
 	end
 	player.Settings.Invite = true
 	self:UpdatePlayer(player)
-	CM:SendMessage("You are now allowing invites, whisper !blockinvite to block them.", "WHISPER", player.Info.Name)
-	return ("%s is now receiving invites."):format(player.Info.Name)
+	if isWhisper then
+		return "PM_AI_ALLOWING"
+	end
+	local msg = L:GetLocale(player.Settings.Locale, true)["PM_AI_ALLOWING"]
+	CM:SendMessage(msg, "WHISPER", player.Info.Name)
+	return "PM_AI_SUCCESS", {player.Info.Name}
 end
 
 --- Kick a player from the group.
@@ -571,20 +610,23 @@ end
 --
 function PM:Kick(player, sender, reason)
 	if player.Info.Name == UnitName("player") then
-		return false, "Cannot kick myself."
+		return false, "PM_KICK_SELF"
 	elseif self:IsFriend(player) or self:IsBNFriend(player) then
-		return false, "Cannot kick my friend."
+		return false, "PM_KICK_FRIEND"
 	elseif not GT:IsInGroup(player.Info.Name) then
-		return false, ("%s is not in the group."):format(player.Info.Name)
+		return false, "PM_ERR_NOTINGROUP", {player.Info.Name}
 	end
 	if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() then
 		KickName = player.Info.Name
 		KickSender = sender.Info.Name
-		KickReason = reason or ("%s used !kick command."):format(KickSender)
+		KickReason = reason or GetL("PM_KICK_DEFAULTREASON"):format(KickSender)
+		StaticPopupDialogs.COMMAND_CONFIRMKICK.text = GetL("PM_KICK_POPUP")
+		StaticPopupDialogs.COMMAND_CONFIRMKICK.button1 = GetL("YES")
+		StaticPopupDialogs.COMMAND_CONFIRMKICK.button2 = GetL("NO")
 		StaticPopup_Show("COMMAND_CONFIRMKICK", KickSender, KickName)
-		return ("Awaiting confirmation to kick %s..."):format(KickName)
+		return "PM_KICK_WAIT", {KickName}
 	end
-	return false, ("Unable to kick %s from group. Not group leader or assistant."):format(player.Info.Name)
+	return false, "PM_KICK_NOPRIV", {player.Info.Name}
 end
 
 --- Promote a player to group leader.
@@ -594,20 +636,19 @@ end
 --
 function PM:PromoteToLeader(player)
 	if player.Info.Name == UnitName("player") then
-		return false, "Cannot promote myself to leader."
+		return false, "PM_LEADER_SELF"
 	elseif GT:IsGroupLeader(player.Info.Name) then
-		return false, ("%s is already leader."):format(player.Info.Name)
+		return false, "PM_LEADER_DUPE", {player.Info.Name}
 	elseif not GT:IsInGroup(player.Info.Name) then
-		return false, ("%s is not in the group."):format(player.Info.Name)
+		return false, "PM_ERR_NOTINGROUP", {player.Info.Name}
 	end
 	if GT:IsGroupLeader() then
-		if self:IsLocked(player) then return false, "Target player is locked and cannot be modified." end
+		if self:IsLocked(player) then return false, "PM_ERR_LOCKED" end
 		PromoteToLeader(player.Info.Name)
-		return ("Promoted %s to group leader."):format(player.Info.Name)
+		return "PM_LEADER_SUCCESS", {player.Info.Name}
 	else
-		return false, ("Cannot promote %s to group leader, insufficient permissions."):format(player.Info.Name)
+		return false, "PM_LEADER_NOPRIV", {player.Info.Name}
 	end
-	return false, "Unknown error occurred."
 end
 
 --- Promote player to assistant.
@@ -617,42 +658,40 @@ end
 --
 function PM:PromoteToAssistant(player)
 	if player.Info.Name == UnitName("player") then
-		return false, "Cannot promote myself to assistant."
+		return false, "PM_ASSIST_SELF"
 	elseif GT:IsRaidAssistant(player.Info.Name) then
-		return false, ("%s is already assistant."):format(player.Info.Name)
+		return false, "PM_ASSIST_DUPE", {player.Info.Name}
 	elseif not GT:IsInGroup(player.Info.Name) then
-		return false, ("%s is not in the group."):format(player.Info.Name)
+		return false, "PM_ERR_NOTINGROUP", {player.Info.Name}
 	elseif not UnitInRaid("player") then
-		return false, "Cannot promote to assistant when not in a raid."
+		return false, "PM_ASSIST_NORAID"
 	end
 	if GT:IsGroupLeader() then
-		if self:IsLocked(player) then return false, "Target player is locked and cannot be modified." end
+		if self:IsLocked(player) then return false, "PM_ERR_LOCKED" end
 		PromoteToAssistant(player.Info.Name)
-		return ("Promoted %s to assistant."):format(player.Info.Name)
+		return "PM_ASSIST_SUCCESS", {player.Info.Name}
 	else
-		return false, ("Cannot promote %s to assistant, insufficient permissions."):format(player.Info.Name)
+		return false, "PM_ASSIST_NOPRIV", {player.Info.Name}
 	end
-	return false, "Unknown error occurred."
 end
 
 function PM:DemoteAssistant(player)
 	if player.Info.Name == UnitName("player") then
-		return false, "Cannot demote myself."
+		return false, "PM_DEMOTE_SELF"
 	elseif not GT:IsRaidAssistant(player.Info.Name) then
-		return false, ("%s is not an assistant, can only demote assistants."):format(player.Info.Name)
+		return false, "PM_DEMOTE_INVALID", {player.Info.Name}
 	elseif not GT:IsInGroup(player.Info.Name) then
-		return false, ("%s is not in the group."):format(player.Info.Name)
+		return false, "PM_ERR_NOTINGROUP", {player.Info.Name}
 	elseif not UnitInRaid("player") then
-		return false, "Cannot demote when not in a raid."
+		return false, "PM_DEMOTE_NORAID"
 	end
 	if GT:IsGroupLeader() then
-		if self:IsLocked(player) then return false, "Target player is locked and cannot be modified." end
+		if self:IsLocked(player) then return false, "PM_ERR_LOCKED" end
 		DemoteAssistant(player.Info.Name)
-		return ("Demoted %s."):format(player.Info.Name)
+		return "PM_DEMOTE_SUCCESS", {player.Info.Name}
 	else
-		return false, ("Cannot demote %s, insufficient permissions."):format(player.Info.Name)
+		return false, "PM_DEMOTE_NOPRIV", {player.Info.Name}
 	end
-	return false, "Unknown error occurred."
 end
 
 --- Check if a certain command is on the blacklist/whitelist.
@@ -670,23 +709,22 @@ end
 --
 function PM:List(command, list)
 	if not CCM:HasCommand(command) then
-		return false, ("%q is not a registered command."):format(command)
+		return false, "CM_ERR_NOTREGGED", {command}
 	end
 	command = CCM:GetRealName(command)
+	local mode = self:GetListMode()
 	if list then
 		List[command] = true
-		local mode = "blacklist"
-		if self:GetListMode() == MODE_WHITELIST then
-			mode = "whitelist"
+		if mode == MODE_WHITELIST then
+			return "PM_LIST_ADDWHITE", {command}
 		end
-		return ("Added %s to %s."):format(command, mode)
+		return "PM_LIST_ADDBLACK", {command}
 	end
 	List[command] = false
-	local mode = "blacklist"
-	if self:GetListMode() == MODE_WHITELIST then
-		mode = "whitelist"
+	if mode == MODE_WHITELIST then
+		return "PM_LIST_REMOVEWHITE", {command}
 	end
-	return ("Removed %s from %s."):format(command, mode)
+	return "PM_LIST_REMOVEBLACK", {command}
 end
 
 --- Dynamically add or remove an item from the list.
@@ -733,11 +771,11 @@ end
 --
 function PM:SetListMode(mode)
 	if mode == MODE_WHITELIST then
-		C.Global["PLAYER_MANAGER"]["LIST_MODE"] = MODE_WHITELIST
-		return "Now using list as whitelist."
+		self.Data.LIST_MODE = MODE_WHITELIST
+		return "PM_LIST_SETWHITE"
 	else
-		C.Global["PLAYER_MANAGER"]["LIST_MODE"] = MODE_BLACKLIST
-		return "Now using list as blacklist."
+		self.Data.LIST_MODE = MODE_BLACKLIST
+		return "PM_LIST_SETBLACK"
 	end
 end
 
@@ -745,5 +783,5 @@ end
 -- @return List mode, possible values: 0/1, as set by MODE_BLACKLIST and MODE_WHITELIST.
 --
 function PM:GetListMode()
-	return C.Global["PLAYER_MANAGER"]["LIST_MODE"]
+	return self.Data.LIST_MODE
 end

@@ -1,5 +1,5 @@
---[[
-	* Copyright (c) 2011 by Adam Hellberg.
+﻿--[[
+	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
 	* 
@@ -18,6 +18,7 @@
 --]]
 
 local C = Command
+local L = function(k) return C.LocaleManager:GetActive()[k] end
 local GT = C.GroupTools
 local CM
 local CES = C.Extensions.String
@@ -31,9 +32,6 @@ C.RollManager = {
 }
 
 local RM = C.RollManager
-
-local RollFormat = "%s rolls %d (%d-%d)" -- Not Used
-local RollMatch = "(%w+) rolls (%d+) %((%d+)-(%d+)%)" -- Thanks to ITSBTH for the pattern string
 
 local Rollers = {}
 local RollCount = 0
@@ -54,7 +52,7 @@ local function RollTimerUpdate(_, elapsed)
 	local left = RollTimer.Time - RollTimer.Current
 	if not RollTimer.LastWarning then RollTimer.LastWarning = 0 end
 	if (left <= 10 and left > 0) and ceil(RollTimer.Current) - RollTimer.LastWarning >= 5 then
-		CM:SendMessage(ceil(left) .. " seconds left to roll!", "SMART")
+		CM:SendMessage(L("RM_UPDATE_TIMELEFT"):format(ceil(left)), "SMART")
 		RollTimer.LastWarning = ceil(RollTimer.Current)
 	end
 	
@@ -78,62 +76,62 @@ function RM:LoadSavedVars()
 		C.Global["ROLL_MANAGER"] = {}
 	end
 	self.Settings = C.Global["ROLL_MANAGER"]
-	if type(self.Settings["MIN_ROLL"]) ~= "number" then
-		self.Settings["MIN_ROLL"] = 1
+	if type(self.Settings.MIN_ROLL) ~= "number" then
+		self.Settings.MIN_ROLL = 1
 	end
-	if type(self.Settings["MAX_ROLL"]) ~= "number" then
-		self.Settings["MAX_ROLL"] = 100
+	if type(self.Settings.MAX_ROLL) ~= "number" then
+		self.Settings.MAX_ROLL = 100
 	end
-	if type(self.Settings["DEFAULT_TIME"]) ~= "number" then
-		self.Settings["DEFAULT_TIME"] = 20
+	if type(self.Settings.DEFAULT_TIME) ~= "number" then
+		self.Settings.DEFAULT_TIME = 20
 	end
 end
 
 function RM:SetMin(amount)
 	if type(amount) ~= "number" then
-		return false, "Invalid amount passed: " .. tostring(amount)
+		return false, "RM_ERR_INVALIDAMOUNT", {tostring(amount)}
 	end
 	if amount > self.Settings.MAX_ROLL then
-		return false, "Minimum roll number cannot be higher than maximum roll number!"
+		return false, "RM_SET_MINFAIL"
 	end
 	self.Settings.MIN_ROLL = amount
-	return "Sucessfully set minimum roll number to " .. amount .. "!"
+	return "RM_SET_MINSUCCESS", {amount}
 end
 
 function RM:SetMax(amount)
 	if type(amount) ~= "number" then
-		return false, "Invalid amount passed: " .. tostring(amount)
+		return false, "PM_ERR_INVALIDAMOUNT", {tostring(amount)}
 	end
 	if amount < self.Settings.MIN_ROLL then
-		return false, "Maximum roll number cannot be higher than minimum roll number!"
+		return false, "PM_SET_MAXFAIL"
 	end
 	self.Settings.MAX_ROLL = amount
-	return "Sucessfully set maximum roll number to " .. amount .. "!"
+	return "PM_SET_MAXSUCCESS", {amount}
 end
 
 function RM:SetTime(amount)
 	if type(amount) ~= "number" then
-		return false, "Invalid amount passed: " .. tostring(amount)
+		return false, "RM_ERR_INVALIDAMOUNT", {tostring(amount)}
 	end
 	if amount <= 0 then
-		return false, "Amount must be larger than zero (0)."
+		return false, "RM_SET_TIMEFAIL"
 	end
 	self.Settings.DEFAULT_TIME = amount
-	return "Successfully set default roll time to " .. amount .. "!"
+	return "RM_SET_TIMESUCCESS", {amount}
 end
 
 function RM:StartRoll(sender, item, time)
 	if RM.Running then
-		return false, "A roll is already in progress, wait for it to complete or use roll stop."
+		return false, "RM_START_RUNNING"
 	end
 	time = tonumber(time) or self.Settings.DEFAULT_TIME
 	RollTimer.Time = time
 	if not sender then
-		return false, "Could not identify sender: " .. tostring(sender) .. ". Aborting roll..."
+		return false, "RM_START_SENDER", {tostring(sender)}
 	end
 	self.NumGroupMembers = GT:GetNumGroupMembers()
 	if self.NumGroupMembers <= 0 then
-		return false, "Could not start roll, not enough group members!"
+		return false, "RM_START_MEMBERS"
 	end
 	self.Running = true
 	self.Sender = sender
@@ -142,16 +140,11 @@ function RM:StartRoll(sender, item, time)
 	if item then
 		self.Item = item
 		RollTimer.Frame:SetScript("OnUpdate", RollTimerUpdate)
-		return ("%s started a roll for %s, ends in %d seconds! Type /roll %d %d. Type !roll pass to pass."):format(self.Sender, self.Item, time, self.Settings.MIN_ROLL, self.Settings.MAX_ROLL)
+		return "RM_START_SUCCESSITEM", {self.Sender, self.Item, time, self.Settings.MIN_ROLL, self.Settings.MAX_ROLL}
 	else
 		RollTimer.Frame:SetScript("OnUpdate", RollTimerUpdate)
-		return ("%s started a roll, ends in %d seconds! Type /roll %d %d. Type !roll pass to pass."):format(self.Sender, time, self.Settings.MIN_ROLL, self.Settings.MAX_ROLL)
+		return "RM_START_SUCCESS", {self.Sender, time, self.Settings.MIN_ROLL, self.Settings.MAX_ROLL}
 	end
-	-- We shouldn't reach this place
-	self.Running = false
-	self.Sender = nil
-	self.Item = nil
-	return false, "Unknown error occurred"
 end
 
 function RM:StopRoll(finished, expire)
@@ -159,61 +152,59 @@ function RM:StopRoll(finished, expire)
 		self:AnnounceResult(expire)
 	else
 		if not self.Running then
-			return false, "No roll is currently in progress!"
+			return false, "RM_ERR_NOTRUNNING"
 		end
 	end
 	self.Running = false
 	self.Sender = nil
 	self.Item = nil
 	wipe(Rollers)
-	return "Roll has been stopped."
+	return "RM_STOP_SUCCESS"
 end
 
 function RM:DoRoll(min, max)
 	min = min or self.Settings.MIN_ROLL
 	max = max or self.Settings.MAX_ROLL
 	RandomRoll(min, max)
-	return "Done! Executed RandomRoll(" .. min .. ", " .. max .. ")"
+	return "RM_DO_SUCCESS", {min, max}
 end
 
 function RM:AddRoll(name, roll)
 	if CET:HasKey(Rollers, name) then
-		CM:SendMessage(name .. " has already rolled! (" .. Rollers[name] .. ")", "SMART")
+		CM:SendMessage(L("RM_ROLLEXISTS"):format(name, Rollers[name]), "SMART")
 		return
 	end
 	Rollers[name] = tonumber(roll)
 	RollCount = RollCount + 1
-	CM:SendMessage(("%d/%d players have rolled!"):format(RollCount, self.NumGroupMembers), "SMART")
-	--if RollCount >= self.NumGroupMembers then RM:StopRoll(true) end
+	CM:SendMessage(L("RM_ROLLPROGRESS"):format(RollCount, self.NumGroupMembers), "SMART")
 end
 
 function RM:PassRoll(name)
 	name = name or UnitName("player")
 	if CET:HasKey(Rollers, name) then
-		return false, ("%s has already rolled (%d)"):format(name, Rollers[name])
+		return false, "RM_ROLLEXISTS", {name, Rollers[name]}
 	end
 	Rollers[name] = -1
 	RollCount = RollCount + 1
-	--if RollCount >= self.NumGroupMembers then RM:StopRoll(true) end
-	return ("%s has passed on the roll."):format(name)
+	return "RM_PASS_SUCCESS", {name}
 end
 
 function RM:GetTime()
 	if self.Running then
-		return ("%d seconds remaining!"):format(max(ceil(RollTimer.Time - RollTimer.Current), 0))
+		return "RM_TIME_LEFT", {max(ceil(RollTimer.Time - RollTimer.Current), 0)}
 	else
-		return false, "No roll is currently in progress!"
+		return false, "RM_ERR_NOTRUNNING"
 	end
 end
 
 function RM:AnnounceResult(expire)
 	if expire then
-		CM:SendMessage("Roll time expired! Results...", "SMART")
+		CM:SendMessage(L("RM_ANNOUNCE_EXPIRE"), "SMART")
 	else
-		CM:SendMessage("Everyone has rolled! Results...", "SMART")
+		CM:SendMessage(L("RM_ANNOUNCE_FINISH"), "SMART")
 	end
 	if RollCount <= 0 then
-		CM:SendMessage("Noone rolled, there is no winner!", "SMART")
+		CM:SendMessage(L("RM_ANNOUNCE_EMPTY"), "SMART")
 		return
 	end
 	local name
@@ -233,42 +224,42 @@ function RM:AnnounceResult(expire)
 	end
 	local msg
 	if roll == -1 then
-		msg = "Everyone passed on the roll! There is no winner"
 		if self.Item then
-			msg = msg .. " for " .. self.Item
+			msg = L("RM_ANNOUNCE_PASSITEM"):format(self.Item)
+		else
+			msg = L("RM_ANNOUNCE_PASS")
 		end
-		msg = msg .. "."
 		CM:SendMessage(msg, "SMART")
 	elseif numAdditional <= 0 then
-		msg = "The winner is: " .. name .. "! With a roll of " .. roll
 		if self.Item then
-			msg = msg .. " for " .. self.Item
+			msg = L("RM_ANNOUNCE_WINITEM"):format(name, roll, self.Item)
+		else
+			msg = L("RM_ANNOUNCE_WIN"):format(name, roll)
 		end
-		msg = msg .. "."
 		CM:SendMessage(msg, "SMART")
 	else
-		msg = "There are multiple winners"
 		if self.Item then
-			msg = msg .. " for " .. self.Item
+			msg = L("RM_ANNOUNCE_MULTIPLEITEM"):format(self.Item)
+		else
+			msg = L("RM_ANNOUNCE_MULTIPLE")
 		end
-		msg = msg .. ":"
 		CM:SendMessage(msg, "SMART")
-		CM:SendMessage(name .. " with a roll of " .. roll, "SMART")
+		CM:SendMessage(L("RM_ANNOUNCE_WINNER"):format(name, roll), "SMART")
 		for k,v in pairs(additional) do
-			CM:SendMessage(k .. " with a roll of " .. v, "SMART")
+			CM:SendMessage(L("RM_ANNOUNCE_WINNER"):format(k, v), "SMART")
 		end
 	end
 end
 
 function RM:ParseMessage(msg)
-	if not string.match(msg, RollMatch) then return end
-	local name, roll, minRoll, maxRoll = msg:match(RollMatch)
+	if not string.match(msg, L("RM_MATCH")) then return end
+	local name, roll, minRoll, maxRoll = msg:match(L("RM_MATCH"))
 	roll = tonumber(roll)
 	minRoll = tonumber(minRoll)
 	maxRoll = tonumber(maxRoll)
 	print(name, roll, minRoll, maxRoll)
 	if minRoll ~= self.Settings.MIN_ROLL or maxRoll ~= self.Settings.MAX_ROLL then
-		CM:SendMessage(name .. " specified too high or low roll region, not including their roll!", "SMART")
+		CM:SendMessage(L("RM_ERR_INVALIDROLL"):format(name), "SMART")
 		return
 	end
 	self:AddRoll(name, roll)

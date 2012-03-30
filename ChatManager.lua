@@ -1,5 +1,5 @@
---[[
-	* Copyright (c) 2011 by Adam Hellberg.
+﻿--[[
+	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
 	* 
@@ -55,6 +55,7 @@ C.ChatManager = {
 
 local CM = C.ChatManager
 local PM = C.PlayerManager
+local L = C.LocaleManager
 local GT = C.GroupTools
 local AC = C.AddonComm
 local CCM = C.CommandManager
@@ -153,11 +154,11 @@ end
 
 function CM:SetCmdChar(char)
 	if type(char) ~= "string" then
-		return false, "Command char has to be of type string."
+		return false, "CHAT_ERR_CMDCHAR"
 	end
 	char = char:lower() --:sub(1, 1)
 	self.Settings.CMD_CHAR = char
-	return "Successfully set the command char to: " .. char
+	return "CHAT_CMDCHAR_SUCCESS", {char}
 end
 
 --- Handle a chat message.
@@ -180,7 +181,7 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 	local cmd = self:ParseCommand(args[1])
 	if not CCM:HasCommand(cmd) then return end
 	if not AC:IsController(sourceChannel) then
-		C.Logger:Normal("Not controller instance for \124cff00FFFF" .. sourceChannel:lower() .. "\124r, aborting.")
+		C.Logger:Normal(L:GetActive()["CHAT_HANDLE_NOTCONTROLLER"]:format(sourceChannel:lower()))
 		return
 	end
 	local t = {}
@@ -190,11 +191,48 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 		end
 	end
 	local player = PM:GetOrCreatePlayer(sender)
-	local result, err = CCM:HandleCommand(cmd, t, true, player)
+	--local result, err = CCM:HandleCommand(cmd, t, true, player)
+	local result, arg, errArg = CCM:HandleCommand(cmd, t, sourceChannel, player)
 	if isBN then
 		target = pID
 		sender = pID
 	end
+	local l
+	if (channel == "WHISPER" or channel == "BNET") or not result then
+		l = L:GetLocale(player.Settings.Locale, true)
+	else
+		l = L:GetActive()
+	end
+	if result then
+		if type(result) == "table" then
+			for _,v in ipairs(result) do
+				if type(v) == "table" then
+					local s = v[1]
+					if type(v[2]) == "table" then
+						s = s:format(unpack(v[2]))
+					end
+					self:SendMessage(s, channel, target, isBN)
+				end
+			end
+		elseif result == "RAW_TABLE_OUTPUT" then
+			for _,v in ipairs(arg) do
+				self:SendMessage(tostring(v), channel, target, isBN)
+			end
+		else
+			local s = l[result]
+			if type(arg) == "table" then
+				s = s:format(unpack(arg))
+			end
+			self:SendMessage(s, channel, target, isBN)
+		end
+	else
+		local s = l[arg]
+		if type(errArg) == "table" then
+			s = s:format(unpack(errArg))
+		end
+		self:SendMessage(s, "WHISPER", sender, isBN)
+	end
+	--[[ PRE-Locale stuff
 	if result then
 		if type(result) == "table" then
 			for _,v in ipairs(result) do
@@ -206,4 +244,5 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 	else
 		self:SendMessage(tostring(err), "WHISPER", sender, isBN)
 	end
+	-- END PRE-Locale stuff ]]
 end

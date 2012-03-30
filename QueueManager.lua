@@ -1,5 +1,5 @@
---[[
-	* Copyright (c) 2011 by Adam Hellberg.
+﻿--[[
+	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
 	* 
@@ -38,6 +38,7 @@ C.QueueManager = {
 	Announced = false
 }
 
+local L = function(k) return C.LocaleManager:GetActive()[k] end
 local QM = C.QueueManager
 
 --- Contains information about various dungeon types.
@@ -225,7 +226,7 @@ function QM:Queue(index)
 	SetCVar("Sound_EnableSFX", 1)
 	self.Current = name
 	self.Announced = false
-	return ("Starting queue for %s, please select your role(s)... Type !cancel to cancel."):format(tostring(QM.Current))
+	return "QM_QUEUE_START", {tostring(QM.Current)}
 end
 
 --- Cancel the queueing/rolechecking.
@@ -235,7 +236,7 @@ function QM:Cancel()
 	self.QueuedByCommand = false
 	self.Announced = false
 	LeaveLFG()
-	return "Left the LFG queue."
+	return "QM_CANCEL"
 end
 
 --- Causes player to accept a pending LFG invite.
@@ -245,7 +246,7 @@ function QM:Accept()
 	self.QueuedByCommand = false
 	self.Announced = false
 	AcceptProposal()
-	return "Accepted LFG invite."
+	return "QM_ACCEPT"
 end
 
 --- Announce the current status of LFG to group.
@@ -258,12 +259,14 @@ function QM:Announce(_, elapsed)
 		local mode = (select(1, GetLFGMode()))
 		if mode ~= nil then self.LastMode = mode end
 		if mode == "queued" and not self.Announced then
-			Command.ChatManager:SendMessage(("Now queueing for %s, type !cancel to cancel."):format(QM.Current), "PARTY")
+			C.ChatManager:SendMessage(L("QM_ANNOUNCE_QUEUEING"):format(QM.Current), "SMART")
 			self.Announced = true
 		elseif not mode then
-			local current = "Role check"
-			if self.LastMode ~= "rolecheck" then current = "LFG" end
-			Command.ChatManager:SendMessage(current .. " cancelled.", "PARTY")
+			if self.LastMode ~= "rolecheck" then
+				C.ChatManager:SendMessage(L("QM_ANNOUNCE_LFGCANCEL"), "SMART")
+			else
+				C.ChatManager:SendMessage(L("QM_ANNOUNCE_ROLECANCEL"), "SMART")
+			end
 			self.QueuedByCommand = false
 			self.Announced = false
 		end

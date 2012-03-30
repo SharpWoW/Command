@@ -1,5 +1,5 @@
---[[
-	* Copyright (c) 2011 by Adam Hellberg.
+﻿--[[
+	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
 	* 
@@ -43,6 +43,8 @@ Command = {
 }
 
 local C = Command
+local L
+local GetL
 local Cmd
 local CM
 local PM
@@ -56,6 +58,7 @@ function C:Init()
 	if self.Version == "@" .. "project-version" .. "@" then
 		self.Version = "Dev"
 	end
+	L = self.LocaleManager
 	Cmd = self.CommandManager
 	CM = self.ChatManager
 	PM = self.PlayerManager
@@ -63,7 +66,8 @@ function C:Init()
 	AC = self.AddonComm
 	log = self.Logger
 	self:LoadSavedVars()
-	log:Normal("AddOn loaded! Use /cmd help or !help for help. !!NYI!!")
+	GetL = function(k) return L:GetActive()[k] end
+	log:Normal(GetL("ADDON_LOAD"))
 	self.Loaded = true
 end
 
@@ -75,7 +79,7 @@ function C:LoadSavedVars()
 		_G["COMMAND"] = {}
 	elseif type(_G["COMMAND"]["VERSION"]) == "number" then
 		if _G["COMMAND"]["VERSION"] < self.VarVersion then
-			log:Normal("Saved Variables out of date, resetting...")
+			log:Normal(GetL("SVARS_OUTDATED"))
 			wipe(_G["COMMAND"])
 			_G["COMMAND"] = {}
 		end
@@ -97,6 +101,7 @@ function C:LoadSavedVars()
 	if type(self.Settings.GROUP_INVITE_ANNOUNCE_DELAY) ~= "number" then
 		self.Settings.GROUP_INVITE_ANNOUNCE_DELAY = 0
 	end
+	L:Init()
 	CM:Init()
 	PM:Init()
 	RM:Init()
@@ -110,7 +115,7 @@ function C:CheckVersion(ver)
 	if self.VersionChecked then return end
 	ver = ver or 0
 	if ver > self.VersionNum then
-		log:Normal("\124cffFF0000A new version of \124cff00FFFF" .. self.Name .. "\124cffFF0000 is available! \124cffFFFF00Check the site you downloaded from for the updated version.")
+		log:Normal(GetL("NEWVERSION_NOTICE"):format(self.Name))
 		self.VersionChecked = true
 	end
 end
@@ -121,9 +126,9 @@ end
 function C:SetEnabled(enabled)
 	self.Settings.ENABLED = enabled
 	if self.Settings.ENABLED then
-		return "AddOn \124cff00FF00enabled\124r."
+		return "ENABLED"
 	end
-	return "AddOn \124cffFF0000disabled\124r."
+	return "DISABLED"
 end
 
 --- Enable AddOn.
@@ -151,9 +156,9 @@ function C:SetDebug(enabled)
 	self.Settings.DEBUG = enabled
 	log:SetDebug(enabled)
 	if self.Settings.DEBUG then
-		return "Debugging \124cff00FF00enabled\124r."
+		return "DEBUGENABLED"
 	end
-	return "Debugging \124cffFF0000disabled\124r."
+	return "DEBUGDISABLED"
 end
 
 --- Enable debugging.
@@ -177,9 +182,9 @@ end
 function C:SetGroupInvite(enabled)
 	self.Settings.GROUP_INVITE_ANNOUNCE = enabled
 	if self.Settings.GROUP_INVITE_ANNOUNCE then
-		return "Group Invite (Announce) enabled."
+		return "GI_ENABLED"
 	end
-	return "Group Invite (Announce) disabled."
+	return "GI_DISABLED"
 end
 
 function C:EnableGroupInvite()
@@ -196,17 +201,17 @@ end
 
 function C:SetGroupInviteDelay(time)
 	if type(time) ~= "number" then
-		return false, "Delay has to be a number."
+		return false, "GI_DELAY_NUM"
 	end
 	time = math.ceil(time)
 	if time > 50 then
-		return false, "Delay cannot be greater than 50 seconds."
+		return false, "GI_DELAY_MAX"
 	end
 	self.Settings.GROUP_INVITE_ANNOUNCE_DELAY = time
 	if self.Settings.GROUP_INVITE_ANNOUNCE_DELAY > 0 then
-		return "Group Invite (Announce) delay set to " .. self.Settings.GROUP_INVITE_ANNOUNCE_DELAY .. " seconds."
+		return "GI_DELAY_SET", {self.Settings.GROUP_INVITE_ANNOUNCE_DELAY}
 	end
-	return "Group Invite (Announce) delay disabled."
+	return "GI_DELAY_DISABLED"
 end
 
 function C:DisableGroupInviteDelay()

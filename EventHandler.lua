@@ -1,5 +1,5 @@
---[[
-	* Copyright (c) 2011 by Adam Hellberg.
+﻿--[[
+	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
 	* 
@@ -18,6 +18,7 @@
 --]]
 
 local C = Command
+local L = C.LocaleManager
 local CES = C.Extensions.String
 
 --- Handles events.
@@ -39,6 +40,5 @@ end
 C.Frame = CreateFrame("Frame")
 for k,_ in pairs(C.Events) do
 	C.Frame:RegisterEvent(k)
-	C.Logger:Debug(("%q registered."):format(k))
 end
 C.Frame:SetScript("OnEvent", function(frame, event, ...) C:OnEvent(frame, event, ...) end)
