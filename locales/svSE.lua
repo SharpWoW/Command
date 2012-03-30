@@ -106,39 +106,39 @@ local L = {
 	CM_LOCK_HELP = "Lås en användare.",
 	CM_UNLOCK_HELP = "Lås upp en användare.",
 	
-	CM_GETACCESS_HELP = "Get the access level of a user.",
-	CM_GETACCESS_STRING = "%s's access is %d (%s)",
+	CM_GETACCESS_HELP = "Visa en användares behörighetsnivå.",
+	CM_GETACCESS_STRING = "%ss behörighet är %d (%s)",
 	
-	CM_SETACCESS_HELP = "Set the access level of a user.",
-	CM_SETACCESS_USAGE = "Usage: setaccess [player] <group>",
+	CM_SETACCESS_HELP = "Ändra en användares behörighetsnivå/grupp.",
+	CM_SETACCESS_USAGE = "Användning: setaccess [namn] <grupp>",
 	
-	CM_OWNER_HELP = "Promote a player to owner rank.",
+	CM_OWNER_HELP = "Befordra en användare till ägarnivå.",
 	
-	CM_ADMIN_HELP = "Promote a player to admin rank.",
-	CM_ADMIN_USAGE = "Usage: admin <name>",
+	CM_ADMIN_HELP = "Befordra en användare till adminnivå.",
+	CM_ADMIN_USAGE = "Användning: admin <namn>",
 	
-	CM_OP_HELP = "Promote a player to op rank.",
+	CM_OP_HELP = "Befordra en användare till operatörnivå.",
 	
-	CM_USER_HELP = "Promote a player to user rank.",
+	CM_USER_HELP = "Befordra en användare till användarnivå.",
 	
-	CM_BAN_HELP = "Ban a player.",
-	CM_BAN_USAGE = "Usage: ban <name>",
+	CM_BAN_HELP = "Bannlys en användare.",
+	CM_BAN_USAGE = "Användning: ban <namn>",
 	
-	CM_ACCEPTINVITE_HELP = "Accepts a pending group invite.",
-	CM_ACCEPTINVITE_NOTACTIVE = "No pending invites active.",
-	CM_ACCEPTINVITE_EXISTS = "I am already in a group.",
-	CM_ACCEPTINVITE_SUCCESS = "Accepted group invite!",
+	CM_ACCEPTINVITE_HELP = "Accepterar en pågående gruppinbjudan.",
+	CM_ACCEPTINVITE_NOTACTIVE = "Inga aktiva inbjudningar just nu.",
+	CM_ACCEPTINVITE_EXISTS = "Jag är redan i en grupp.",
+	CM_ACCEPTINVITE_SUCCESS = "Accepterade gruppinbjudningen!",
 	
-	CM_INVITE_HELP = "Invite a player to group.",
+	CM_INVITE_HELP = "Bjuder in en användare till gruppen.",
 	
-	CM_INVITEME_HELP = "Player who issued the command will be invited to group.",
+	CM_INVITEME_HELP = "Användaren som skickar kommandot bjuds in till gruppen.",
 	
-	CM_DENYINVITE_HELP = "Player issuing this command will no longer be sent invites from this AddOn.",
+	CM_DENYINVITE_HELP = "Användare som använder det här kommandot kommer inte längre att få gruppinbjudningar.",
 	
-	CM_ALLOWINVITE_HELP = "Player issuing this command will receive invites sent from this AddOn.",
+	CM_ALLOWINVITE_HELP = "Användare som använder det här kommandot kommer att få gruppinbjudningar.",
 	
-	CM_KICK_HELP = "Kick a player from group with optional reason (Requires confirmation).",
-	CM_KICK_USAGE = "Usage: kick <player> [reason]",
+	CM_KICK_HELP = "Sparka ut en spelare från gruppen med valfri anledning (Kräver konfirmation).",
+	CM_KICK_USAGE = "Användning: kick <spelare> [anledning]",
 	
 	CM_KINGME_HELP = "Player issuing this command will be promoted to group leader.",
 	
@@ -159,7 +159,7 @@ local L = {
 	CM_QUEUE_USAGE = "Usage: queue <type>",
 	CM_QUEUE_INVALID = "No such dungeon type: %q.",
 	
-	CM_LEAVELFG_HELP = "Leave the LFG queue.",
+	CM_LEAVELFG_HELP = "Lämna LFG-kön.",
 	CM_LEAVELFG_FAIL = "Not queued by command, unable to cancel.",
 	
 	CM_ACCEPTLFG_HELP = "Causes you to accept the LFG invite.",
@@ -405,10 +405,10 @@ local L = {
 	RM_ERR_NOTRUNNING = "No roll is currently in progress.",
 	RM_ERR_INVALIDROLL = "%s specified too high or too low roll region, not including their roll.",
 	
-	RM_MATCH = "(%w+) rolls (%d+) %((%d+)-(%d+)%)",
+	RM_MATCH = "(%w+) rolls (%d+) %((%d+)-(%d+)%)", -- Same as enUS since svSE has no official client support.
 	
 	RM_ROLLEXISTS = "%s has already rolled! (%d)",
-	RM_ROLLPROGRESS = "%d/%d players have rolled!",
+	RM_ROLLPROGRESS = "%d/%d spelare har rolled!",
 	
 	RM_UPDATE_TIMELEFT = "%d seconds left to roll!",
 	
