@@ -22,7 +22,6 @@ local MODE_WHITELIST = 1
 
 local C = Command
 local L = C.LocaleManager
-local GetL = function(k) return L:GetActive()[k] end
 local CM
 local GT = C.GroupTools
 local BNT = C.BattleNetTools
@@ -107,34 +106,34 @@ local function Kick(name, sender, reason)
 		if type(reason) == "string" then
 			local msg
 			if CM.LastChannel == "WHISPER" or CM.LastChannel == "BNET" then
-				msg = L:GetLocale(PM:GetOrCreatePlayer(sender).Settings.Locale, true)["PM_KICK_REASON"]:format(name, sender, reason)
+				msg = L(PM:GetOrCreatePlayer(sender).Settings.Locale, "PM_KICK_REASON", true):format(name, sender, reason)
 			else
-				msg = GetL("PM_KICK_REASON"):format(name, sender, reason)
+				msg = L("PM_KICK_REASON"):format(name, sender, reason)
 			end
 			CM:SendMessage(msg, CM.LastChannel, CM.LastTarget)
 		else
 			local msg
 			if CM.LastChannel == "WHISPER" or CM.LastChannel == "BNET" then
-				msg = L:GetLocale(PM:GetOrCreatePlayer(sender).Settings.Locale, true)["PM_KICK"]:format(name, sender)
+				msg = L(PM:GetOrCreatePlayer(sender).Settings.Locale, "PM_KICK", true):format(name, sender)
 			else
-				msg = GetL("PM_KICK"):format(name, sender)
+				msg = L("PM_KICK"):format(name, sender)
 			end
 			CM:SendMessage(msg, CM.LastChannel, CM.LastTarget)
 		end
 	else
-		local msg = L:GetLocale(PM:GetOrCreatePlayer(sender).Settings.Locale, true)["PM_KICK_NOTIFY"]:format(name)
+		local msg = L(PM:GetOrCreatePlayer(sender).Settings.Locale, "PM_KICK_NOTIFY", true):format(name)
 		CM:SendMessage(msg, "WHISPER", sender)
 	end
-	local msg = L:GetLocale(PM:GetOrCreatePlayer(name).Settings.Locale, true)["PM_KICK_TARGET"]:format(sender)
+	local msg = L(PM:GetOrCreatePlayer(name).Settings.Locale, "PM_KICK_TARGET", true):format(sender)
 	CM:SendMessage(msg, "WHISPER", name)
 end
 
 local function KickCancelled(name, sender)
 	local msg
 	if CM.LastTarget and (CM.LastChannel == "WHISPER" or CM.LastChannel == "BNET") then
-		msg = L:GetLocale(PM:GetOrCreatePlayer(CM.LastTarget).Settings.Locale, true)["PM_KICK_DENIED"]:format(sender, name)
+		msg = L(PM:GetOrCreatePlayer(CM.LastTarget).Settings.Locale, "PM_KICK_DENIED", true):format(sender, name)
 	else
-		msg = GetL("PM_KICK_DENIED"):format(sender, name)
+		msg = L("PM_KICK_DENIED"):format(sender, name)
 	end
 	CM:SendMessage(msg, CM.LastChannel, CM.LastTarget)
 end
@@ -224,7 +223,7 @@ function PM:GetOrCreatePlayer(name)
 			player.Info.Group = self.Access.Groups.User.Name
 		end
 		Players[player.Info.Name] = player
-		log:Normal(GetL("PM_PLAYER_CREATE"):format(player.Info.Name))
+		log:Normal(L("PM_PLAYER_CREATE"):format(player.Info.Name))
 		return player
 	end
 end
@@ -234,7 +233,7 @@ end
 --
 function PM:UpdatePlayer(player)
 	Players[player.Info.Name] = player
-	log:Normal(GetL("PM_PLAYER_UPDATE"):format(player.Info.Name))
+	log:Normal(L("PM_PLAYER_UPDATE"):format(player.Info.Name))
 end
 
 --- Completely remove a command from a group's access list.
@@ -564,7 +563,7 @@ function PM:Invite(player, sender)
 			return "PM_INVITE_NOTIFYTARGET"
 		elseif player.Settings.Invite then
 			InviteUnit(player.Info.Name)
-			local msg = L:GetLocale(player.Settings.Locale, true)["PM_INVITE_NOTIFY"]:format(sender.Info.Name, player.Info.Name)
+			local msg = L(player.Settings.Locale, "PM_INVITE_NOTIFY", true):format(sender.Info.Name, player.Info.Name)
 			CM:SendMessage(msg, "WHISPER", player.Info.Name)
 			return "PM_INVITE_SUCCESS", {player.Info.Name}
 		else
@@ -586,7 +585,7 @@ function PM:DenyInvites(player, isWhisper)
 		if isWhisper then
 			return "PM_DI_BLOCKING"
 		end
-		local msg = L:GetLocale(player.Settings.Locale, true)["PM_DI_BLOCKING"]
+		local msg = L(player.Settings.Locale, "PM_DI_BLOCKING", true)
 		CM:SendMessage(msg, "WHISPER", player.Info.Name)
 		return "PM_DI_SUCCESS", {player.Info.Name}
 	end
@@ -607,7 +606,7 @@ function PM:AllowInvites(player, isWhisper)
 	if isWhisper then
 		return "PM_AI_ALLOWING"
 	end
-	local msg = L:GetLocale(player.Settings.Locale, true)["PM_AI_ALLOWING"]
+	local msg = L(player.Settings.Locale, "PM_AI_ALLOWING", true)
 	CM:SendMessage(msg, "WHISPER", player.Info.Name)
 	return "PM_AI_SUCCESS", {player.Info.Name}
 end
@@ -629,10 +628,10 @@ function PM:Kick(player, sender, reason)
 	if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() then
 		KickName = player.Info.Name
 		KickSender = sender.Info.Name
-		KickReason = reason or GetL("PM_KICK_DEFAULTREASON"):format(KickSender)
-		StaticPopupDialogs.COMMAND_CONFIRMKICK.text = GetL("PM_KICK_POPUP")
-		StaticPopupDialogs.COMMAND_CONFIRMKICK.button1 = GetL("YES")
-		StaticPopupDialogs.COMMAND_CONFIRMKICK.button2 = GetL("NO")
+		KickReason = reason or L("PM_KICK_DEFAULTREASON"):format(KickSender)
+		StaticPopupDialogs.COMMAND_CONFIRMKICK.text = L("PM_KICK_POPUP")
+		StaticPopupDialogs.COMMAND_CONFIRMKICK.button1 = L("YES")
+		StaticPopupDialogs.COMMAND_CONFIRMKICK.button2 = L("NO")
 		StaticPopup_Show("COMMAND_CONFIRMKICK", KickSender, KickName)
 		return "PM_KICK_WAIT", {KickName}
 	end

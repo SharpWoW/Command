@@ -38,7 +38,7 @@ C.QueueManager = {
 	Announced = false
 }
 
-local L = function(k) return C.LocaleManager:GetActive()[k] end
+local L = C.LocaleManager
 local QM = C.QueueManager
 
 --- Contains information about various dungeon types.

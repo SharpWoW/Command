@@ -31,16 +31,31 @@ C.LocaleManager = {
 
 local LM = C.LocaleManager
 
-local function l_index(t, k) -- Wait with metatable stuff til we know everything else works properly :P
-	local master = LM:GetMaster()[k]
-	if master then return master end
-	return ("%%%s%%"):format(k)
+local function l_index(self, k)
+	k = tostring(k):upper()
+	master = LM:GetMaster()
+	if self == master then -- Prevent recursion
+		return ("%%%s%%"):format(k)
+	end
+	local val = master[k]
+	if val then return val end
 end
+
+local s_meta = {
+	__call = function(self, arg1, arg2, isPlr)
+		if not arg1 then return nil end
+		if arg2 then -- (locale, key)
+			return self:GetLocale(tostring(arg1), isPlr)[tostring(arg2):upper()]
+		end
+		arg1 = tostring(arg1):upper()
+		return self:GetActive()[arg1]
+	end
+}
 
 -- Initialize LocaleManager
 function LM:Init()
 	if self.Active == "enGB" then self.Active = "enUS" end
-	--setmetatable(self.Locales, {__index = function(t, k) error("FATAL: __index meta LocaleManager.Locales report to addon author.") end})
+	setmetatable(self, s_meta)
 	self:LoadSavedVars()
 end
 
@@ -72,7 +87,7 @@ function LM:Register(locale, localeTable)
 			self.Locales[locale][k] = v
 		end
 	end
-	--setmetatable(self.Locales[locale], {__index = l_index})
+	setmetatable(self.Locales[locale], {__index = l_index})
 end
 
 -- Check if a locale has been loaded/registered

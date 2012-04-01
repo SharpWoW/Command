@@ -181,7 +181,7 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 	local cmd = self:ParseCommand(args[1])
 	if not CCM:HasCommand(cmd) then return end
 	if not AC:IsController(sourceChannel) then
-		C.Logger:Normal(L:GetActive()["CHAT_HANDLE_NOTCONTROLLER"]:format(sourceChannel:lower()))
+		C.Logger:Normal(L("CHAT_HANDLE_NOTCONTROLLER"):format(sourceChannel:lower()))
 		return
 	end
 	local t = {}
@@ -191,7 +191,6 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 		end
 	end
 	local player = PM:GetOrCreatePlayer(sender)
-	--local result, err = CCM:HandleCommand(cmd, t, true, player)
 	local result, arg, errArg = CCM:HandleCommand(cmd, t, sourceChannel, player)
 	if isBN then
 		target = pID
@@ -207,7 +206,7 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 		if type(result) == "table" then
 			for _,v in ipairs(result) do
 				if type(v) == "table" then
-					local s = v[1]
+					local s = l[v[1]]
 					if type(v[2]) == "table" then
 						s = s:format(unpack(v[2]))
 					end

@@ -27,7 +27,7 @@ local C = Command
 C.LootManager = {
 }
 
-local L = function(k) return C.LocaleManager:GetActive()[k] end
+local L = C.LocaleManager
 local LM = C.LootManager
 local GT = C.GroupTools
 

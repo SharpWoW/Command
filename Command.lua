@@ -44,7 +44,6 @@ Command = {
 
 local C = Command
 local L
-local GetL
 local Cmd
 local CM
 local PM
@@ -66,8 +65,7 @@ function C:Init()
 	AC = self.AddonComm
 	log = self.Logger
 	self:LoadSavedVars()
-	GetL = function(k) return L:GetActive()[k] end
-	log:Normal(GetL("ADDON_LOAD"))
+	log:Normal(L("ADDON_LOAD"))
 	self.Loaded = true
 end
 
@@ -79,7 +77,7 @@ function C:LoadSavedVars()
 		_G["COMMAND"] = {}
 	elseif type(_G["COMMAND"]["VERSION"]) == "number" then
 		if _G["COMMAND"]["VERSION"] < self.VarVersion then
-			log:Normal(GetL("SVARS_OUTDATED"))
+			log:Normal(L("SVARS_OUTDATED"))
 			wipe(_G["COMMAND"])
 			_G["COMMAND"] = {}
 		end
@@ -115,7 +113,7 @@ function C:CheckVersion(ver)
 	if self.VersionChecked then return end
 	ver = ver or 0
 	if ver > self.VersionNum then
-		log:Normal(GetL("NEWVERSION_NOTICE"):format(self.Name))
+		log:Normal(L("NEWVERSION_NOTICE"):format(self.Name))
 		self.VersionChecked = true
 	end
 end
