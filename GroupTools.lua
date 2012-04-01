@@ -64,7 +64,7 @@ end
 --
 function GT:IsGroupLeader(name)
 	name = name or "player"
-	return UnitIsPartyLeader(name) -- or (name == "player" and not self:IsGroup())
+	return UnitIsGroupLeader(name) -- or (name == "player" and not self:IsGroup())
 end
 
 --- Get the number of group members in the current party or raid (including the player).
@@ -75,7 +75,7 @@ function GT:GetNumGroupMembers()
 	if UnitInRaid("player") then
 		return GetNumRaidMembers()
 	else
-		return GetNumPartyMembers() + 1 -- We need to add one because it won't count the player
+		return GetNumSubgroupMembers() + 1 -- We need to add one because it won't count the player
 	end
 end
 
@@ -115,7 +115,7 @@ end
 --
 function GT:IsRaidAssistant(name)
 	name = name or "player"
-	return UnitIsRaidOfficer(name)
+	return UnitIsGroupAssistant(name)
 end
 
 --- Check if the unit is in the player's group.
