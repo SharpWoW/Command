@@ -221,6 +221,14 @@ CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, i
 			return L:ResetLocale()
 		elseif sub:match("^u.*m") then -- Use master
 			return L:UseMasterLocale()
+		elseif sub:match("^p.*i") then -- Player Independent
+			local enabled = tostring(args[3]):lower()
+			if enabled:match("^[eay]") then
+				return L:EnablePlayerIndependent()
+			elseif enabled:match("^[dn]") then
+				return L:DisablePlayerIndependent()
+			end
+			return L:TogglePlayerIndependent()
 		end
 		return false, "CM_SET_LOCALE_USAGE"
 	end

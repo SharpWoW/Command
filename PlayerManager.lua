@@ -38,6 +38,7 @@ local log
 -- @field Access Table containing all available access groups.
 --
 C.PlayerManager = {
+	VarVersion = 1,
 	Access = {
 		Min = 0,
 		Max = 4,
@@ -165,8 +166,17 @@ function PM:LoadSavedVars()
 		C.Global["PLAYER_MANAGER"] = {}
 	end
 	self.Data = C.Global["PLAYER_MANAGER"]
+	if not self.Data.VERSION or self.Data.VERSION < self.VarVersion then
+		if type(self.Data.PLAYERS) == "table" and not self.Data.VERSION then
+			wipe(self.Data.PLAYERS)
+		end
+		self.Data.VERSION = self.VarVersion
+	end
 	if type(self.Data.PLAYERS) ~= "table" then
 		self.Data.PLAYERS = {}
+	end
+	if type(self.Data.PLAYERS[GetRealmName()]) ~= "table" then
+		self.Data.PLAYERS[GetRealmName()] = {}
 	end
 	if type(self.Data.LIST_MODE) ~= "number" then
 		self.Data.LIST_MODE = MODE_BLACKLIST
@@ -193,7 +203,7 @@ function PM:LoadSavedVars()
 		self.Access.Groups[k].Allow = v.Allow
 		self.Access.Groups[k].Deny = v.Deny
 	end
-	Players = self.Data.PLAYERS
+	Players = self.Data.PLAYERS[GetRealmName()]
 	List = self.Data.LIST
 end
 

@@ -24,6 +24,8 @@ local L = {
 
 	LOCALE_NOT_LOADED = "The specified locale has not been loaded.",
 	LOCALE_UPDATE = "Set new locale to: %s",
+	LOCALE_PI_ACTIVE = "Player independent locale settings is now active.",
+	LOCALE_PI_INACTIVE = "Player independent locale settings is now inactive.",
 	
 	-------------
 	-- General --

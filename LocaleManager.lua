@@ -141,3 +141,23 @@ end
 function LM:UseMasterLocale()
 	return self:SetLocale(self.Master)
 end
+
+function LM:SetPlayerIndependent(active)
+	self.Settings.PLAYER_INDEPENDENT = active
+	if self.Settings.PLAYER_INDEPENDENT then
+		return "LOCALE_PI_ACTIVE"
+	end
+	return "LOCALE_PI_INACTIVE"
+end
+
+function LM:EnablePlayerIndependent()
+	return self:SetPlayerIndependent(true)
+end
+
+function LM:DisablePlayerIndependent()
+	return self:SetPlayerIndependent(false)
+end
+
+function LM:TogglePlayerIndependent()
+	return self:SetPlayerIndependent(not self.Settings.PLAYER_INDEPENDENT)
+end

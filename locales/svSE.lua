@@ -17,8 +17,6 @@
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local LM = Command.LocaleManager
-
 local L = {
 	-------------------
 	-- LocaleManager --
@@ -26,6 +24,8 @@ local L = {
 
 	LOCALE_NOT_LOADED = "Det specifierade språket är inte initialiserat.",
 	LOCALE_UPDATE = "Nytt språk inställt till: %s",
+	LOCALE_PI_ACTIVE = "Språkinställningar per-användare är nu aktivt.",
+	LOCALE_PI_INACTIVE = "Språkinställningar per-användare är nu inaktivt.",
 	
 	-------------
 	-- General --
@@ -445,4 +445,4 @@ local L = {
 	RM_ANNOUNCE_WINNER = "%s with a roll of %d."
 }
 
-LM:Register("svSE", L)
+Command.LocaleManager:Register("svSE", L)
