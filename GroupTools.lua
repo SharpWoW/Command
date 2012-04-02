@@ -73,7 +73,7 @@ end
 function GT:GetNumGroupMembers()
 	if not self:IsGroup() then return 0 end
 	if UnitInRaid("player") then
-		return GetNumRaidMembers()
+		return GetNumGroupMembers()
 	else
 		return GetNumSubgroupMembers() + 1 -- We need to add one because it won't count the player
 	end
@@ -100,7 +100,7 @@ end
 function GT:IsRaidLeaderOrAssistant(name)
 	name = name or "player"
 	if not self:IsRaid() then return false end
-	for i=1,GetNumRaidMembers() do
+	for i=1,GetNumGroupMembers() do
 		local name, rank = (select(1, GetRaidRosterInfo(i))), (select(2, GetRaidRosterInfo(i)))
 		if name:lower() == UnitName("player"):lower() then
 			if rank >= 1 then return true end
@@ -124,7 +124,7 @@ end
 --
 function GT:IsInGroup(name)
 	if self:IsRaid() then
-		for i=1,GetNumRaidMembers() do
+		for i=1,GetNumGroupMembers() do
 			local n = (select(1, GetRaidRosterInfo(i)))
 			if n == name then return true end
 		end

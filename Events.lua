@@ -83,7 +83,10 @@ function C.Events.READY_CHECK_FINISHED(self, ...)
 	C.Data.ReadyCheckRunning = false
 end
 
-function C.Events.RAID_ROSTER_UPDATE(self, ...)
+function C.Events.GROUP_ROSTER_UPDATE(self, ...)
+	if StaticPopup_Visible("PARTY_INVITE") then
+		StaticPopup_Hide("PARTY_INVITE")
+	end
 	if AC.GroupRunning then return end
 	AC:UpdateGroup()
 end
@@ -99,14 +102,6 @@ function C.Events.PARTY_INVITE_REQUEST(self, ...)
 	else
 		CM:SendMessage(msg, "WHISPER", sender)
 	end
-end
-
-function C.Events.PARTY_MEMBERS_CHANGED(self, ...)
-	if StaticPopup_Visible("PARTY_INVITE") then
-		StaticPopup_Hide("PARTY_INVITE")
-	end
-	if AC.GroupRunning then return end
-	AC:UpdateGroup()
 end
 
 function C.Events.PARTY_LEADER_CHANGED(self, ...)
