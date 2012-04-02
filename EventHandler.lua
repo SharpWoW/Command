@@ -18,7 +18,6 @@
 --]]
 
 local C = Command
-local L = C.LocaleManager
 local CES = C.Extensions.String
 
 --- Handles events.

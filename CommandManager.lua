@@ -135,7 +135,7 @@ end
 -- @return Error message if not successful, otherwise nil.
 --
 function CM:HandleCommand(command, args, isChat, player)
-	command = command:lower()
+	command = tostring(command):lower()
 	local cmd = self:GetCommand(command)
 	if cmd then
 		if isChat then
@@ -747,7 +747,6 @@ SlashCmdList[C.Name:upper()] = function(msg, editBox)
 			table.insert(t, args[i])
 		end
 	end
-	--local result, err = CM:HandleCommand(cmd, t, false, PM:GetOrCreatePlayer(UnitName("player")))
 	local result, arg, errArg = CM:HandleCommand(cmd, t, false, PM:GetOrCreatePlayer(UnitName("player")))
 	local l = L:GetActive()
 	if result then
@@ -775,17 +774,4 @@ SlashCmdList[C.Name:upper()] = function(msg, editBox)
 	else
 		C.Logger:Error(tostring(err))
 	end
-	--[[ PRE-Locale code
-	if result then
-		if type(result) == "table" then
-			for _,v in ipairs(result) do
-				C.Logger:Normal(tostring(v))
-			end
-		else
-			C.Logger:Normal(tostring(result))
-		end
-	else
-		C.Logger:Error(tostring(err))
-	end
-	-- END PRE-Locale code ]]
 end

@@ -19,7 +19,7 @@
 
 local C = Command
 
-local L = function(k) return C.LocaleManager:GetActive()[k] end
+local L = C.LocaleManager
 local CM = C.ChatManager
 local QM = C.QueueManager
 local AC = C.AddonComm

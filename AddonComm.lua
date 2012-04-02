@@ -19,10 +19,7 @@
 
 local C = Command
 
-local function L(k)
-	return C.LocaleManager:GetActive()[k]
-end
-
+local L = C.LocaleManager
 local GT = C.GroupTools
 local CES = C.Extensions.String
 local CET = C.Extensions.Table
