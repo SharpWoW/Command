@@ -24,12 +24,6 @@ local CM = C.ChatManager
 local QM = C.QueueManager
 local AC = C.AddonComm
 
---[[
-function T.Events.CHAT_MSG_ADDON(event, ...)
-	
-end
---]]
-
 --- Event handler for ADDON_LOADED
 -- @name Command.Events.ADDON_LOADED
 -- @param self Reference to Command object.
@@ -39,6 +33,7 @@ function C.Events.ADDON_LOADED(self, ...)
 	local name = (select(1, ...))
 	if name:lower() ~= self.Name:lower() then return end
 	self:Init()
+	C.Frame:UnregisterEvent("ADDON_LOADED")
 end
 
 --- Event handler for LFG_UPDATE
