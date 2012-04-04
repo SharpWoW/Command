@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
@@ -16,6 +16,13 @@
 	* You should have received a copy of the GNU General Public License
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
+
+-- Upvalues
+local type = type
+local wipe = wipe
+local pairs = pairs
+local tostring = tostring
+local tonumber = tonumber
 
 local C = Command
 local L = C.LocaleManager
@@ -257,7 +264,6 @@ function RM:ParseMessage(msg)
 	roll = tonumber(roll)
 	minRoll = tonumber(minRoll)
 	maxRoll = tonumber(maxRoll)
-	print(name, roll, minRoll, maxRoll)
 	if minRoll ~= self.Settings.MIN_ROLL or maxRoll ~= self.Settings.MAX_ROLL then
 		CM:SendMessage(L("RM_ERR_INVALIDROLL"):format(name), "SMART")
 		return

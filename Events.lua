@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
@@ -17,18 +17,16 @@
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
+-- Upvalues
+local select = select
+local tostring = tostring
+
 local C = Command
 
 local L = C.LocaleManager
 local CM = C.ChatManager
 local QM = C.QueueManager
 local AC = C.AddonComm
-
---[[
-function T.Events.CHAT_MSG_ADDON(event, ...)
-	
-end
---]]
 
 --- Event handler for ADDON_LOADED
 -- @name Command.Events.ADDON_LOADED
@@ -39,6 +37,7 @@ function C.Events.ADDON_LOADED(self, ...)
 	local name = (select(1, ...))
 	if name:lower() ~= self.Name:lower() then return end
 	self:Init()
+	C.Frame:UnregisterEvent("ADDON_LOADED")
 end
 
 --- Event handler for LFG_UPDATE

@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
@@ -16,6 +16,9 @@
 	* You should have received a copy of the GNU General Public License
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
+
+-- Upvalues
+local select = select
 
 local C = Command
 local CM = C.ChatManager

@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
@@ -16,6 +16,14 @@
 	* You should have received a copy of the GNU General Public License
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
+
+-- Upvalues
+local type = type
+local pairs = pairs
+local ipairs = ipairs
+local unpack = unpack
+local tostring = tostring
+local tonumber = tonumber
 
 local C = Command
 
@@ -178,7 +186,6 @@ CM:Register({"commands", "cmds", "cmdlist", "listcmds", "listcommands", "command
 end, "CM_COMMANDS_HELP")
 
 CM:Register({"version", "ver", "v"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
-	--return C.Version
 	return "CM_VERSION", {C.Version}
 end, "CM_VERSION_HELP")
 
