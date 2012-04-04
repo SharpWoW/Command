@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
@@ -16,6 +16,12 @@
 	* You should have received a copy of the GNU General Public License
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
+
+-- Upvalues
+local type = type
+local ipairs = ipairs
+local unpack = unpack
+local tostring = tostring
 
 local C = Command
 
@@ -231,17 +237,4 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 		end
 		self:SendMessage(s, "WHISPER", sender, isBN)
 	end
-	--[[ PRE-Locale stuff
-	if result then
-		if type(result) == "table" then
-			for _,v in ipairs(result) do
-				self:SendMessage(tostring(v), channel, target, isBN)
-			end
-		else
-			self:SendMessage(tostring(result), channel, target, isBN)
-		end
-	else
-		self:SendMessage(tostring(err), "WHISPER", sender, isBN)
-	end
-	-- END PRE-Locale stuff ]]
 end

@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
@@ -19,6 +19,12 @@
 
 -- NOTE: All error() calls use constant strings in english for debugging reasons.
 -- NOTE: return after error() shouldn't be needed. Consider remove.
+
+-- Upvalues
+local type = type
+local pairs = pairs
+local tostring = tostring
+local setmetatable = setmetatable
 
 local C = Command
 

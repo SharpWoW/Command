@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	* Copyright (c) 2011-2012 by Adam Hellberg.
 	* 
 	* This file is part of Command.
