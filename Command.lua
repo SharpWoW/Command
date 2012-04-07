@@ -20,6 +20,7 @@
 -- Upvalues
 local type = type
 local wipe = wipe
+local assert = assert
 
 --- Table containing all Command methods.
 -- This is referenced "C" in Command.lua
