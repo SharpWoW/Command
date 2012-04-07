@@ -37,7 +37,6 @@ local CCM
 local CET = C.Extensions.Table
 local log
 
-
 --- Table containing all PlayerManager methods.
 -- This is referenced "PM" in PlayerManager.lua.
 -- @name Command.PlayerManager

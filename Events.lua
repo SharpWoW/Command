@@ -37,7 +37,7 @@ function C.Events.ADDON_LOADED(self, ...)
 	local name = (select(1, ...))
 	if name:lower() ~= self.Name:lower() then return end
 	self:Init()
-	C.Frame:UnregisterEvent("ADDON_LOADED")
+	self.Frame:UnregisterEvent("ADDON_LOADED")
 end
 
 --- Event handler for LFG_UPDATE

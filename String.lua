@@ -49,7 +49,7 @@ end
 
 --- Check if a string ends with a specific string.
 -- @param s String to be checked.
--- @param target Stromg to search for at end of s.
+-- @param target String to search for at end of s.
 --
 function CES:EndsWith(s, target)
 	return target == '' or s:sub(-target:len()) == target
@@ -77,15 +77,15 @@ function CES:Split(s, d)
 		end
 	else
 		if not s:find(d) then return {s} end
-		local p = "(.-)" .. d .. "()"
-		local nb = 0
+		local pattern = "(.-)" .. d .. "()"
+		local num = 0
 		local lastPos
-		for part,pos in s:gmatch(p) do
-			nb = nb + 1
-			t[nb] = part
+		for part,pos in s:gmatch(pattern) do
+			num = num + 1
+			t[num] = part
 			lastPos = pos
 		end
-		t[nb + 1] = s:sub(lastPos)
+		t[num + 1] = s:sub(lastPos)
 	end
 	return t
 end
