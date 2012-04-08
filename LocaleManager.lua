@@ -49,9 +49,9 @@ end
 
 local s_meta = {
 	__call = function(self, arg1, arg2, isPlr)
-		if not arg1 then return nil end
+		if not arg1 and not arg2 then return nil end
 		if arg2 then -- (locale, key)
-			return self:GetLocale(tostring(arg1), isPlr)[tostring(arg2):upper()]
+			return self:GetLocale(arg1, isPlr)[tostring(arg2):upper()]
 		end
 		arg1 = tostring(arg1):upper()
 		return self:GetActive()[arg1]
@@ -111,7 +111,7 @@ end
 -- ^NOTE^ Above should not happen, under any circumstance what-so-ever unless Locales table is modified.
 function LM:GetLocale(locale, isPlr)
 	if isPlr and not self.Settings.PLAYER_INDEPENDENT then
-		locale = self.Active
+		locale = self.Settings.LOCALE
 	end
 	locale = locale or self.Settings.LOCALE
 	locale = locale:lower()
