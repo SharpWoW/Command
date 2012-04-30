@@ -52,6 +52,8 @@ local L = {
 	
 	AC_ERR_PREFIX = "[KRITISK] Misslyckades med att registrera AddOn prefix %q. Maximalt antal prefix har nåtts på klienten.",
 	AC_ERR_MSGTYPE = "Ogiltig meddelandetyp: %s",
+	AC_ERR_MALFORMED_DATA = "Ogiltig data från %s. Deras AddOn är antagligen inaktuell.",
+	AC_ERR_MALFORMED_DATA_SEND = "[AddonComm] Malformed data detected (\"%s\"). Aborting Send...",
 	
 	AC_GROUP_NORESP = "Inget svar från grupp, uppdaterar...",
 	AC_GROUP_R_UPDATE = "Gruppmedlemmar uppdaterade, kontrollerare: %s",
