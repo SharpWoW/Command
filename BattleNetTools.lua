@@ -142,7 +142,7 @@ function BNT:GetFriendByName(name)
 	if n <= 0 then return nil end
 	for i = 1, n do
 		local friend = ParseBNFriendResult(BNGetFriendInfo(i))
-		if friend.ToonName:lower() == name:lower() then
+		if (friend.ToonName or ""):lower() == name:lower() then
 			return friend
 		end
 	end
@@ -159,7 +159,7 @@ function BNT:GetToonByName(name)
 	for i = 1, numF do
 		for t = 1, BNGetNumFriendToons(i) do
 			local toon = ParseBNToonResult(BNGetFriendToonInfo(i, t))
-			if toon.Name:lower() == name:lower() then return toon end
+			if (toon.Name or ""):lower() == name:lower() then return toon end
 		end
 	end
 	return nil
