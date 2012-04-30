@@ -123,7 +123,7 @@ function AC:Receive(msgType, msg, channel, sender)
 			if v then
 				if not v:find("-") then
 					local name, realm = UnitName(v)
-					if realm then
+					if realm and realm ~= "" then
 						v = ("%s-%s"):format(name, realm)
 					end
 				end
@@ -137,7 +137,7 @@ function AC:Receive(msgType, msg, channel, sender)
 		if self.GroupMembers[1] ~= UnitName("player") then return end
 		if not msg:find("-") then
 			local name, realm = UnitName(msg)
-			if realm then
+			if realm and realm ~= "" then
 				msg = ("%s-%s"):format(name, realm)
 			end
 		end
@@ -192,7 +192,7 @@ function AC:Send(msgType, msg, channel, target)
 	if type(target) == "string" then
 		if not target:find("-") then
 			local name, realm = UnitName(target)
-			if realm then
+			if realm and realm ~= "" then
 				target = ("%s-%s"):format(name, realm)
 			end
 		end
