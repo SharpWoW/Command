@@ -193,7 +193,7 @@ function C.Events.CHAT_MSG_SAY(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
 	local sender = (select(2, ...))
-	CM:HandleMessage(msg, sender, chan)
+	CM:HandleMessage(msg, sender, chan, nil, "SAY")
 end
 
 --- Event handler for CHAT_MSG_WHISPER.
@@ -220,5 +220,5 @@ function C.Events.CHAT_MSG_YELL(self, event, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
 	local msg = (select(1, ...))
 	local sender = (select(2, ...))
-	CM:HandleMessage(msg, sender, chan)
+	CM:HandleMessage(msg, sender, chan, nil, "YELL")
 end
