@@ -123,9 +123,11 @@ function AC:Receive(msgType, msg, channel, sender)
 			if v then
 				if not v:find("-") then
 					local name, realm = UnitName(v)
-					if realm then
+					if realm and realm ~= "" then
 						v = ("%s-%s"):format(name, realm)
 					end
+				elseif v:match("^%w+-$") then
+					log:Error(L("AC_ERR_MALFORMED_DATA"):format(sender))
 				end
 				table.insert(self.GroupMembers, v)
 			end
@@ -137,9 +139,11 @@ function AC:Receive(msgType, msg, channel, sender)
 		if self.GroupMembers[1] ~= UnitName("player") then return end
 		if not msg:find("-") then
 			local name, realm = UnitName(msg)
-			if realm then
+			if realm and realm ~= "" then
 				msg = ("%s-%s"):format(name, realm)
 			end
+		elseif msg:match("^%w+-$") then
+			log:Error(L("AC_ERR_MALFORMED_DATA"):format(sender))
 		end
 		if not CET:HasValue(self.GroupMembers, msg) then
 			table.insert(self.GroupMembers, msg)
@@ -192,9 +196,12 @@ function AC:Send(msgType, msg, channel, target)
 	if type(target) == "string" then
 		if not target:find("-") then
 			local name, realm = UnitName(target)
-			if realm then
+			if realm and realm ~= "" then
 				target = ("%s-%s"):format(name, realm)
 			end
+		elseif target:match("^%w+-$") then
+			log:Error(L("AC_ERR_MALFORMED_DATA_SEND"):format(target))
+			return
 		end
 	end
 	SendAddonMessage(msgType, msg, channel, target)

@@ -75,7 +75,7 @@ end
 --
 function GT:GetNumGroupMembers()
 	if not self:IsGroup() then return 0 end
-	if UnitInRaid("player") then
+	if self:IsRaid() then
 		return GetNumGroupMembers()
 	else
 		return GetNumSubgroupMembers() + 1 -- We need to add one because it won't count the player
@@ -90,8 +90,8 @@ end
 function GT:IsGroupFull()
 	-- We need to add 1 to the number because it doesn't count the player.
 	local num = self:GetNumGroupMembers()
-	local max = self.RaidMax
-	if self:IsGroup() then max = self.PartyMax end
+	local max = self.PartyMax
+	if self:IsRaid() then max = self.RaidMax end
 	if num >= max then return true end
 	return false
 end
