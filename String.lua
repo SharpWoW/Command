@@ -144,3 +144,7 @@ function CES:Fit(s, l, d)
 	end
 	return parts
 end
+
+function CES:IsNullOrEmpty(s)
+	return s == nil or s == ""
+end
