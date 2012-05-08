@@ -477,7 +477,7 @@ CM:Register({"acceptlfg", "acceptlfd", "joinlfg", "joinlfd"}, PM.Access.Groups.U
 		return false, "CM_ERR_DISABLED"
 	end
 	local exists = (select(1, GetLFGProposal()))
-	if not QM.QueuedByCommand or then
+	if not QM.QueuedByCommand then
 		return false, "CM_ACCEPTLFG_FAIL"
 	elseif not exists then
 		return false, "CM_ACCEPTLFG_NOEXIST"
