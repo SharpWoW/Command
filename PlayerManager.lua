@@ -621,18 +621,23 @@ end
 --- Kick a player from the group.
 -- @param player Player object of the player to kick.
 -- @param sender Player object of the player who requested the kick.
+-- @param reason Optional reason for the kick.
+-- @param override True to kick even if target is friend.
 -- @return String stating the result of the kick, false if error.
 -- @return Error message if unsuccessful, nil otherwise.
 --
-function PM:Kick(player, sender, reason)
+function PM:Kick(player, sender, reason, override)
 	if player.Info.Name == UnitName("player") then
 		return false, "PM_KICK_SELF"
-	elseif self:IsFriend(player) or self:IsBNFriend(player) then
+	elseif (self:IsFriend(player) or self:IsBNFriend(player)) and not override then
 		return false, "PM_KICK_FRIEND"
 	elseif not GT:IsInGroup(player.Info.Name) then
 		return false, "PM_ERR_NOTINGROUP", {player.Info.Name}
 	end
 	if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() then
+		if GT:IsRaidAssistant() and GT:IsRaidAssistant(player.Info.Name) then
+			return false, "PM_KICK_TARGETASSIST", {player.Info.Name}
+		end
 		KickName = player.Info.Name
 		KickSender = sender.Info.Name
 		KickReason = reason or L("PM_KICK_DEFAULTREASON"):format(KickSender)

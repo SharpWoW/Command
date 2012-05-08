@@ -1,18 +1,18 @@
 --[[
 	* Copyright (c) 2011-2012 by Adam Hellberg.
-	* 
+	*
 	* This file is part of Command.
-	* 
+	*
 	* Command is free software: you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
 	* the Free Software Foundation, either version 3 of the License, or
 	* (at your option) any later version.
-	* 
+	*
 	* Command is distributed in the hope that it will be useful,
 	* but WITHOUT ANY WARRANTY; without even the implied warranty of
 	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	* GNU General Public License for more details.
-	* 
+	*
 	* You should have received a copy of the GNU General Public License
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
@@ -343,7 +343,7 @@ CM:Register({"ban"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat
 	return PM:BanUser(player)
 end, "CM_BAN_HELP")
 
-CM:Register({"acceptinvite", "acceptinv", "join", "joingroup"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"accept", "acceptinvite", "acceptinv", "join", "joingroup"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if not StaticPopup_Visible("PARTY_INVITE") then
 		return false, "CM_ACCEPTINVITE_NOTACTIVE"
 	elseif GT:IsInGroup() then
@@ -388,7 +388,13 @@ CM:Register({"kick"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 		return false, "CM_KICK_USAGE"
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
-	return PM:Kick(player, sender, args[2])
+	local reason = args[2]
+	local override = args[3] ~= nil
+	if (reason:lower() == "override" or reason:lower() == "true") and #args == 2 then
+		reason = nil
+		override = true
+	end
+	return PM:Kick(player, sender, reason, override)
 end, "CM_KICK_HELP")
 
 CM:Register({"kingme", "givelead"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
@@ -464,9 +470,17 @@ CM:Register({"leavelfg", "cancellfg", "cancel", "leavelfd", "cancellfd"}, PM.Acc
 	return QM:Cancel()
 end, "CM_LEAVELFG_HELP")
 
-CM:Register({"acceptlfg", "accept", "acceptlfd", "joinlfg", "joinlfd"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
-	if not QM.QueuedByCommand then
+-- So apparently Blizzard does not allow accepting invites without HW event... Making this command useless...
+-- I'm keeping this command here for the future, if there will ever be a way to make this work.
+CM:Register({"acceptlfg", "acceptlfd", "joinlfg", "joinlfd"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not C.Settings.DEBUG then
+		return false, "CM_ERR_DISABLED"
+	end
+	local exists = (select(1, GetLFGProposal()))
+	if not QM.QueuedByCommand or then
 		return false, "CM_ACCEPTLFG_FAIL"
+	elseif not exists then
+		return false, "CM_ACCEPTLFG_NOEXIST"
 	end
 	return QM:Accept()
 end, "CM_ACCEPTLFG_HELP")
@@ -579,9 +593,11 @@ CM:Register({"toggledebug", "td", "debug", "d"}, PM.Access.Local, function(args,
 	return C:ToggleDebug()
 end, "CM_TOGGLEDEBUG_HELP")
 
-CM:Register({"readycheck", "rc"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+CM:Register({"readycheck", "rc"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if #args <= 0 then
-		if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() then
+		if PM:GetAccess(sender) > PM.Access.Groups.Op.Level then
+			return "CM_ERR_NOACCESS", {sender.Info.Name, PM.Access.Groups.Op.Level, PM:GetAccess(sender)}
+		elseif GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() then
 			C.Data.ReadyCheckRunning = true
 			local name = tostring(sender.Info.Name)
 			DoReadyCheck()
@@ -737,6 +753,9 @@ CM:Register({"raidwarning", "rw", "raid_warning"}, PM.Access.Groups.User.Level, 
 		end
 	end
 	Chat:SendMessage(msg, "RAID_WARNING")
+	if isChat then
+		return nil -- "CM_RAIDWARNING_SENT"
+	end
 	return "CM_RAIDWARNING_SENT"
 end, "CM_RAIDWARNING_HELP")
 
@@ -778,7 +797,11 @@ SlashCmdList[C.Name:upper()] = function(msg, editBox)
 			end
 			C.Logger:Normal(s)
 		end
-	else
-		C.Logger:Error(tostring(err))
+	elseif arg then
+		local s = l[arg]
+		if type(errArg) == "table" then
+			s = s:format(unpack(errArg))
+		end
+		C.Logger:Error(s)
 	end
 end
