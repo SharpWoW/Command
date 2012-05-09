@@ -43,16 +43,21 @@ C.AddonComm = {
 	GuildChecked = false,
 	GroupRunning = false,
 	GuildRunning = false,
+	Prefix = "COMMAND",
 	Type = {
-		VersionUpdate = "COMM_VU",
-		GroupUpdate = "COMM_GU",
-		GroupAdd = "COMM_GA",
-		GroupRequest = "COMM_GR",
-		GuildUpdate = "COMM_UG",
-		GuildAdd = "COMM_AG",
-		GuildRequest = "COMM_RG"
+		VersionUpdate	= "VU",
+		GroupUpdate		= "GU",
+		GroupAdd		= "GA",
+		GroupRequest	= "GR",
+		GuildUpdate		= "UG",
+		GuildAdd		= "AG",
+		GuildRequest	= "RG"
+	},
+	Pattern = {
+		Message = "{(%w+)}(.*)"
 	},
 	Format = {
+		Message = "{%s}%s",
 		VersionUpdate = "%s"
 	},
 	GroupMembers = {},
@@ -92,11 +97,17 @@ end
 
 function AC:Init()
 	--self:LoadSavedVars()
+	--[[
 	for _,v in pairs(self.Type) do
 		if not RegisterAddonMessagePrefix(v) then
 			log:Error(L("AC_ERR_PREFIX"):format(tostring(v)))
 			error(L("AC_ERR_PREFIX"):format(tostring(v)))
 		end
+	end
+	]]
+	if not RegisterAddonMessagePrefix(self.Prefix) then
+		log:Error(L("AC_ERR_PREFIX"):format(tostring(self.Prefix)))
+		error(L("AC_ERR_PREFIX"):format(tostring(self.Prefix)))
 	end
 end
 
@@ -106,6 +117,9 @@ end
 
 function AC:Receive(msgType, msg, channel, sender)
 	if sender == UnitName("player") or not msg then return end
+	if msgType ~= self.Prefix then return end
+	log:Debug("[AddonComm] " .. msg)
+	msgType, msg = msg:match(self.Pattern.Message)
 	if msgType == self.Type.VersionUpdate then
 		local ver = tonumber(msg)
 		if type(ver) ~= "number" then return end
@@ -204,9 +218,9 @@ function AC:Send(msgType, msg, channel, target)
 			return
 		end
 	end
-	SendAddonMessage(msgType, msg, channel, target)
+	SendAddonMessage(self.Prefix, self.Format.Message:format(msgType, msg), channel, target)
 	if msgType ~= self.Type.VersionUpdate and channel ~= "WHISPER" then
-		SendAddonMessage(self.Type.VersionUpdate, self.Format.VersionUpdate:format(C.VersionNum), channel)
+		SendAddonMessage(self.Prefix, self.Format.Message:format(self.Type.VersionUpdate, self.Format.VersionUpdate:format(C.VersionNum)), channel)
 	end
 end
 
