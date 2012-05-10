@@ -35,16 +35,16 @@ C.GroupTools = {
 	RaidMax = 40,
 	Difficulty = {
 		Dungeon = {
-			[1] = function() return L("GT_DUNGEON_NORMAL") end,
-			[2] = function() return L("GT_DUNGEON_HEROIC") end,
+			[1] = "GT_DUNGEON_NORMAL",
+			[2] = "GT_DUNGEON_HEROIC",
 			Normal = 1,
 			Heroic = 2
 		},
 		Raid = {
-			[1] = function() return L("GT_RAID_N10") end,
-			[2] = function() return L("GT_RAID_N25") end,
-			[3] = function() return L("GT_RAID_H10") end,
-			[4] = function() return L("GT_RAID_H25") end,
+			[1] = "GT_RAID_N10",
+			[2] = "GT_RAID_N25",
+			[3] = "GT_RAID_H10",
+			[4] = "GT_RAID_H25",
 			Normal10 = 1,
 			Normal25 = 2,
 			Heroic10 = 3,
@@ -183,7 +183,7 @@ end
 -- @return String representation of dungeon difficulty.
 --
 function GT:GetFriendlyDungeonDifficulty(diff)
-	return self.Difficulty.Dungeon[tonumber(diff) or GetDungeonDifficulty()]()
+	return L(self.Difficulty.Dungeon[tonumber(diff) or GetDungeonDifficulty()])
 end
 
 --- Set the raid difficulty.
@@ -204,5 +204,5 @@ end
 -- @return String representation of raid difficulty.
 --
 function GT:GetFriendlyRaidDifficulty(diff)
-	return self.Difficulty.Raid[tonumber(diff) or GetRaidDifficulty()]()
+	return L(self.Difficulty.Raid[tonumber(diff) or GetRaidDifficulty()])
 end
