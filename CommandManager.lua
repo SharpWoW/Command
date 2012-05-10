@@ -390,13 +390,10 @@ CM:Register({"kick"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	local player = PM:GetOrCreatePlayer(args[1])
 	local reason = args[2]
 	local override = args[3] ~= nil
-	print("Override args[3] == " .. tostring(args[3]))
 	if ((reason or ""):lower() == "override" or (reason or ""):lower() == "true") and #args == 2 then
-		print("OVERRIDE ARGUMENT GIVEN")
 		reason = nil
 		override = true
 	end
-	print("Overide == " .. tostring(override))
 	return PM:Kick(player, sender, reason, override)
 end, "CM_KICK_HELP")
 
