@@ -234,6 +234,12 @@ local L = {
 	CM_RAIDWARNING_NOPRIV = "Cannot send raid warning: Not raid leader or assistant.",
 	CM_RAIDWARNING_SENT = "Sent raid warning.",
 
+	CM_DUNGEONMODE_HELP = "Set the dungeon difficulty.",
+	CM_DUNGEONMODE_USAGE = "Usage: dungeondifficulty <difficulty>",
+
+	CM_RAIDMODE_HELP = "Set the raid difficulty.",
+	CM_RAIDMODE_USAGE = "Usage: raiddifficulty <difficulty>",
+
 	------------
 	-- Events --
 	------------
@@ -390,6 +396,25 @@ local L = {
 	PM_LIST_REMOVEBLACK = "Removed %s from blacklist.",
 	PM_LIST_SETWHITE = "Now using list as whitelist.",
 	PM_LIST_SETBLACK = "Now using list as blacklist.",
+
+	----------------
+	-- GroupTools --
+	----------------
+
+	GT_DUNGEON_NORMAL = "Normal",
+	GT_DUNGEON_HEROIC = "Heroic",
+	GT_RAID_N10 = "Normal (10)",
+	GT_RAID_N25 = "Normal (25)",
+	GT_RAID_H10 = "Heroic (10)",
+	GT_RAID_H25 = "Heroic (25)",
+
+	GT_DIFF_INVALID = "%q is not a valid difficulty.",
+
+	GT_DD_DUPE = "Dungeon difficulty is already set to %s.",
+	GT_DD_SUCCESS = "Successfully set the dungeon difficulty to %s!",
+
+	GT_RD_DUPE = "Raid difficulty is already set to %s.",
+	GT_RD_SUCCESS = "Successfully set raid difficulty to %s!",
 
 	------------------
 	-- QueueManager --

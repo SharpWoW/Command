@@ -390,10 +390,13 @@ CM:Register({"kick"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	local player = PM:GetOrCreatePlayer(args[1])
 	local reason = args[2]
 	local override = args[3] ~= nil
-	if (reason:lower() == "override" or reason:lower() == "true") and #args == 2 then
+	print("Override args[3] == " .. tostring(args[3]))
+	if ((reason or ""):lower() == "override" or (reason or ""):lower() == "true") and #args == 2 then
+		print("OVERRIDE ARGUMENT GIVEN")
 		reason = nil
 		override = true
 	end
+	print("Overide == " .. tostring(override))
 	return PM:Kick(player, sender, reason, override)
 end, "CM_KICK_HELP")
 
@@ -758,6 +761,44 @@ CM:Register({"raidwarning", "rw", "raid_warning"}, PM.Access.Groups.User.Level, 
 	end
 	return "CM_RAIDWARNING_SENT"
 end, "CM_RAIDWARNING_HELP")
+
+CM:Register({"dungeondifficulty", "dd", "dungeonmode", "dm"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if #args < 1 then
+		return GT:GetFrindlyDungeonDifficulty()
+	end
+	local diff = args[1]:lower()
+	if diff:match("^n") then
+		diff = GT.Difficulty.Dungeon.Normal
+	elseif diff:match("^h") then
+		diff = GT.Difficulty.Dungeon.Heroic
+	elseif tonumber(diff)
+		diff = tonumber(diff)
+	else
+		return false, "CM_DUNGEONMODE_USAGE"
+	end
+	return GT:SetDungeonDifficulty(diff)
+end, "CM_DUNGEONMODE_HELP")
+
+CM:Register({"raiddifficulty", "rd", "raidmode", "rm"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if #args < 1 then
+		return GT:GetFriendlyRaidDifficulty()
+	end
+	local diff = args[1]:lower()
+	if diff:match("^n.*1") then
+		diff = GT.Difficulty.Raid.Normal10
+	elseif diff:match("^n.*2") then
+		diff = GT.Difficulty.Raid.Normal25
+	elseif diff:match("^h.*1") then
+		diff = GT.Difficulty.Raid.Heroic10
+	elseif diff:match("^h.*2") then
+		diff = GT.Difficulty.Raid.Heroic25
+	elseif tonumber(diff)
+		diff = tonumber(diff)
+	else
+		return false, "CM_RAIDMODE_USAGE"
+	end
+	return GT:SetRaidDifficulty(diff)
+end, "CM_RAIDMODE_HELP")
 
 for i,v in ipairs(CM.Slash) do
 	_G["SLASH_" .. C.Name:upper() .. i] = "/" .. v
