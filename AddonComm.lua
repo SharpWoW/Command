@@ -1,18 +1,18 @@
 --[[
 	* Copyright (c) 2011-2012 by Adam Hellberg.
-	* 
+	*
 	* This file is part of Command.
-	* 
+	*
 	* Command is free software: you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
 	* the Free Software Foundation, either version 3 of the License, or
 	* (at your option) any later version.
-	* 
+	*
 	* Command is distributed in the hope that it will be useful,
 	* but WITHOUT ANY WARRANTY; without even the implied warranty of
 	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	* GNU General Public License for more details.
-	* 
+	*
 	* You should have received a copy of the GNU General Public License
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
@@ -112,13 +112,12 @@ function AC:Init()
 end
 
 function AC:LoadSavedVars()
-	
+
 end
 
 function AC:Receive(msgType, msg, channel, sender)
 	if sender == UnitName("player") or not msg then return end
 	if msgType ~= self.Prefix then return end
-	log:Debug("[AddonComm] " .. msg)
 	msgType, msg = msg:match(self.Pattern.Message)
 	if msgType == self.Type.VersionUpdate then
 		local ver = tonumber(msg)
@@ -225,6 +224,7 @@ function AC:Send(msgType, msg, channel, target)
 end
 
 function AC:UpdateGroup()
+	if self.GroupRunning then return end
 	if not GT:IsGroup() then
 		if self.InGroup then
 			log:Normal(L("AC_GROUP_LEFT"))
@@ -267,6 +267,7 @@ function AC:UpdateGroup()
 end
 
 function AC:UpdateGuild()
+	if self.GuildRunning then return end
 	if not IsInGuild() then
 		self.InGuild = false
 		self.GuildChecked = false
@@ -317,7 +318,7 @@ end
 
 function AC:CheckGroupRoster()
 	for i,v in ipairs(self.GroupMembers) do
-		if not GT:IsInGroup(v) then
+		if not GT:IsInGroup(v) or not GT:IsOnline(v) then
 			log:Normal(L("AC_GROUP_REMOVE"):format(v))
 			table.remove(self.GroupMembers, i)
 			if self.GroupMembers[1] == UnitName("player") then
