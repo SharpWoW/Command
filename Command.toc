@@ -8,7 +8,4 @@
 # No libraries at the moment
 #embed.xml
 
-# !!LOCALE SUPPORT NOT ADDED!! #
-#locales\load.xml
-
 load.xml

@@ -1,18 +1,18 @@
 --[[
 	* Copyright (c) 2011-2012 by Adam Hellberg.
-	* 
+	*
 	* This file is part of Command.
-	* 
+	*
 	* Command is free software: you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
 	* the Free Software Foundation, either version 3 of the License, or
 	* (at your option) any later version.
-	* 
+	*
 	* Command is distributed in the hope that it will be useful,
 	* but WITHOUT ANY WARRANTY; without even the implied warranty of
 	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	* GNU General Public License for more details.
-	* 
+	*
 	* You should have received a copy of the GNU General Public License
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
@@ -73,7 +73,14 @@ function CM:Register(names, access, func, help)
 	if names[1] ~= "__DEFAULT__" then
 		names[1] = names[1]:lower()
 	end
-	local entry = {Name=names[1], Access=access, Call=func, Help=help, Alias={}}
+	local entry =
+	{
+		Name = names[1],
+		Access = access,
+		Call = func,
+		Help = help or "CM_NO_HELP",
+		Alias = {}
+	}
 	if #names > 1 then
 		for i=2,#names do
 			table.insert(entry.Alias, names[i]:lower())
@@ -160,6 +167,7 @@ function CM:HandleCommand(command, args, isChat, player)
 end
 
 --- Prints all command names together with their help messages.
+--
 function CM:AutoHelp()
 	local l = L:GetActive()
 	for k,v in pairs(self.Commands) do
@@ -168,13 +176,32 @@ function CM:AutoHelp()
 	end
 end
 
-CM:Register({"__DEFAULT__", "help", "h"}, PM.Access.Local, function(args, sender, isChat)
+function CM:GetHelp(cmd)
+	cmd = tostring(cmd):lower()
+	if not self:HasCommand(cmd) then return false, "CM_ERR_NOTREGGED" end
+	local command = self:GetCommand(cmd)
+	return command.Help or "CM_NO_HELP"
+end
+
+
+CM:Register({"__DEFAULT__"}, PM.Access.Local, function(args, sender, isChat)
 	if isChat then
 		return "CM_DEFAULT_CHAT"
 	end
 	CM:AutoHelp()
+	C.Logger:Normal(L("CM_DEFAULT_HELPCOMMAND"))
 	return "CM_DEFAULT_END"
 end, "CM_DEFAULT_HELP")
+
+CM:Register({"help", "h"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if #args <= 0 then
+		if isChat then
+			return "CM_DEFAULT_CHAT"
+		end
+		return false, "CM_HELP_USAGE"
+	end
+	return CM:GetHelp(tostring(args[1]):lower())
+end, "CM_HELP_HELP")
 
 CM:Register({"commands", "cmds", "cmdlist", "listcmds", "listcommands", "commandlist"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	local all
@@ -213,34 +240,36 @@ CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, i
 			return C:DisableGroupInvite()
 		end
 		return false, "CM_SET_GROUPINVITE_USAGE"
-	elseif args[1]:match("^s.*l") then -- Set locale
-		if #args < 2 then
-			return false, "CM_SET_SETLOCALE_USAGE"
-		end
-		local locale = tostring(args[2]):lower()
-		return L:SetLocale(locale)
-	elseif args[1]:match("^l") then -- Other locale settings
-		if #args < 2 then
-			return false, "CM_SET_LOCALE_USAGE"
-		end
-		local sub = tostring(args[2]):lower()
-		if sub:match("^r") or sub:match("^u.*a") then -- Reset / Use active
-			return L:ResetLocale()
-		elseif sub:match("^u.*m") then -- Use master
-			return L:UseMasterLocale()
-		elseif sub:match("^p.*i") then -- Player Independent
-			local enabled = tostring(args[3]):lower()
-			if enabled:match("^[eay]") then
-				return L:EnablePlayerIndependent()
-			elseif enabled:match("^[dn]") then
-				return L:DisablePlayerIndependent()
-			end
-			return L:TogglePlayerIndependent()
-		end
-		return false, "CM_SET_LOCALE_USAGE"
 	end
 	return false, "CM_SET_USAGE"
 end, "CM_SET_HELP")
+
+CM:Register({"locale", "loc"}, PM.Access.Local, function(args, sender, isChat)
+	if isChat then return false, "CM_ERR_NOCHAT" end
+	if #args <= 0 then
+		return "CM_LOCALE_CURRENT", {L.Settings.LOCALE}
+	end
+	local arg = tostring(args[1]):lower()
+	if arg:match("^s") then -- Set
+		if #args < 2 then
+			return false, "CM_LOCALE_SET_USAGE"
+		end
+		return L:SetLocale(tostring(args[2]):lower())
+	elseif arg:match("^r") or arg:match("^u.*a") then -- Reset / Use Active
+		return L:ResetLocale()
+	elseif arg:match("^u.*m") then -- Use Master
+		return L:UseMasterLocale()
+	elseif arg:match("^p.*i") then -- Player Independent
+		local enabled = tostring(args[3]):lower()
+		if enabled:match("^[eay]") then
+			return L:EnablePlayerIndependent()
+		elseif enabled:match("^[dn]") then
+			return L:DisablePlayerIndependent()
+		end
+		return L:TogglePlayerIndependent()
+	end
+	return false, "CM_LOCALE_USAGE"
+end, "CM_LOCALE_HELP")
 
 CM:Register({"mylocale", "ml"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if not isChat then
@@ -343,7 +372,7 @@ CM:Register({"ban"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat
 	return PM:BanUser(player)
 end, "CM_BAN_HELP")
 
-CM:Register({"acceptinvite", "acceptinv", "join", "joingroup"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"accept", "acceptinvite", "acceptinv", "join", "joingroup"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if not StaticPopup_Visible("PARTY_INVITE") then
 		return false, "CM_ACCEPTINVITE_NOTACTIVE"
 	elseif GT:IsInGroup() then
@@ -388,7 +417,13 @@ CM:Register({"kick"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 		return false, "CM_KICK_USAGE"
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
-	return PM:Kick(player, sender, args[2])
+	local reason = args[2]
+	local override = args[3] ~= nil
+	if ((reason or ""):lower() == "override" or (reason or ""):lower() == "true") and #args == 2 then
+		reason = nil
+		override = true
+	end
+	return PM:Kick(player, sender, reason, override)
 end, "CM_KICK_HELP")
 
 CM:Register({"kingme", "givelead"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
@@ -464,9 +499,17 @@ CM:Register({"leavelfg", "cancellfg", "cancel", "leavelfd", "cancellfd"}, PM.Acc
 	return QM:Cancel()
 end, "CM_LEAVELFG_HELP")
 
-CM:Register({"acceptlfg", "accept", "acceptlfd", "joinlfg", "joinlfd"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+-- So apparently Blizzard does not allow accepting invites without HW event... Making this command useless...
+-- I'm keeping this command here for the future, if there will ever be a way to make this work.
+CM:Register({"acceptlfg", "acceptlfd", "joinlfg", "joinlfd"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not C.Settings.DEBUG then
+		return false, "CM_ERR_DISABLED"
+	end
+	local exists = (select(1, GetLFGProposal()))
 	if not QM.QueuedByCommand then
 		return false, "CM_ACCEPTLFG_FAIL"
+	elseif not exists then
+		return false, "CM_ACCEPTLFG_NOEXIST"
 	end
 	return QM:Accept()
 end, "CM_ACCEPTLFG_HELP")
@@ -579,9 +622,11 @@ CM:Register({"toggledebug", "td", "debug", "d"}, PM.Access.Local, function(args,
 	return C:ToggleDebug()
 end, "CM_TOGGLEDEBUG_HELP")
 
-CM:Register({"readycheck", "rc"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+CM:Register({"readycheck", "rc"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if #args <= 0 then
-		if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() then
+		if PM:GetAccess(sender) > PM.Access.Groups.Op.Level then
+			return "CM_ERR_NOACCESS", {sender.Info.Name, PM.Access.Groups.Op.Level, PM:GetAccess(sender)}
+		elseif GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() then
 			C.Data.ReadyCheckRunning = true
 			local name = tostring(sender.Info.Name)
 			DoReadyCheck()
@@ -737,8 +782,49 @@ CM:Register({"raidwarning", "rw", "raid_warning"}, PM.Access.Groups.User.Level, 
 		end
 	end
 	Chat:SendMessage(msg, "RAID_WARNING")
+	if isChat then
+		return nil -- "CM_RAIDWARNING_SENT"
+	end
 	return "CM_RAIDWARNING_SENT"
 end, "CM_RAIDWARNING_HELP")
+
+CM:Register({"dungeondifficulty", "dungeondiff", "dd", "dungeonmode", "dm"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if #args < 1 then
+		return GT:GetDungeonDifficultyString()
+	end
+	local diff = args[1]:lower()
+	if diff:match("^n") then
+		diff = GT.Difficulty.Dungeon.Normal
+	elseif diff:match("^h") then
+		diff = GT.Difficulty.Dungeon.Heroic
+	elseif tonumber(diff) then
+		diff = tonumber(diff)
+	else
+		return false, "CM_DUNGEONMODE_USAGE"
+	end
+	return GT:SetDungeonDifficulty(diff)
+end, "CM_DUNGEONMODE_HELP")
+
+CM:Register({"raiddifficulty", "raiddiff", "rd", "raidmode", "rm"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if #args < 1 then
+		return GT:GetRaidDifficultyString()
+	end
+	local diff = args[1]:lower()
+	if diff:match("^n.*1") then
+		diff = GT.Difficulty.Raid.Normal10
+	elseif diff:match("^n.*2") then
+		diff = GT.Difficulty.Raid.Normal25
+	elseif diff:match("^h.*1") then
+		diff = GT.Difficulty.Raid.Heroic10
+	elseif diff:match("^h.*2") then
+		diff = GT.Difficulty.Raid.Heroic25
+	elseif tonumber(diff) then
+		diff = tonumber(diff)
+	else
+		return false, "CM_RAIDMODE_USAGE"
+	end
+	return GT:SetRaidDifficulty(diff)
+end, "CM_RAIDMODE_HELP")
 
 for i,v in ipairs(CM.Slash) do
 	_G["SLASH_" .. C.Name:upper() .. i] = "/" .. v
@@ -778,7 +864,11 @@ SlashCmdList[C.Name:upper()] = function(msg, editBox)
 			end
 			C.Logger:Normal(s)
 		end
-	else
-		C.Logger:Error(tostring(err))
+	elseif arg then
+		local s = l[arg]
+		if type(errArg) == "table" then
+			s = s:format(unpack(errArg))
+		end
+		C.Logger:Error(s)
 	end
 end

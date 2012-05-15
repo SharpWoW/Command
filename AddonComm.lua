@@ -1,18 +1,18 @@
 --[[
 	* Copyright (c) 2011-2012 by Adam Hellberg.
-	* 
+	*
 	* This file is part of Command.
-	* 
+	*
 	* Command is free software: you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
 	* the Free Software Foundation, either version 3 of the License, or
 	* (at your option) any later version.
-	* 
+	*
 	* Command is distributed in the hope that it will be useful,
 	* but WITHOUT ANY WARRANTY; without even the implied warranty of
 	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	* GNU General Public License for more details.
-	* 
+	*
 	* You should have received a copy of the GNU General Public License
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
@@ -43,16 +43,21 @@ C.AddonComm = {
 	GuildChecked = false,
 	GroupRunning = false,
 	GuildRunning = false,
+	Prefix = "COMMAND",
 	Type = {
-		VersionUpdate = "COMM_VU",
-		GroupUpdate = "COMM_GU",
-		GroupAdd = "COMM_GA",
-		GroupRequest = "COMM_GR",
-		GuildUpdate = "COMM_UG",
-		GuildAdd = "COMM_AG",
-		GuildRequest = "COMM_RG"
+		VersionUpdate	= "VU",
+		GroupUpdate		= "GU",
+		GroupAdd		= "GA",
+		GroupRequest	= "GR",
+		GuildUpdate		= "UG",
+		GuildAdd		= "AG",
+		GuildRequest	= "RG"
+	},
+	Pattern = {
+		Message = "{(%w+)}(.*)"
 	},
 	Format = {
+		Message = "{%s}%s",
 		VersionUpdate = "%s"
 	},
 	GroupMembers = {},
@@ -92,20 +97,28 @@ end
 
 function AC:Init()
 	--self:LoadSavedVars()
+	--[[
 	for _,v in pairs(self.Type) do
 		if not RegisterAddonMessagePrefix(v) then
 			log:Error(L("AC_ERR_PREFIX"):format(tostring(v)))
 			error(L("AC_ERR_PREFIX"):format(tostring(v)))
 		end
 	end
+	]]
+	if not RegisterAddonMessagePrefix(self.Prefix) then
+		log:Error(L("AC_ERR_PREFIX"):format(tostring(self.Prefix)))
+		error(L("AC_ERR_PREFIX"):format(tostring(self.Prefix)))
+	end
 end
 
 function AC:LoadSavedVars()
-	
+
 end
 
 function AC:Receive(msgType, msg, channel, sender)
 	if sender == UnitName("player") or not msg then return end
+	if msgType ~= self.Prefix then return end
+	msgType, msg = msg:match(self.Pattern.Message)
 	if msgType == self.Type.VersionUpdate then
 		local ver = tonumber(msg)
 		if type(ver) ~= "number" then return end
@@ -204,13 +217,14 @@ function AC:Send(msgType, msg, channel, target)
 			return
 		end
 	end
-	SendAddonMessage(msgType, msg, channel, target)
+	SendAddonMessage(self.Prefix, self.Format.Message:format(msgType, msg), channel, target)
 	if msgType ~= self.Type.VersionUpdate and channel ~= "WHISPER" then
-		SendAddonMessage(self.Type.VersionUpdate, self.Format.VersionUpdate:format(C.VersionNum), channel)
+		SendAddonMessage(self.Prefix, self.Format.Message:format(self.Type.VersionUpdate, self.Format.VersionUpdate:format(C.VersionNum)), channel)
 	end
 end
 
 function AC:UpdateGroup()
+	if self.GroupRunning then return end
 	if not GT:IsGroup() then
 		if self.InGroup then
 			log:Normal(L("AC_GROUP_LEFT"))
@@ -253,6 +267,7 @@ function AC:UpdateGroup()
 end
 
 function AC:UpdateGuild()
+	if self.GuildRunning then return end
 	if not IsInGuild() then
 		self.InGuild = false
 		self.GuildChecked = false
@@ -303,7 +318,7 @@ end
 
 function AC:CheckGroupRoster()
 	for i,v in ipairs(self.GroupMembers) do
-		if not GT:IsInGroup(v) then
+		if not GT:IsInGroup(v) or not GT:IsOnline(v) then
 			log:Normal(L("AC_GROUP_REMOVE"):format(v))
 			table.remove(self.GroupMembers, i)
 			if self.GroupMembers[1] == UnitName("player") then
