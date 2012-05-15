@@ -24,8 +24,8 @@ local L = {
 
 	LOCALE_NOT_LOADED = "Det specifierade språket är inte initialiserat.",
 	LOCALE_UPDATE = "Nytt språk inställt till: %s",
-	LOCALE_PI_ACTIVE = "Språkinställningar per-användare är nu aktivt.",
-	LOCALE_PI_INACTIVE = "Språkinställningar per-användare är nu inaktivt.",
+	LOCALE_PI_ACTIVE = "Språkinställning per-användare är nu aktivt.",
+	LOCALE_PI_INACTIVE = "Språkinställning per-användare är nu inaktivt.",
 
 	-------------
 	-- General --
@@ -89,8 +89,12 @@ local L = {
 	CM_NO_HELP = "Ingen hjälp tillgänglig.",
 
 	CM_DEFAULT_HELP = "Visar det här hjälpmeddelandet.",
-	CM_DEFAULT_CHAT = "Skriv !commands för en lista över kommandon.",
+	CM_DEFAULT_HELPCOMMAND = "Use \"help <command>\" to get help on a specific command.",
+	CM_DEFAULT_CHAT = "Skriv !commands för en lista över kommandon. Skriv !help <command> för hjälp med ett specifikt kommando.",
 	CM_DEFAULT_END = "Slut på hjälpmeddelandet.",
+
+	CM_HELP_HELP = "Gets help about the addon or a specific command.",
+	CM_HELP_USAGE = "Användning: help <command>",
 
 	CM_COMMANDS_HELP = "Visa alla registrerade kommandon.",
 
@@ -98,10 +102,13 @@ local L = {
 	CM_VERSION = "%s",
 
 	CM_SET_HELP = "Ändra inställningarna i Command.",
-	CM_SET_USAGE = "Användning: set cmdchar|groupinvite|setlocale|locale",
+	CM_SET_USAGE = "Användning: set cmdchar|groupinvite",
 	CM_SET_GROUPINVITE_USAGE = "Användning: set groupinvite enable|disable|<tid>",
-	CM_SET_SETLOCALE_USAGE = "Användning: set setlocale <språk>",
-	CM_SET_LOCALE_USAGE = "Användning: set locale reset|usemaster",
+
+	CM_LOCALE_HELP = "Change locale settings.",
+	CM_LOCALE_USAGE ="Användning: locale [set|reset|usemaster|playerindependent]",
+	CM_LOCALE_CURRENT = "Current locale: %s.",
+	CM_LOCALE_SET_USAGE = "Användning: locale set <locale>",
 
 	CM_MYLOCALE_HELP = "Låter användare ställa in sitt eget språk.",
 	CM_MYLOCALE_SET = "Ditt språk är nu inställt till %s.",
@@ -150,16 +157,16 @@ local L = {
 	CM_DEOPME_HELP = "Player issuing this command will be demoted from assistant status.",
 
 	CM_LEADER_HELP = "Promote a player to group leader.",
-	CM_LEADER_USAGE = "Usage: leader <name>",
+	CM_LEADER_USAGE = "Användning: leader <name>",
 
 	CM_PROMOTE_HELP = "Promote a player to raid assistant.",
-	CM_PROMOTE_USAGE = "Usage: promote <name>",
+	CM_PROMOTE_USAGE = "Användning: promote <name>",
 
 	CM_DEMOTE_HELP = "Demote a player from assistant status.",
-	CM_DEMOTE_USAGE = "Usage: demote <name>",
+	CM_DEMOTE_USAGE = "Användning: demote <name>",
 
 	CM_QUEUE_HELP = "Enter the LFG queue for the specified category.",
-	CM_QUEUE_USAGE = "Usage: queue <type>",
+	CM_QUEUE_USAGE = "Användning: queue <type>",
 	CM_QUEUE_INVALID = "No such dungeon type: %q.",
 
 	CM_LEAVELFG_HELP = "Lämna LFG-kön.",
@@ -170,7 +177,7 @@ local L = {
 	CM_ACCEPTLFG_NOEXIST = "There is currently no LFG proposal to accept.",
 
 	CM_CONVERT_HELP = "Convert group to party or raid.",
-	CM_CONVERT_USAGE = "Usage: convert party||raid",
+	CM_CONVERT_USAGE = "Användning: convert party||raid",
 	CM_CONVERT_LFG = "LFG groups cannot be converted.",
 	CM_CONVERT_NOGROUP = "Cannot convert if not in a group.",
 	CM_CONVERT_NOLEAD = "Cannot convert group, not leader.",
@@ -181,27 +188,27 @@ local L = {
 	CM_CONVERT_INVALID = "Invalid group type, only \"party\" or \"raid\" allowed.",
 
 	CM_LIST_HELP = "Toggle status of a command on the blacklist/whitelist.",
-	CM_LIST_USAGE = "Usage: list <command>",
+	CM_LIST_USAGE = "Användning: list <command>",
 
 	CM_LISTMODE_HELP = "Toggle list between being a blacklist and being a whitelist.",
 
 	CM_GROUPALLOW_HELP = "Allow a group to use a specific command.",
-	CM_GROUPALLOW_USAGE = "Usage: groupallow <group> <command>",
+	CM_GROUPALLOW_USAGE = "Användning: groupallow <group> <command>",
 
 	CM_GROUPDENY_HELP = "Deny a group to use a specific command.",
-	CM_GROUPDENY_USAGE = "Usage: groupdeny <group> <command>",
+	CM_GROUPDENY_USAGE = "Användning: groupdeny <group> <command>",
 
 	CM_RESETGROUPACCESS_HELP = "Reset the group's access to a specific command.",
-	CM_RESETGROUPACCESS_USAGE = "Usage: resetgroupaccess <group> <command>",
+	CM_RESETGROUPACCESS_USAGE = "Användning: resetgroupaccess <group> <command>",
 
 	CM_USERALLOW_HELP = "Allow a user to use a specific command.",
-	CM_USERALLOW_USAGE = "Usage: userallow <player> <command>",
+	CM_USERALLOW_USAGE = "Användning: userallow <player> <command>",
 
 	CM_USERDENY_HELP = "Deny a user to use a specific command.",
-	CM_USERDENY_USAGE = "Usage: userdeny <player> <command>",
+	CM_USERDENY_USAGE = "Användning: userdeny <player> <command>",
 
 	CM_RESETUSERACCESS_HELP = "Reset the user's access to a specific command.",
-	CM_RESETUSERACCESS_USAGE = "Usage: resetuseraccess <player> <command>",
+	CM_RESETUSERACCESS_USAGE = "Användning: resetuseraccess <player> <command>",
 
 	CM_TOGGLE_HELP = "Toggle AddOn on and off.",
 
@@ -217,22 +224,28 @@ local L = {
 	CM_READYCHECK_FAIL = "Failed to accept or decline ready check.",
 
 	CM_LOOT_HELP = "Provides various loot functions.",
-	CM_LOOT_USAGE = "Usage: loot type||threshold||master||pass",
+	CM_LOOT_USAGE = "Användning: loot type||threshold||master||pass",
 	CM_LOOT_LFG = "Cannot use loot command in LFG group.",
 	CM_LOOT_NOMETHOD = "No loot method specified.",
 	CM_LOOT_NOTHRESHOLD = "No loot threshold specified.",
 	CM_LOOT_NOMASTER = "No master looter specified.",
 
 	CM_ROLL_HELP = "Provides tools for managing or starting/stopping rolls.",
-	CM_ROLL_USAGE = "Usage: roll [start||stop||pass||time||do||set]",
-	CM_ROLL_START_USAGE = "Usage: roll start <[time] [item]>",
-	CM_ROLL_SET_USAGE = "Usage: roll set min||max||time <amount>",
+	CM_ROLL_USAGE = "Användning: roll [start||stop||pass||time||do||set]",
+	CM_ROLL_START_USAGE = "Användning: roll start <[time] [item]>",
+	CM_ROLL_SET_USAGE = "Användning: roll set min||max||time <amount>",
 
 	CM_RAIDWARNING_HELP = "Sends a raid warning.",
-	CM_RAIDWARNING_USAGE = "Usage: raidwarning <message>",
+	CM_RAIDWARNING_USAGE = "Användning: raidwarning <message>",
 	CM_RAIDWARNING_NORAID = "Cannot send raid warning when not in a raid group.",
 	CM_RAIDWARNING_NOPRIV = "Cannot send raid warning: Not raid leader or assistant.",
 	CM_RAIDWARNING_SENT = "Sent raid warning.",
+
+	CM_DUNGEONMODE_HELP = "Set the dungeon difficulty.",
+	CM_DUNGEONMODE_USAGE = "Användning: dungeondifficulty <difficulty>",
+
+	CM_RAIDMODE_HELP = "Set the raid difficulty.",
+	CM_RAIDMODE_USAGE = "Användning: raiddifficulty <difficulty>",
 
 	------------
 	-- Events --
@@ -390,6 +403,25 @@ local L = {
 	PM_LIST_REMOVEBLACK = "Removed %s from blacklist.",
 	PM_LIST_SETWHITE = "Now using list as whitelist.",
 	PM_LIST_SETBLACK = "Now using list as blacklist.",
+
+	----------------
+	-- GroupTools --
+	----------------
+
+	GT_DUNGEON_NORMAL = "Normal",
+	GT_DUNGEON_HEROIC = "Heroic",
+	GT_RAID_N10 = "Normal (10)",
+	GT_RAID_N25 = "Normal (25)",
+	GT_RAID_H10 = "Heroic (10)",
+	GT_RAID_H25 = "Heroic (25)",
+
+	GT_DIFF_INVALID = "%q is not a valid difficulty.",
+
+	GT_DD_DUPE = "Dungeon difficulty is already set to %s.",
+	GT_DD_SUCCESS = "Successfully set the dungeon difficulty to %s!",
+
+	GT_RD_DUPE = "Raid difficulty is already set to %s.",
+	GT_RD_SUCCESS = "Successfully set raid difficulty to %s!",
 
 	------------------
 	-- QueueManager --

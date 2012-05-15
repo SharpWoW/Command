@@ -89,8 +89,12 @@ local L = {
 	CM_NO_HELP = "No help available.",
 
 	CM_DEFAULT_HELP = "Prints this help message.",
-	CM_DEFAULT_CHAT = "Type !commands for a listing of commands available.",
+	CM_DEFAULT_HELPCOMMAND = "Use \"help <command>\" to get help on a specific command.",
+	CM_DEFAULT_CHAT = "Type !commands for a listing of commands available. Type !help <command> for help on a specific command.",
 	CM_DEFAULT_END = "End of help message.",
+
+	CM_HELP_HELP = "Gets help about the addon or a specific command.",
+	CM_HELP_USAGE = "Usage: help <command>",
 
 	CM_COMMANDS_HELP = "Print all registered commands.",
 
@@ -98,10 +102,13 @@ local L = {
 	CM_VERSION = "%s",
 
 	CM_SET_HELP = "Control the settings of Command.",
-	CM_SET_USAGE = "Usage: set cmdchar|groupinvite|setlocale|locale",
+	CM_SET_USAGE = "Usage: set cmdchar|groupinvite",
 	CM_SET_GROUPINVITE_USAGE = "Usage: set groupinvite enable|disable|<time>",
-	CM_SET_SETLOCALE_USAGE = "Usage: set setlocale <locale>",
-	CM_SET_LOCALE_USAGE = "Usage: set locale reset|usemaster",
+
+	CM_LOCALE_HELP = "Change locale settings.",
+	CM_LOCALE_USAGE ="Usage: locale [set|reset|usemaster|playerindependent]",
+	CM_LOCALE_CURRENT = "Current locale: %s.",
+	CM_LOCALE_SET_USAGE = "Usage: locale set <locale>",
 
 	CM_MYLOCALE_HELP = "Let's users set their own locale.",
 	CM_MYLOCALE_SET = "Successfully set your locale to %s.",

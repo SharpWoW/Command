@@ -178,6 +178,10 @@ function GT:SetDungeonDifficulty(diff)
 	return "GT_DD_SUCCESS", {self:GetFriendlyDungeonDifficulty(diff)}
 end
 
+function GT:GetDungeonDifficultyString(diff)
+	return self.Difficulty.Dungeon[tonumber(diff) or GetDungeonDifficulty()]
+end
+
 --- Get a string representation of the dungeon difficulty.
 -- @param diff (number) Difficulty to parse, defaults to current difficulty.
 -- @return String representation of dungeon difficulty.
@@ -197,6 +201,14 @@ function GT:SetRaidDifficulty(diff)
 	if diff == GetRaidDifficulty() then return false, "GT_RD_DUPE", {self:GetFriendlyRaidDifficulty(diff)} end
 	SetRaidDifficulty(diff)
 	return "GT_RD_SUCCESS", {self:GetFriendlyRaidDifficulty(diff)}
+end
+
+--- Get a string representation of the raid difficulty.
+-- @param diff (number) Difficulty to parse, defaults to current difficulty.
+-- @return String representation of raid difficulty.
+--
+function GT:GetRaidDifficultyString(diff)
+	return self.Difficulty.Raid[tonumber(diff) or GetRaidDifficulty()]
 end
 
 --- Get a string representation of the raid difficulty.
