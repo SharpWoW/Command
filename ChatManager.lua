@@ -108,7 +108,10 @@ end
 function CM:SendMessage(msg, channel, target, isBN)
 	isBN = isBN or false
 	if not self.Settings.LOCAL_ONLY then
-		msg = ("[%s] %s"):format(C.Name, tostring(msg))
+		-- Sanitize message
+		--msg = msg:gsub("|*", "|") -- First make sure every pipe char is alone (This is probably not needed)
+		msg = tostring(msg):gsub("|", "||") -- Escape the pipe characters
+		msg = ("[%s] %s"):format(C.Name, msg)
 		if channel == "SMART" then
 			if GT:IsRaid() then
 				channel = "RAID"
