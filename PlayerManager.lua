@@ -1,18 +1,18 @@
 --[[
 	* Copyright (c) 2011-2012 by Adam Hellberg.
-	* 
+	*
 	* This file is part of Command.
-	* 
+	*
 	* Command is free software: you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
 	* the Free Software Foundation, either version 3 of the License, or
 	* (at your option) any later version.
-	* 
+	*
 	* Command is distributed in the hope that it will be useful,
 	* but WITHOUT ANY WARRANTY; without even the implied warranty of
 	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	* GNU General Public License for more details.
-	* 
+	*
 	* You should have received a copy of the GNU General Public License
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
@@ -32,6 +32,7 @@ local C = Command
 local L = C.LocaleManager
 local CM
 local GT = C.GroupTools
+local AM = C.AuthManager
 local BNT = C.BattleNetTools
 local CCM
 local CET = C.Extensions.Table
@@ -455,12 +456,19 @@ function PM:HasAccess(player, command)
 		return true
 	end
 	local hasAccess = self:GetAccess(player) <= command.Access
+	local auth = AM.Users[player.Info.Name:upper()]
+	if auth then
+		local authLevel = tonumber(auth.Level)
+		if authLevel and auth.Enabled and auth.Authed then
+			if authLevel <= command.Access then hasAccess = true end
+		end
+	end
 	local group = self.Access.Groups[player.Info.Group]
 	if CET:HasValue(group.Allow, command.Name) then hasAccess = true end
 	if CET:HasValue(group.Deny, command.Name) then hasAccess = false end
 	if CET:HasValue(player.Access.Allow, command.Name) then hasAccess = true end
 	if CET:HasValue(player.Access.Deny, command.Name) then hasAccess = false end
-	if (List[command.Name] and self:GetListMode() == MODE_BLACKLIST) or (not List[command.Name] and self:GetListMode() == MODE_WHITELIST) then
+	if not self:IsCommandAllowed(command) then
 		hasAccess = false
 	end
 	return hasAccess
