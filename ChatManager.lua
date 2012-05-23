@@ -173,9 +173,11 @@ end
 --- Handle a chat message.
 -- @param msg The message to handle.
 -- @param sender Player object of the player who sent the message.
--- @param channel Channel the message was sent from.
+-- @param channel The channel to which HandleMessage will send the result.
 -- @param target Player or channel index.
+-- @param sourceChannel The source channel that the message was sent from.
 -- @param isBN True if battle.net message, false or nil otherwise.
+-- @param pID Player ID (for battle.net messages, this is nil when isBN is false or nil).
 --
 function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID)
 	isBN = isBN or false
@@ -223,6 +225,10 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 				end
 			end
 		elseif result == "RAW_TABLE_OUTPUT" then
+			if type(arg) ~= "table" then
+				error("Received RAW_TABLE_OUTPUT request, but arg was of type '" .. type(arg) .. "', expected 'table', aborting...")
+				return
+			end
 			for _,v in ipairs(arg) do
 				self:SendMessage(tostring(v), channel, target, isBN)
 			end

@@ -17,6 +17,11 @@
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
+-- Upvalues
+local tostring = tostring
+local tonumber = tonumber
+local math = math
+
 local C = Command
 
 C.AuthManager = {
