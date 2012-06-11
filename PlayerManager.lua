@@ -46,6 +46,9 @@ local log
 --
 C.PlayerManager = {
 	VarVersion = 1,
+	Dialogs = {
+		Kick = "COMMAND_CONFIRMKICK"
+	},
 	Access = {
 		Min = 0,
 		Max = 4,
@@ -146,7 +149,7 @@ local function KickCancelled(name, sender)
 	CM:SendMessage(msg, CM.LastChannel, CM.LastTarget)
 end
 
-StaticPopupDialogs["COMMAND_CONFIRMKICK"] = {
+StaticPopupDialogs[PM.Dialogs.Kick] = {
 	text = "PM_KICK_POPUP",
 	button1 = "YES",
 	button2 = "NO",
@@ -219,7 +222,7 @@ end
 -- @return Player from list of players if exists, otherwise a new player object.
 --
 function PM:GetOrCreatePlayer(name)
-	name = name:lower():gsub("^%l", string.upper)
+	name = (name or UnitName("player")):lower():gsub("^%l", string.upper)
 	if CET:HasKey(Players, name) then
 		return Players[name]
 	else
@@ -649,10 +652,10 @@ function PM:Kick(player, sender, reason, override)
 		KickName = player.Info.Name
 		KickSender = sender.Info.Name
 		KickReason = reason or L("PM_KICK_DEFAULTREASON"):format(KickSender)
-		StaticPopupDialogs.COMMAND_CONFIRMKICK.text = L("PM_KICK_POPUP")
-		StaticPopupDialogs.COMMAND_CONFIRMKICK.button1 = L("YES")
-		StaticPopupDialogs.COMMAND_CONFIRMKICK.button2 = L("NO")
-		StaticPopup_Show("COMMAND_CONFIRMKICK", KickSender, KickName)
+		StaticPopupDialogs[self.Dialogs.Kick].text = L("PM_KICK_POPUP")
+		StaticPopupDialogs[self.Dialogs.Kick].button1 = L("YES")
+		StaticPopupDialogs[self.Dialogs.Kick].button2 = L("NO")
+		StaticPopup_Show(self.Dialogs.Kick, KickSender, KickName)
 		return "PM_KICK_WAIT", {KickName}
 	end
 	return false, "PM_KICK_NOPRIV", {player.Info.Name}
