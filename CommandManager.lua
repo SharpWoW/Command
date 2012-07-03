@@ -49,6 +49,7 @@ local QM = C.QueueManager
 local RM = C.RollManager
 local LM = C.LootManager
 local GT = C.GroupTools
+local AM = C.AuthManager
 local Chat
 local CES = C.Extensions.String
 local CET = C.Extensions.Table
@@ -371,6 +372,38 @@ CM:Register({"ban"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat
 	local player = PM:GetOrCreatePlayer(args[1])
 	return PM:BanUser(player)
 end, "CM_BAN_HELP")
+
+CM:Register({"auth", "authenticate", "a"}, PM.Access.Local, function(args, sender, isChat)
+	if isChat and isChat ~= "WHISPER" then return false, "CM_ERR_NOCHAT" end
+	if #args < 2 then return false, "CM_AUTH_USAGE" end
+	local arg = tostring(args[1]):lower()
+	local target = tostring(args[2]):upper()
+	local notify = true
+	if target == UnitName("player"):upper() then return false, "CM_AUTH_ERR_SELF" end
+	if sender.Info.Name:upper() == target then notify = false end
+	if arg:match("^a") then -- Add
+		local level = tonumber(args[3])
+		local pass = args[4]
+		if not level then
+			return false, "CM_AUTH_ADDUSAGE"
+		end
+		return AM:Add(target, level, pass, notify)
+	elseif arg:match("^r") then -- Remove
+		return AM:Remove(target)
+	elseif arg:match("^e") then -- Enable
+		return AM:Enable(target)
+	elseif arg:match("^d") then -- Disable
+		return AM:Disable(target)
+	end
+	return false, "CM_AUTH_USAGE"
+end, "CM_AUTH_HELP")
+
+CM:Register({"authme", "authenticateme", "am"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not isChat then return false, "CM_ERR_CHATONLY" end
+	if #args <= 0 then return false, "CM_AUTHME_USAGE" end
+	local pass = tostring(args[1])
+	return AM:Authenticate(sender.Info.Name, pass)
+end, "CM_AUTHME_HELP")
 
 CM:Register({"accept", "acceptinvite", "acceptinv", "join", "joingroup"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if not StaticPopup_Visible("PARTY_INVITE") then

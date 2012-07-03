@@ -134,6 +134,14 @@ local L = {
 	CM_BAN_HELP = "Ban a player.",
 	CM_BAN_USAGE = "Usage: ban <name>",
 
+	CM_AUTH_HELP = "Add/Remove/Enable/Disable auths.",
+	CM_AUTH_USAGE = "Usage: auth add|remove|enable|disable <target>",
+	CM_AUTH_ADDUSAGE = "Usage: auth add <target> <level> [password]",
+	CM_AUTH_ERR_SELF = "Cannot modify myself in auth list.",
+
+	CM_AUTHME_HELP = "Authenticates the sender if the correct pass is specified.",
+	CM_AUTHME_USAGE = "Usage: authme <password>",
+
 	CM_ACCEPTINVITE_HELP = "Accepts a pending group invite.",
 	CM_ACCEPTINVITE_NOTACTIVE = "No pending invites active.",
 	CM_ACCEPTINVITE_EXISTS = "I am already in a group.",
@@ -403,6 +411,28 @@ local L = {
 	PM_LIST_REMOVEBLACK = "Removed %s from blacklist.",
 	PM_LIST_SETWHITE = "Now using list as whitelist.",
 	PM_LIST_SETBLACK = "Now using list as blacklist.",
+
+	-----------------
+	-- AuthManager --
+	-----------------
+
+	AM_ERR_NOEXISTS = "%q does not exist in the auth list.",
+	AM_ERR_USEREXISTS = "%q is already in the auth list, please authenticate with authme.",
+	AM_ERR_DISABLED = "%q is disabled in the auth list.",
+	AM_ERR_NOLEVEL = "No access level specified.",
+	AM_ERR_AUTHED = "%q is already authenticated!",
+
+	AM_AUTH_ERR_INVALIDPASS = "Invalid password.",
+	AM_AUTH_SUCCESS = "%q successfully authenticated for access level %d!",
+
+	AM_ADD_SUCCESS = "Added %q to auth list for access level %d, password: %s. Authenticate with !authme.",
+	AM_ADD_WHISPER = "Added you to the auth list for access level %d, password: %s. Authenticate with !authme.",
+
+	AM_REMOVE_SUCCESS = "Removed %q from auth list.",
+
+	AM_ENABLE_SUCCESS = "Enabled %q for authentication.",
+
+	AM_DISABLE_SUCCESS = "Disabled %q from authenticating.",
 
 	----------------
 	-- GroupTools --
