@@ -1,18 +1,18 @@
 --[[
 	* Copyright (c) 2011-2012 by Adam Hellberg.
-	* 
+	*
 	* This file is part of Command.
-	* 
+	*
 	* Command is free software: you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
 	* the Free Software Foundation, either version 3 of the License, or
 	* (at your option) any later version.
-	* 
+	*
 	* Command is distributed in the hope that it will be useful,
 	* but WITHOUT ANY WARRANTY; without even the implied warranty of
 	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	* GNU General Public License for more details.
-	* 
+	*
 	* You should have received a copy of the GNU General Public License
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
@@ -23,6 +23,9 @@ local wipe = wipe
 local pairs = pairs
 local tostring = tostring
 local tonumber = tonumber
+
+-- API Upvalues
+local RandomRoll = RandomRoll
 
 local C = Command
 local L = C.LocaleManager
@@ -53,22 +56,22 @@ local function RollTimerUpdate(_, elapsed)
 		RollTimer.LastWarning = 0
 		RollTimer.Current = 0
 	end
-	
+
 	RollTimer.Current = RollTimer.Current + elapsed
-	
+
 	local left = RollTimer.Time - RollTimer.Current
 	if not RollTimer.LastWarning then RollTimer.LastWarning = 0 end
 	if (left <= 10 and left > 0) and ceil(RollTimer.Current) - RollTimer.LastWarning >= 5 then
 		CM:SendMessage(L("RM_UPDATE_TIMELEFT"):format(ceil(left)), "SMART")
 		RollTimer.LastWarning = ceil(RollTimer.Current)
 	end
-	
+
 	if RollTimer.Current < RollTimer.Time and RollCount < RM.NumGroupMembers then return end
-	
+
 	RollTimer.Frame:SetScript("OnUpdate", nil)
 	RollTimer.Current = 0
 	RollTimer.LastWarning = 0
-	
+
 	RM:StopRoll(true, RollCount < RM.NumGroupMembers)
 end
 

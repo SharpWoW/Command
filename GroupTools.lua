@@ -20,6 +20,22 @@
 -- Upvalues
 local select = select
 
+-- API Upvalues
+local UnitExists = UnitExists
+local GetLFGMode = GetLFGMode
+local UnitInRaid = UnitInRaid
+local UnitInParty = UnitInParty
+local UnitIsConnected = UnitIsConnected
+local GetRaidDifficulty = GetRaidDifficulty
+local SetRaidDifficulty = SetRaidDifficulty
+local GetNumRaidMembers = GetNumRaidMembers
+local GetRaidRosterInfo = GetRaidRosterInfo
+local UnitIsPartyLeader = UnitIsPartyLeader
+local UnitIsRaidOfficer = UnitIsRaidOfficer
+local GetNumPartyMembers = GetNumPartyMembers
+local GetDungeonDifficulty = GetDungeonDifficulty
+local SetDungeonDifficulty = SetDungeonDifficulty
+
 local C = Command
 local L = C.LocaleManager
 

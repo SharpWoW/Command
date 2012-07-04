@@ -25,6 +25,22 @@ local ipairs = ipairs
 local select = select
 local tostring = tostring
 
+-- API Upvalues
+local UnitName = UnitName
+local IsInGuild = IsInGuild
+local UnitInRaid = UnitInRaid
+local InviteUnit = InviteUnit
+local UninviteUnit = UninviteUnit
+local GetNumFriends = GetNumFriends
+local GetFriendInfo = GetFriendInfo
+local PromoteToLeader = PromoteToLeader
+local DemoteAssistant = DemoteAssistant
+local BNET_CLIENT_WOW = BNET_CLIENT_WOW
+local StaticPopup_Show = StaticPopup_Show
+local GetNumGuildMembers = GetNumGuildMembers
+local GetGuildRosterInfo = GetGuildRosterInfo
+local PromoteToAssistant = PromoteToAssistant
+
 local MODE_BLACKLIST = 0
 local MODE_WHITELIST = 1
 

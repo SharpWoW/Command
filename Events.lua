@@ -21,6 +21,11 @@
 local select = select
 local tostring = tostring
 
+-- API Upvalues
+local StaticPopup_Hide = StaticPopup_Hide
+local GetNumGuildMembers = GetNumGuildMembers
+local StaticPopup_Visible = StaticPopup_Visible
+
 local C = Command
 
 local L = C.LocaleManager

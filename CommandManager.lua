@@ -25,6 +25,22 @@ local unpack = unpack
 local tostring = tostring
 local tonumber = tonumber
 
+-- API Upvalues
+local SetCVar = SetCVar
+local UnitName = UnitName
+local ShowUIPanel = ShowUIPanel
+local HideUIPanel = HideUIPanel
+local AcceptGroup = AcceptGroup
+local DoReadyCheck = DoReadyCheck
+local ConvertToRaid = ConvertToRaid
+local GetLFGProposal = GetLFGProposal
+local ConvertToParty = ConvertToParty
+local ConfirmReadyCheck = ConfirmReadyCheck
+local StaticPopup_Visible = StaticPopup_Visible
+local ClearAllLFGDungeons = ClearAllLFGDungeons
+local GetReadyCheckStatus = GetReadyCheckStatus
+local GetReadyCheckTimeLeft = GetReadyCheckTimeLeft
+
 local C = Command
 
 --- Table holding all CommandManager methods.
@@ -450,9 +466,9 @@ CM:Register({"kick"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 		return false, "CM_KICK_USAGE"
 	end
 	local player = PM:GetOrCreatePlayer(args[1])
-	local reason = args[2]
+	local reason = (args[2] or ""):lower()
 	local override = args[3] ~= nil
-	if ((reason or ""):lower() == "override" or (reason or ""):lower() == "true") and #args == 2 then
+	if (reason == "override" or reason == "true") and #args == 2 then
 		reason = nil
 		override = true
 	end
