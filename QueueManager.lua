@@ -1,18 +1,18 @@
 --[[
 	* Copyright (c) 2011-2012 by Adam Hellberg.
-	* 
+	*
 	* This file is part of Command.
-	* 
+	*
 	* Command is free software: you can redistribute it and/or modify
 	* it under the terms of the GNU General Public License as published by
 	* the Free Software Foundation, either version 3 of the License, or
 	* (at your option) any later version.
-	* 
+	*
 	* Command is distributed in the hope that it will be useful,
 	* but WITHOUT ANY WARRANTY; without even the implied warranty of
 	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	* GNU General Public License for more details.
-	* 
+	*
 	* You should have received a copy of the GNU General Public License
 	* along with Command. If not, see <http://www.gnu.org/licenses/>.
 --]]
@@ -22,6 +22,18 @@ local type = type
 local pairs = pairs
 local select = select
 local tostring = tostring
+
+-- API Upvalues
+local SetCVar = SetCVar
+local JoinLFG = JoinLFG
+local LeaveLFG = LeaveLFG
+local GetLFGMode = GetLFGMode
+local HideUIPanel = HideUIPanel
+local SetLFGRoles = SetLFGRoles
+local SetLFGDungeon = SetLFGDungeon
+local AcceptProposal = AcceptProposal
+local GetLFGDungeonInfo = GetLFGDungeonInfo
+local GetRandomDungeonBestChoice = GetRandomDungeonBestChoice
 
 local C = Command
 

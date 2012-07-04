@@ -23,6 +23,10 @@ local ipairs = ipairs
 local unpack = unpack
 local tostring = tostring
 
+-- API Upvalues
+local BNSendWhisper = BNSendWhisper
+local SendChatMessage = SendChatMessage
+
 local C = Command
 
 --- Table holding all ChatManager methods.

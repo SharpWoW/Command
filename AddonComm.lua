@@ -25,6 +25,13 @@ local ipairs = ipairs
 local tostring = tostring
 local tonumber = tonumber
 
+-- API Upvalues
+local UnitName = UnitName
+local SendAddonMessage = SendAddonMessage
+local GetNumGuildMembers = GetNumGuildMembers
+local GetGuildRosterInfo = GetGuildRosterInfo
+local RegisterAddonMessagePrefix = RegisterAddonMessagePrefix
+
 local C = Command
 
 local L = C.LocaleManager
@@ -97,14 +104,6 @@ end
 
 function AC:Init()
 	--self:LoadSavedVars()
-	--[[
-	for _,v in pairs(self.Type) do
-		if not RegisterAddonMessagePrefix(v) then
-			log:Error(L("AC_ERR_PREFIX"):format(tostring(v)))
-			error(L("AC_ERR_PREFIX"):format(tostring(v)))
-		end
-	end
-	]]
 	if not RegisterAddonMessagePrefix(self.Prefix) then
 		log:Error(L("AC_ERR_PREFIX"):format(tostring(self.Prefix)))
 		error(L("AC_ERR_PREFIX"):format(tostring(self.Prefix)))
