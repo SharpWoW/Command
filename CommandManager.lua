@@ -53,7 +53,6 @@ local C = Command
 C.CommandManager = {
 	Slash = {
 		"command",
-		"comm",
 		"cmd"
 	},
 	Commands = {}
