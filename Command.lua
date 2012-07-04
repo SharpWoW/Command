@@ -114,6 +114,8 @@ function C:LoadSavedVars()
 	self.Global.VERSION = self.VarVersion
 end
 
+--- Check AddOn version and display notice in chat if a newer is detected.
+--
 function C:CheckVersion(ver)
 	if self.VersionChecked then return end
 	ver = ver or 0
