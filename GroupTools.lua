@@ -30,11 +30,11 @@ local GetRaidDifficulty = GetRaidDifficulty
 local SetRaidDifficulty = SetRaidDifficulty
 local GetNumRaidMembers = GetNumRaidMembers
 local GetRaidRosterInfo = GetRaidRosterInfo
-local UnitIsPartyLeader = UnitIsPartyLeader
-local UnitIsRaidOfficer = UnitIsRaidOfficer
-local GetNumPartyMembers = GetNumPartyMembers
+local UnitIsGroupLeader = UnitIsGroupLeader
+local UnitIsGroupAssistant = UnitIsGroupAssistant
 local GetDungeonDifficulty = GetDungeonDifficulty
 local SetDungeonDifficulty = SetDungeonDifficulty
+local GetNumSubGroupMembers = GetNumSubgroupMembers
 
 local C = Command
 local L = C.LocaleManager
