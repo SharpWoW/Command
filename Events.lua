@@ -101,8 +101,7 @@ function C.Events.PARTY_INVITE_REQUEST(self, ...)
 	local locale = C.PlayerManager:GetOrCreatePlayer(sender).Settings.Locale
 	local msg = C.LocaleManager:GetLocale(locale, true)["E_GROUPINVITE"]
 	if self.Settings.GROUP_INVITE_ANNOUNCE_DELAY > 0 then
-		local f=CreateFrame("Frame")f.T=0;f.L=self.Settings.GROUP_INVITE_ANNOUNCE_DELAY;f.S=sender;f.M=msg
-		f:SetScript("OnUpdate",function(s,e)s.T=s.T+e;if(s.T>s.L)then s:SetScript("OnUpdate",nil)if(StaticPopup_Visible("PARTY_INVITE"))then CM:SendMessage(s.M,"WHISPER",s.S)end;end;end)
+		local f=CreateFrame("Frame")f.T=0;f.L=self.Settings.GROUP_INVITE_ANNOUNCE_DELAY;f.S=sender;f.M=msg;f:SetScript("OnUpdate",function(s,e)s.T=s.T+e;if(s.T>s.L)then s:SetScript("OnUpdate",nil)if(StaticPopup_Visible("PARTY_INVITE"))then CM:SendMessage(s.M,"WHISPER",s.S)end;end;end)
 	else
 		CM:SendMessage(msg, "WHISPER", sender)
 	end

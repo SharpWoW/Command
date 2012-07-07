@@ -83,6 +83,7 @@ end
 -- @return True if the player is in an LFG group, false otherwise.
 --
 function GT:IsLFGGroup()
+	if IsPartyLFG() then return true end
 	for k,_ in pairs(LFG_CATEGORY_NAMES) do
 		if type(k) ~= "number" then -- Safety check, you never know with blizzard
 			k = tonumber(k) or LE_LFG_CATEGORY_LFD
