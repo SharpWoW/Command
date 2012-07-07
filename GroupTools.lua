@@ -83,9 +83,15 @@ end
 -- @return True if the player is in an LFG group, false otherwise.
 --
 function GT:IsLFGGroup()
-	local status, _ = GetLFGMode()
-	if status == "abandonedInDungeon" or status == "lfgparty" then
-		return true
+	local statusTable = {}
+	statusTable[1], _ = GetLFGMode(LE_LFG_CATEGORY_LFD)
+	statusTable[2], _ = GetLFGMode(LE_LFG_CATEGORY_LFR)
+	statusTable[3], _ = GetLFGMode(LE_LFG_CATEGORY_RF)
+	statusTable[4], _ = GetLFGMode(LE_LFG_CATEGORY_SCENARIO)
+	for _,v in pairs(statusTable) do
+		if v == "abandonedInDungeon" or v == "lfgparty" then
+			return true
+		end
 	end
 	return false
 end
