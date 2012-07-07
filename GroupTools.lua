@@ -87,7 +87,6 @@ function GT:IsLFGGroup()
 		if type(k) ~= "number" then -- Safety check, you never know with blizzard
 			k = tonumber(k) or LE_LFG_CATEGORY_LFD
 		end
-		end
 		local status, _ = GetLFGMode(k)
 		if status == "abandonedInDungeon" or status == "lfgparty" then
 			return true
