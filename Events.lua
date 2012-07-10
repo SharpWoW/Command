@@ -103,7 +103,20 @@ function C.Events.PARTY_INVITE_REQUEST(self, ...)
 	local locale = C.PlayerManager:GetOrCreatePlayer(sender).Settings.Locale
 	local msg = C.LocaleManager:GetLocale(locale, true)["E_GROUPINVITE"]
 	if self.Settings.GROUP_INVITE_ANNOUNCE_DELAY > 0 then
-		local f=CreateFrame("Frame")f.T=0;f.L=self.Settings.GROUP_INVITE_ANNOUNCE_DELAY;f.S=sender;f.M=msg;f:SetScript("OnUpdate",function(s,e)s.T=s.T+e;if(s.T>s.L)then s:SetScript("OnUpdate",nil)if(StaticPopup_Visible("PARTY_INVITE"))then CM:SendMessage(s.M,"WHISPER",s.S)end;end;end)
+		local f=CreateFrame("Frame") -- Create temporary frame
+		f.Time = 0 -- Current time
+		f.Delay = self.Settings.GROUP_INVITE_ANNOUNCE_DELAY -- Delay to wait
+		f.Sender = sender -- Name of player who sent invite
+		f.Message = msg -- Message to send
+		f:SetScript("OnUpdate", function(self, elapsed) -- The update script to delay sending of message
+			self.Time = self.Time + elapsed
+			if self.Time > self.Delay then
+				self:SetScript("OnUpdate", nil)
+				if StaticPopup_Visible("PARTY_INVITE") then -- Only send message if the invite popup is still showing
+					CM:SendMessage(self.Message, "WHISPER", self.Sender) -- Send the message!
+				end
+			end
+		end)
 	else
 		CM:SendMessage(msg, "WHISPER", sender)
 	end
