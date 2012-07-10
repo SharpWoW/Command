@@ -22,6 +22,7 @@ local select = select
 local tostring = tostring
 
 -- API Upvalues
+local UnitName = UnitName
 local StaticPopup_Hide = StaticPopup_Hide
 local GetNumGuildMembers = GetNumGuildMembers
 local StaticPopup_Visible = StaticPopup_Visible
@@ -78,8 +79,9 @@ end
 
 function C.Events.READY_CHECK(self, ...)
 	if C.Data.ReadyCheckRunning then return end
-	C.Data.ReadyCheckRunning = true
 	local name = tostring(select(1, ...))
+	if name == UnitName("player") then return end
+	C.Data.ReadyCheckRunning = true
 	CM:SendMessage(L("E_READYCHECK"):format(name), "SMART")
 end
 
