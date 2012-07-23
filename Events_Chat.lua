@@ -29,8 +29,14 @@ local AC = C.AddonComm
 local BNT = C.BattleNetTools
 
 function C.Events.CHAT_MSG_SYSTEM(self, event, ...)
+	local message = (select(1, ...))
+
 	if C.RollManager.Running then
-		C.RollManager:ParseMessage((select(1, ...)))
+		C.RollManager:ParseMessage(message)
+	end
+
+	if C.Extensions.Table:GetRealLength(C.PlayerManager.Invites) > 0 then
+		C.PlayerManager:ParseMessage(message)
 	end
 end
 

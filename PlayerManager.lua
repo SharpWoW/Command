@@ -65,6 +65,7 @@ C.PlayerManager = {
 	Dialogs = {
 		Kick = "COMMAND_CONFIRMKICK"
 	},
+	Invites = {},
 	Access = {
 		Min = 0,
 		Max = 4,
@@ -231,6 +232,29 @@ function PM:LoadSavedVars()
 	end
 	Players = self.Data.PLAYERS[GetRealmName()]
 	List = self.Data.LIST
+end
+
+function PM:ParseMessage(message)
+	local name = message:match(L("PM_MATCH_INVITEACCEPTED_PARTY"))
+	if not name then name = message:match(L("PM_MATCH_INVITEACCEPTED_RAID")) end
+	if name then
+		if not self.Invites[name] then return end
+		self.Invites[name] = nil
+		return
+	end
+	name = message:match(L("PM_MATCH_INGROUP"))
+	if name then
+		if not self.Invites[name] then return end
+		CM:SendMessage(L("PM_INVITE_INOTHERGROUP"):format(name), "WHISPER", self.Invites[name][1])
+		self.Invites[name] = nil
+		return
+	end
+	name = message:match(L("PM_MATCH_INVITEDECLINED"))
+	if name then
+		if not self.Invites[name] then return end
+		CM:SendMessage(L("PM_INVITE_DECLINED"):format(name), "WHISPER", self.Invites[name][1])
+		self.Invites[name] = nil
+	end
 end
 
 --- Get or create a player.
@@ -592,13 +616,16 @@ function PM:Invite(player, sender)
 		return false, "PM_INVITE_FULL"
 	end
 	if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() or not GT:IsGroup() then
-		if player.Info.Name == sender.Info.Name then
+		if self.Invites[player.Info.Name] then
+			return false, "PM_INVITE_ACTIVE", {player.Info.Name}
+		elseif player.Info.Name == sender.Info.Name then
 			InviteUnit(player.Info.Name)
 			return "PM_INVITE_NOTIFYTARGET"
 		elseif player.Settings.Invite then
 			InviteUnit(player.Info.Name)
 			local msg = L(player.Settings.Locale, "PM_INVITE_NOTIFY", true):format(sender.Info.Name, player.Info.Name)
 			CM:SendMessage(msg, "WHISPER", player.Info.Name)
+			self.Invites[player.Info.Name] = {sender.Info.Name}
 			return "PM_INVITE_SUCCESS", {player.Info.Name}
 		else
 			return false, "PM_INVITE_BLOCKED", {player.Info.Name}
