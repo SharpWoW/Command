@@ -337,6 +337,11 @@ local L = {
 	PM_ERR_LOCKED = "Target player is locked and cannot be modified.",
 	PM_ERR_NOTINGROUP = "%s is not in the group.",
 
+	PM_MATCH_INVITEACCEPTED_PARTY = "(%w+) joins the party.",
+	PM_MATCH_INVITEACCEPTED_RAID = "(%w+) has joined the raid group.",
+	PM_MATCH_INVITEDECLINED = "(%w+) declines your group invitation.",
+	PM_MATCH_INGROUP = "(%w+) is already in a group.",
+
 	PM_ACCESS_ALLOWED = "%q is now allowed for %s.",
 	PM_ACCESS_DENIED = "%q is now denied for %s.",
 
@@ -374,6 +379,9 @@ local L = {
 	PM_INVITE_SELF = "Cannot invite myself to group.",
 	PM_INVITE_INGROUP = "%s is already in the group.",
 	PM_INVITE_FULL = "The group is already full.",
+	PM_INVITE_ACTIVE = "%s already has an active invite.",
+	PM_INVITE_DECLINED = "%s has declined the group invite.",
+	PM_INVITE_INOTHERGROUP = "%s is already in a group.",
 	PM_INVITE_NOTIFYTARGET = "Invited you to the group.",
 	PM_INVITE_NOTIFY = "%s invited you to the group, %s. Whisper !blockinvites to block these invites.",
 	PM_INVITE_SUCCESS = "Invited %s to group.",
