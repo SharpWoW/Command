@@ -54,6 +54,7 @@ local CM
 local PM
 local RM
 local AC
+local DM
 local log
 
 --- Initialize Command.
@@ -68,6 +69,7 @@ function C:Init()
 	PM = self.PlayerManager
 	RM = self.RollManager
 	AC = self.AddonComm
+	DM = self.DeathManager
 	log = self.Logger
 	self:LoadSavedVars()
 	log:Normal(L("ADDON_LOAD"))
@@ -109,6 +111,7 @@ function C:LoadSavedVars()
 	PM:Init()
 	RM:Init()
 	AC:Init()
+	DM:Init()
 	Cmd:Init()
 	log:SetDebug(self.Settings.DEBUG)
 	self.Global.VERSION = self.VarVersion

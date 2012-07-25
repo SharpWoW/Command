@@ -66,6 +66,7 @@ local RM = C.RollManager
 local LM = C.LootManager
 local GT = C.GroupTools
 local AM = C.AuthManager
+local DM = C.DeathManager
 local Chat
 local CES = C.Extensions.String
 local CET = C.Extensions.Table
@@ -257,6 +258,26 @@ CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, i
 			return C:DisableGroupInvite()
 		end
 		return false, "CM_SET_GROUPINVITE_USAGE"
+	elseif args[1]:match("^d") then -- DeathManager
+		if #args < 2 then
+			if C.DeathManager:IsEnabled() then
+				return "CM_SET_DM_ISENABLED"
+			else
+				return "CM_SET_DM_ISDISABLED"
+			end
+		end
+		if isChat then -- Players are only allowed to check status of DeathManager
+			return false, "CM_ERR_NOCHAT"
+		end
+		args[2] = args[2]:lower()
+		if args[2]:match("^[eay]") then -- Enable
+			return C.DeathManager:Enable()
+		elseif args[2]:match("^[dn]") then -- Disable
+			return C.DeathManager:Disable()
+		elseif args[2]:match("^t") then -- Toggle
+			return C.DeathManager:Toggle()
+		end
+		return false, "CM_SET_DM_USAGE"
 	end
 	return false, "CM_SET_USAGE"
 end, "CM_SET_HELP")
@@ -552,7 +573,7 @@ end, "CM_LEAVELFG_HELP")
 -- I'm keeping this command here for the future, if there will ever be a way to make this work.
 CM:Register({"acceptlfg", "acceptlfd", "joinlfg", "joinlfd"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if not C.Settings.DEBUG then
-		return false, "CM_ERR_DISABLED"
+		return false, "CM_ERR_PERMDISABLED"
 	end
 	local exists = (select(1, GetLFGProposal()))
 	if not QM.QueuedByCommand then
@@ -874,6 +895,20 @@ CM:Register({"raiddifficulty", "raiddiff", "rd", "raidmode", "rm"}, PM.Access.Gr
 	end
 	return GT:SetRaidDifficulty(diff)
 end, "CM_RAIDMODE_HELP")
+
+CM:Register({"release", "rel"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+	if not DM:IsEnabled() then
+		return false, "CM_ERR_DISABLED"
+	end
+	return DM:Release()
+end, "CM_RELEASE_HELP")
+
+CM:Register({"resurrect", "ressurrect", "ress", "res"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not DM:IsEnabled() then
+		return false, "CM_ERR_DISABLED"
+	end
+	return DM:Resurrect()
+end, "CM_RESURRECT_HELP")
 
 for i,v in ipairs(CM.Slash) do
 	_G["SLASH_" .. C.Name:upper() .. i] = "/" .. v
