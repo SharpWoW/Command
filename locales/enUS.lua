@@ -34,6 +34,16 @@ local L = {
 	YES = "Yes",
 	NO = "No",
 
+	------------------
+	-- WoW Specific --
+	---------------------------------------------------------------------------
+	-- ONLY translate these if the locale has official support on the client --
+	---------------------------------------------------------------------------
+
+	USE_SOULSTONE = "Use Soulstone",
+	REINCARNATION = "Reincarnation",
+	TWISTING_NETHER = "Twisting Nether",
+
 	----------
 	-- Core --
 	----------
@@ -84,7 +94,9 @@ local L = {
 	CM_ERR_NOCMDCHAR = "No command character specified.",
 	CM_ERR_NOCHAT = "This command is not allowed to be used from the chat.",
 	CM_ERR_CHATONLY = "This command can only be used from the chat.",
-	CM_ERR_DISABLED = "This command has been permanently disabled.",
+	CM_ERR_DISABLED = "This command has been disabled.",
+	CM_ERR_PERMDISABLED = "This command has been permanently disabled.",
+	CM_ERR_TEMPDISABLED = "This command has been temporarily disabled.",
 
 	CM_NO_HELP = "No help available.",
 
@@ -104,6 +116,9 @@ local L = {
 	CM_SET_HELP = "Control the settings of Command.",
 	CM_SET_USAGE = "Usage: set cmdchar|groupinvite",
 	CM_SET_GROUPINVITE_USAGE = "Usage: set groupinvite enable|disable|<time>",
+	CM_SET_DM_ISENABLED = "DeathManager is enabled.",
+	CM_SET_DM_ISDISABLED = "DeathManager is disabled.",
+	CM_SET_DM_USAGE = "Usage: set dm [enable|disable]",
 
 	CM_LOCALE_HELP = "Change locale settings.",
 	CM_LOCALE_USAGE ="Usage: locale [set|reset|usemaster|playerindependent]",
@@ -254,6 +269,10 @@ local L = {
 
 	CM_RAIDMODE_HELP = "Set the raid difficulty.",
 	CM_RAIDMODE_USAGE = "Usage: raiddifficulty <difficulty>",
+
+	CM_RELEASE_HELP = "Player will release corpse.",
+
+	CM_RESURRECT_HELP = "Player will accept pending resurrect request.",
 
 	------------
 	-- Events --
@@ -419,6 +438,32 @@ local L = {
 	PM_LIST_REMOVEBLACK = "Removed %s from blacklist.",
 	PM_LIST_SETWHITE = "Now using list as whitelist.",
 	PM_LIST_SETBLACK = "Now using list as blacklist.",
+
+	------------------
+	-- DeathManager --
+	------------------
+
+	DM_ERR_NOTDEAD = "I am not dead.",
+
+	DM_ENABLED = "DeathManager has been enabled.",
+	DM_DISABLED = "DeathManager has been disabled.",
+
+	DM_ONDEATH = "I have died! Type !release to make me release spirit.",
+	DM_ONDEATH_SOULSTONE = "Died with active soulstone, type !ress to make me ress!",
+	DM_ONDEATH_REINCARNATE = "Died with reincarnate off cooldown, type !ress to make me ress!",
+	DM_ONDEATH_CARD = "Died with proc from Twisted Nether active, type !ress to make me ress!",
+
+	DM_ONRESS = "I have received a ress from %s! Type !ress to make me accept it.",
+
+	DM_RELEASE_NOTDEAD = "I am not dead or have already released.",
+	DM_RELEASED = "Released corpse!",
+
+	DM_RESURRECT_NOTACTIVE = "I have no pending resurrection request or it has expired.",
+	DM_RESURRECTED = "Successfully resurrected!",
+	DM_RESURRECTED_SOULSTONE = "Resurrected with soulstone!",
+	DM_RESURRECTED_REINCARNATE = "Resurrected with reincarnate!",
+	DM_RESURRECTED_CARD = "Resurrected with Darkmoon Card: Twisting Nether proc!",
+	DM_RESURRECTED_PLAYER = "Accepted resurrect from %s!",
 
 	-----------------
 	-- AuthManager --

@@ -32,6 +32,7 @@
 	<Script file="RollManager.lua" />
 	<Script file="LootManager.lua" />
 	<Script file="AddonComm.lua" />
+	<Script file="DeathManager.lua" />
 	<Script file="CommandManager.lua" />
 	<Script file="ChatManager.lua" />
 	<Script file="Events.lua" />

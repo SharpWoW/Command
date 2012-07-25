@@ -33,6 +33,7 @@ local L = C.LocaleManager
 local CM = C.ChatManager
 local QM = C.QueueManager
 local AC = C.AddonComm
+local DM = C.DeathManager
 
 --- Event handler for ADDON_LOADED
 -- @name Command.Events.ADDON_LOADED
@@ -128,4 +129,24 @@ function C.Events.GUILD_ROSTER_UPDATE(self, ...)
 		numGuildMembers = tmpGuildMembers
 		AC:UpdateGuild()
 	end
+end
+
+function C.Events.PLAYER_DEAD(self, ...)
+	DM:OnDeath()
+end
+
+function C.Events.RESURRECT_REQUEST(self, ...)
+	DM:OnResurrect(select(1, ...))
+end
+
+function C.Events.PLAYER_ALIVE(self, ...)
+	if not UnitIsDeadOrGhost("player") then return end -- Return if player released to graveyard
+	-- Player has accepted a ress before releasing spirit
+	DM.Dead = false
+	DM.Resurrection = false
+end
+
+function C.Events.PLAYER_UNGHOST(self, ...)
+	DM.Dead = false
+	DM.Resurrection = false
 end

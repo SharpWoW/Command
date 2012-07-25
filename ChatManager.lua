@@ -108,8 +108,10 @@ end
 -- @param msg The message to send.
 -- @param channel The channel to send to.
 -- @param target Player or channel index to send message to.
+-- @param isBN Is this message targeted to a BNet friend?
+-- @param smartSay Fallback to SAY instead of local logging if not in group
 --
-function CM:SendMessage(msg, channel, target, isBN)
+function CM:SendMessage(msg, channel, target, isBN, smartSay)
 	isBN = isBN or false
 	if not self.Settings.LOCAL_ONLY then
 		-- Sanitize message
@@ -122,8 +124,12 @@ function CM:SendMessage(msg, channel, target, isBN)
 			elseif GT:IsGroup() then
 				channel = "PARTY"
 			else
-				C.Logger:Normal(msg)
-				return
+				if smartSay then
+					channel = "SAY"
+				else
+					C.Logger:Normal(msg)
+					return
+				end
 			end
 		elseif channel == "RAID_WARNING" then
 			if not GT:IsRaidLeaderOrAssistant() then
