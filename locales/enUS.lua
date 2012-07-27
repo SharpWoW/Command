@@ -447,6 +447,10 @@ local L = {
 
 	DM_ENABLED = "DeathManager has been enabled.",
 	DM_DISABLED = "DeathManager has been disabled.",
+	DM_RELEASE_ENABLED = "DeathManager (Release) has been enabled.",
+	DM_RELEASE_DISABLED = "DeathManager (Release) has been disabled.",
+	DM_RESURRECT_ENABLED = "DeathManager (Resurrect) has been enabled.",
+	DM_RESURRECT_DISABLED = "DeathManager (Resurrect) has been disabled.",
 
 	DM_ONDEATH = "I have died! Type !release to make me release spirit.",
 	DM_ONDEATH_SOULSTONE = "Died with active soulstone, type !ress to make me ress!",

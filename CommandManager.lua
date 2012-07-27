@@ -270,10 +270,22 @@ CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, i
 			return false, "CM_ERR_NOCHAT"
 		end
 		args[2] = args[2]:lower()
-		if args[2]:match("^[eay]") then -- Enable
+		if args[2]:match("^[eay].*rel") then -- Enable release
+			return C.DeathManager:EnableRelease()
+		elseif args[2]:match("^[dn].*rel") then -- Disable release
+			return C.DeathManager:DisableRelease()
+		elseif args[2]:match("^[eay].*r") then -- Enable ress
+			return C.DeathManager:EnableResurrect()
+		elseif args[2]:match("^[dn].*r") then -- Disable ress
+			return C.DeathManager:DisableResurrect()
+		elseif args[2]:match("^[eay]") then -- Enable
 			return C.DeathManager:Enable()
 		elseif args[2]:match("^[dn]") then -- Disable
 			return C.DeathManager:Disable()
+		elseif args[2]:match("^t.*rel") then -- Toggle release
+			return C.DeathManager:ToggleRelease()
+		elseif args[2]:match("^t.*r") then -- Toggle resurrect
+			return C.DeathManager:ToggleResurrect()
 		elseif args[2]:match("^t") then -- Toggle
 			return C.DeathManager:Toggle()
 		end
@@ -897,14 +909,14 @@ CM:Register({"raiddifficulty", "raiddiff", "rd", "raidmode", "rm"}, PM.Access.Gr
 end, "CM_RAIDMODE_HELP")
 
 CM:Register({"release", "rel"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
-	if not DM:IsEnabled() then
+	if not DM:IsEnabled() or not DM:IsReleaseEnabled() then
 		return false, "CM_ERR_DISABLED"
 	end
 	return DM:Release()
 end, "CM_RELEASE_HELP")
 
 CM:Register({"resurrect", "ressurrect", "ress", "res"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
-	if not DM:IsEnabled() then
+	if not DM:IsEnabled() or not DM:IsResurrectEnabled() then
 		return false, "CM_ERR_DISABLED"
 	end
 	return DM:Resurrect()

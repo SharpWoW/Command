@@ -61,6 +61,12 @@ function DM:LoadSavedVars()
 	if type(self.Settings.ENABLED) ~= "boolean" then
 		self.Settings.ENABLED = false
 	end
+	if type(self.Settings.RELEASE_ENABLED) ~= "boolean" then
+		self.Settings.RELEASE_ENABLED = true
+	end
+	if type(self.Settings.RESURRECT_ENABLED) ~= "boolean" then
+		self.Settings.RESURRECT_ENABLED = true
+	end
 end
 
 function DM:OnDeath()
@@ -73,13 +79,13 @@ function DM:OnDeath()
 		CM:SendMessage(L("DM_ONDEATH_REINCARNATE"), "SMART")
 	elseif t == SelfRessType.Card then
 		CM:SendMessage(L("DM_ONDEATH_CARD"), "SMART")
-	else
+	elseif self.Settings.RELEASE_ENABLED then
 		CM:SendMessage(L("DM_ONDEATH"), "SMART")
 	end
 end
 
 function DM:OnResurrect(resser)
-	if not self.Settings.ENABLED then return end
+	if not self.Settings.ENABLED or not self.Settings.RESURRECT_ENABLED then return end
 	self.Resurrection = true
 	CM:SendMessage(L("DM_ONRESS"):format(resser), "SMART")
 end
@@ -170,4 +176,46 @@ function DM:Toggle()
 		return self:Disable()
 	end
 	return self:Enable()
+end
+
+function DM:IsReleaseEnabled()
+	return self.Settings.RELEASE_ENABLED
+end
+
+function DM:EnableRelease()
+	self.Settings.RELEASE_ENABLED = true
+	return "DM_RELEASE_ENABLED"
+end
+
+function DM:DisableRelease()
+	self.Settings.RELEASE_ENABLED = false
+	return "DM_RELEASE_DISABLED"
+end
+
+function DM:ToggleRelease()
+	if self:IsReleaseEnabled() then
+		return self:DisableRelease()
+	end
+	return self:EnableRelease()
+end
+
+function DM:IsResurrectEnabled()
+	return self.Settings.RESURRECT_ENABLED
+end
+
+function DM:EnableResurrect()
+	self.Settings.RESURRECT_ENABLED = true
+	return "DM_RESURRECT_ENABLED"
+end
+
+function DM:DisableResurrect()
+	self.Settings.RESURRECT_ENABLED = false
+	return "DM_RESURRECT_DISABLED"
+end
+
+function DM:ToggleResurrect()
+	if self:IsResurrectEnabled() then
+		return self:DisableResurrect()
+	end
+	return self:EnableResurrect()
 end
