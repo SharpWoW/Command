@@ -145,6 +145,10 @@ function CES:Fit(s, l, d)
 	return parts
 end
 
+--- Checks if a string is null (nil) or empty.
+-- @param s The string to check
+-- @return True if string is null (nil) or empty (""), false otherwise.
+--
 function CES:IsNullOrEmpty(s)
 	return s == nil or s == ""
 end

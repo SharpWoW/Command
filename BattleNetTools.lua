@@ -35,100 +35,69 @@ C.BattleNetTools = {}
 
 local BNT = C.BattleNetTools
 local CET = C.Extensions.Table
+local CES = C.Extensions.String
 
-local Friend = {
-	PresenceID = 0,
-	GivenName = "",
-	SurName = "",
-	ToonName = "",
-	ToonID = 0,
-	Client = "",
-	IsOnline = false,
-	LastOnline = 0,
-	IsAFK = false,
-	IsDND = false,
-	BroadcastText = "",
-	NoteText = "",
-	IsFriend = false,
-	BroadcastTime = 0,
-	Unknown = false
-}
-
-local Toon = {
-	Unknown = false,
-	Name = "",
-	Client = "",
-	Realm = "",
-	RealmID = "",
-	Faction = -1,
-	FactionString = "",
-	Race = "",
-	Class = "",
-	Unknown2 = "",
-	Zone = "",
-	Level = 0,
-	GameText = "",
-	BroadcastText = "",
-	BroadcastTime = "",
-	Unknown3 = false,
-	Unknown4 = 0
-}
+local FRIEND_RETURN_ARGC = 16
+local TOON_RETURN_ARGC = 16
 
 local function ParseBNFriendResult(...)
 	local argc = select("#", ...)
-	if argc ~= 15 then
+	if argc ~= FRIEND_RETURN_ARGC then
 		error("ParseBNFriendResult expected 15 arguments, got " .. argc)
 		return nil
 	end
-	local id, gName, sName, tName, tId, client, online, last, afk, dnd, bText, note, friend, bTime, u = ...
-	local f = CET:Copy(Friend)
-	f.PresenceID = id
-	f.GivenName = gName
-	f.SurName = sName
-	f.ToonName = tName
-	f.ToonID = tID
-	f.Client = client
-	f.IsOnline = online
-	f.LastOnline = last
-	f.IsAFK = afk
-	f.IsDND = dnd
-	f.BroadcastText = bText
-	f.NoteText = note
-	f.IsFriend = friend
-	f.BroadcastTime = bTime
-	f.Unknown = u
+	local id, pName, bTag, isBTagPresence, tName, tId, client, online, last, afk, dnd, bText, note, friend, bTime, u = ...
+	local f = {
+		PresenceID = id,
+		PresenceName = pName,
+		BattleTag = bTag,
+		IsBattleTagPresence = isBTagPresence,
+		ToonName = tName,
+		ToonID = tID,
+		Client = client,
+		IsOnline = online,
+		LastOnline = last,
+		IsAFK = afk,
+		IsDND = dnd,
+		BroadcastText = bText,
+		NoteText = note,
+		IsFriend = friend,
+		BroadcastTime = bTime,
+		Unknown = u
+	}
 	return f
 end
 
 local function ParseBNToonResult(...)
 	local argc = select("#", ...)
-	if argc ~= 16 then
+	if argc ~= TOON_RETURN_ARGC then
 		error("ParseBNToonResult expected 16 arguments, got " .. argc)
 		return nil
 	end
 	local u, name, client, realm, realmId, faction, race, class, u2, zone, lvl, text, bText, bTime, u3, u4 = ...
-	local t = CET:Copy(Toon)
-	t.Unknown = u
-	t.Name = name
-	t.Client = client
-	t.Realm = realm
-	t.RealmID = realmId
-	t.Faction = faction
+	local t = {
+		Unknown = u,
+		Name = name,
+		Client = client,
+		Realm = realm,
+		RealmID = realmId,
+		Faction = faction,
+		Race = race,
+		Class = class,
+		Unknown2 = u2,
+		Zone = zone,
+		Level = tonumber(lvl),
+		GameText = text,
+		BroadcastText = bText,
+		BroadcastTime = bTime,
+		Unknown3 = u3,
+		Unknown4 = u4
+	}
 	if t.Faction == 0 then
 		t.FactionString = "Horde"
 	elseif t.Faction == 1 then
 		t.FactionString = "Alliance"
 	end
-	t.Race = race
-	t.Class = class
-	t.Unknown2 = u2
-	t.Zone = zone
-	t.Level = tonumber(lvl)
-	t.GameText = text
-	t.BroadcastText = bText
-	t.BroadcastTime = bTime
-	t.Unknown3 = u3
-	t.Unknown4 = u4
 	return t
 end
 
@@ -165,7 +134,7 @@ function BNT:GetToonByName(name)
 	for i = 1, numF do
 		for t = 1, BNGetNumFriendToons(i) do
 			local toon = ParseBNToonResult(BNGetFriendToonInfo(i, t))
-			if (toon.Name or ""):lower() == name:lower() then return toon end
+			if not CES:IsNullOrEmpty(toon.Name) and toon.Name:lower() == name:lower() then return toon end
 		end
 	end
 	return nil
