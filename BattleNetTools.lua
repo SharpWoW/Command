@@ -46,7 +46,7 @@ local function ParseBNFriendResult(...)
 		error("ParseBNFriendResult expected 15 arguments, got " .. argc)
 		return nil
 	end
-	local id, pName, bTag, isBTagPresence, tName, tId, client, online, last, afk, dnd, bText, note, friend, bTime, u = ...
+	local id, pName, bTag, isBTagPresence, tName, tId, client, online, last, afk, dnd, bText, note, friend, bTime, sor = ...
 	local f = {
 		PresenceID = id,
 		PresenceName = pName,
@@ -63,7 +63,7 @@ local function ParseBNFriendResult(...)
 		NoteText = note,
 		IsFriend = friend,
 		BroadcastTime = bTime,
-		Unknown = u
+		CanSoR = sor
 	}
 	return f
 end
@@ -74,9 +74,9 @@ local function ParseBNToonResult(...)
 		error("ParseBNToonResult expected 16 arguments, got " .. argc)
 		return nil
 	end
-	local u, name, client, realm, realmId, faction, race, class, u2, zone, lvl, text, bText, bTime, u3, u4 = ...
+	local focus, name, client, realm, realmId, faction, race, class, guild, zone, lvl, text, bText, bTime, online, id = ...
 	local t = {
-		Unknown = u,
+		HasFocus = focus,
 		Name = name,
 		Client = client,
 		Realm = realm,
@@ -84,14 +84,14 @@ local function ParseBNToonResult(...)
 		Faction = faction,
 		Race = race,
 		Class = class,
-		Unknown2 = u2,
+		Guild = guild,
 		Zone = zone,
 		Level = tonumber(lvl),
 		GameText = text,
 		BroadcastText = bText,
 		BroadcastTime = bTime,
-		Unknown3 = u3,
-		Unknown4 = u4
+		IsOnline = online,
+		PresenceID = id
 	}
 	if t.Faction == 0 then
 		t.FactionString = "Horde"
