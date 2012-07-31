@@ -35,9 +35,7 @@ function C.Events.CHAT_MSG_SYSTEM(self, event, ...)
 		C.RollManager:ParseMessage(message)
 	end
 
-	if C.Extensions.Table:GetRealLength(C.PlayerManager.Invites) > 0 then
-		C.PlayerManager:ParseMessage(message)
-	end
+	C.PlayerManager:ParseMessage(message)
 end
 
 function C.Events.CHAT_MSG_ADDON(self, event, ...)
