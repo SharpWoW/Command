@@ -49,7 +49,7 @@ local function l_index(self, k)
 	k = tostring(k):upper()
 	master = LM:GetMaster()
 	if self == master then -- Prevent recursion
-		return ("%%%s%%"):format(k)
+		return ("%s"):format(k)
 	end
 	local val = master[k]
 	if val then return val end

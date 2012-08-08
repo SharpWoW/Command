@@ -67,6 +67,7 @@ local LM = C.LootManager
 local GT = C.GroupTools
 local AM = C.AuthManager
 local DM = C.DeathManager
+local SM = C.SummonManager
 local Chat
 local CES = C.Extensions.String
 local CET = C.Extensions.Table
@@ -238,58 +239,83 @@ CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, i
 	if #args <= 0 then
 		return false, "CM_SET_USAGE"
 	end
-	args[1] = args[1]:lower()
-	if args[1]:match("^c") then -- Command Char setting
+	local mod = args[1]:lower()
+	if mod:match("^c") then -- Command Char setting
 		if #args < 2 then
 			return false, "CM_ERR_NOCMDCHAR"
 		end
 		return Chat:SetCmdChar(args[2])
-	elseif args[1]:match("^g") then -- Group invite (announce)
+	elseif mod:match("^g") then -- Group invite (announce)
 		if #args < 2 then
 			return false, "CM_SET_GROUPINVITE_USAGE"
 		end
 		args[2] = args[2]:lower()
-		local time = tonumber(args[2])
-		if time then
-			return C:SetGroupInviteDelay(time)
+		local delay = tonumber(args[2])
+		if delay then
+			return C:SetGroupInviteDelay(delay)
 		elseif args[2]:match("^[eay]") then -- Enable
 			return C:EnableGroupInvite()
 		elseif args[2]:match("^[dn]") then -- Disable
 			return C:DisableGroupInvite()
 		end
 		return false, "CM_SET_GROUPINVITE_USAGE"
-	elseif args[1]:match("^d") then -- DeathManager
+	elseif mod:match("^d") then -- DeathManager
 		if #args < 2 then
 			if C.DeathManager:IsEnabled() then
 				return "CM_SET_DM_ISENABLED"
-			else
-				return "CM_SET_DM_ISDISABLED"
 			end
+			return "CM_SET_DM_ISDISABLED"
 		end
 		if isChat then -- Players are only allowed to check status of DeathManager
 			return false, "CM_ERR_NOCHAT"
 		end
-		args[2] = args[2]:lower()
-		if args[2]:match("^[eay].*rel") then -- Enable release
+		local setting = args[2]:lower()
+		if setting:match("^[eay].*rel") then -- Enable release
 			return C.DeathManager:EnableRelease()
-		elseif args[2]:match("^[dn].*rel") then -- Disable release
+		elseif setting:match("^[dn].*rel") then -- Disable release
 			return C.DeathManager:DisableRelease()
-		elseif args[2]:match("^[eay].*r") then -- Enable ress
+		elseif setting:match("^[eay].*r") then -- Enable ress
 			return C.DeathManager:EnableResurrect()
-		elseif args[2]:match("^[dn].*r") then -- Disable ress
+		elseif setting:match("^[dn].*r") then -- Disable ress
 			return C.DeathManager:DisableResurrect()
-		elseif args[2]:match("^[eay]") then -- Enable
+		elseif setting:match("^[eay]") then -- Enable
 			return C.DeathManager:Enable()
-		elseif args[2]:match("^[dn]") then -- Disable
+		elseif setting:match("^[dn]") then -- Disable
 			return C.DeathManager:Disable()
-		elseif args[2]:match("^t.*rel") then -- Toggle release
+		elseif setting:match("^t.*rel") then -- Toggle release
 			return C.DeathManager:ToggleRelease()
-		elseif args[2]:match("^t.*r") then -- Toggle resurrect
+		elseif setting:match("^t.*r") then -- Toggle resurrect
 			return C.DeathManager:ToggleResurrect()
-		elseif args[2]:match("^t") then -- Toggle
+		elseif setting:match("^t") then -- Toggle
 			return C.DeathManager:Toggle()
 		end
 		return false, "CM_SET_DM_USAGE"
+	elseif mod:match("^s") then -- SummonManager
+		if #args < 2 then
+			if SM:IsEnabled() then
+				return "CM_SET_SM_ISENABLED"
+			end
+			return "CM_SET_SM_ISDISABLED"
+		end
+		if isChat then -- Players are only allowed to check status of SummonManager
+			return false, "CM_ERR_NOCHAT"
+		end
+		local setting = args[2]:lower()
+		if setting:match("^[eay]") then -- Enable
+			return SM:Enable()
+		elseif setting:match("^di") or setting:match("^n") then -- Disable
+			return SM:Disable()
+		elseif setting:match("^to") then -- Toggle
+			return SM:Toggle()
+		elseif setting:match("^[std]") then -- (Set) Delay
+			if #args < 3 then
+				return "CM_SET_SM_DELAY_CURRENT", {SM:GetDelay()}
+			end
+			local newDelay = tonumber(args[3])
+			if not newDelay then return false, "CM_SET_SM_DELAY_USAGE" end
+			return SM:SetDelay(newDelay)
+		end
+		return false, "CM_SET_SM_USAGE"
 	end
 	return false, "CM_SET_USAGE"
 end, "CM_SET_HELP")
@@ -921,6 +947,20 @@ CM:Register({"resurrect", "ressurrect", "ress", "res"}, PM.Access.Groups.User.Le
 	end
 	return DM:Resurrect()
 end, "CM_RESURRECT_HELP")
+
+CM:Register({"acceptsummon", "as", "acceptsumm", "asumm"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not SM:IsEnabled() then
+		return false, "CM_ERR_DISABLED"
+	end
+	return SM:AcceptSummon()
+end, "CM_ACCEPTSUMMON_HELP")
+
+CM:Register({"declinesummon", "ds", "declinesumm", "dsumm", "cancelsummon", "csumm"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not SM:IsEnabled() then
+		return false, "CM_ERR_DISABLED"
+	end
+	return SM:DeclineSummon()
+end, "CM_DECLINESUMMON_HELP")
 
 for i,v in ipairs(CM.Slash) do
 	_G["SLASH_" .. C.Name:upper() .. i] = "/" .. v

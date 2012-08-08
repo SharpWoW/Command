@@ -33,6 +33,8 @@ local L = {
 
 	YES = "Ja",
 	NO = "Nej",
+	UNKNOWN = "Okänd",
+	SECONDS = "Sekund(er)",
 
 	------------------
 	-- WoW Specific --
@@ -115,10 +117,15 @@ local L = {
 
 	CM_SET_HELP = "Ändra inställningarna i Command.",
 	CM_SET_USAGE = "Användning: set cmdchar|groupinvite",
-	CM_SET_GROUPINVITE_USAGE = "Användning: set groupinvite enable|disable|<tid>",
+	CM_SET_GROUPINVITE_USAGE = "Användning: set groupinvite enable|disable|<fördröjning>",
 	CM_SET_DM_ISENABLED = "DeathManager is enabled.",
 	CM_SET_DM_ISDISABLED = "DeathManager is disabled.",
-	CM_SET_DM_USAGE = "Usage: set dm [enable|disable]",
+	CM_SET_DM_USAGE = "Användning: set dm [enable|disable|toggle|enableress|disableress|toggleress|enablerel|disablerel|togglerel]",
+	CM_SET_SM_ISENABLED = "SummonManager is enabled.",
+	CM_SET_SM_ISDISABLED = "SummonManager is disabled.",
+	CM_SET_SM_DELAY_CURRENT = "The current delay for summon announcements is %s.",
+	CM_SET_SM_DELAY_USAGE = "Usage: set sm delay <delay>"
+	CM_SET_SM_USAGE = "Användning: set sm [enable|disable|toggle|delay]",
 
 	CM_LOCALE_HELP = "Change locale settings.",
 	CM_LOCALE_USAGE ="Användning: locale [set|reset|usemaster|playerindependent]",
@@ -274,6 +281,10 @@ local L = {
 
 	CM_RESURRECT_HELP = "Player will accept pending resurrect request.",
 
+	CM_ACCEPTSUMMON_HELP = "Player will accept a pending summon request.",
+
+	CM_DECLINESUMMON_HELP = "Player will decline a pending summon request.",
+
 	------------
 	-- Events --
 	------------
@@ -336,7 +347,7 @@ local L = {
 	LOOT_SM_SUCCESS = "Successfully set the loot method to %s!",
 	LOOT_SM_SUCCESSMASTER = "Successfully set the loot method to %s (%s)!",
 
-	LOOT_SLM_NOLOEAD = "Unable to change master looter, not group leader.",
+	LOOT_SLM_NOLEAD = "Unable to change master looter, not group leader.",
 	LOOT_SLM_METHOD = "Cannot set master looter when loot method is set to %s.",
 	LOOT_SLM_SPECIFY = "Master looter not specified.",
 	LOOT_SLM_SUCCESS = "Successfully set %s as the master looter!",
@@ -468,6 +479,25 @@ local L = {
 	DM_RESURRECTED_REINCARNATE = "Resurrected with reincarnate!",
 	DM_RESURRECTED_CARD = "Resurrected with Darkmoon Card: Twisting Nether proc!",
 	DM_RESURRECTED_PLAYER = "Accepted resurrect from %s!",
+
+	-------------------
+	-- SummonManager --
+	-------------------
+
+	SM_ERR_NOSUMMON = "I do not have an active summon request.",
+
+	SM_ENABLED = "Summon Manager has been enabled!",
+
+	SM_DISABLED = "Summon Manager has been disabled!",
+
+	SM_ONSUMMON = "I have received a summon to %s from %s, expires in %s! Type !acceptsummon or !declinesummon to make me accept or decline the request.",
+
+	SM_ACCEPTED = "Accepted summon request from %s!",
+
+	SM_DECLINED = "Declined summon request from %s!",
+
+	SM_SETDELAY_SUCCESS = "Summon announce delay successfully set to %s!",
+	SM_SETDELAY_INSTANT = "Summons will now announce instantly when received.",
 
 	-----------------
 	-- AuthManager --

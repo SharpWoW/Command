@@ -34,6 +34,7 @@ local CM = C.ChatManager
 local QM = C.QueueManager
 local AC = C.AddonComm
 local DM = C.DeathManager
+local SM = C.SummonManager
 
 --- Event handler for ADDON_LOADED
 -- @name Command.Events.ADDON_LOADED
@@ -149,4 +150,8 @@ end
 function C.Events.PLAYER_UNGHOST(self, ...)
 	DM.Dead = false
 	DM.Resurrection = false
+end
+
+function C.Events.CONFIRM_SUMMON(self, ...)
+	SM:OnSummon()
 end

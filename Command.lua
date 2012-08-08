@@ -37,7 +37,7 @@ local assert = assert
 Command = {
 	Name = "Command",
 	Version = GetAddOnMetadata("Command", "Version"),
-	VersionNum = 7, -- Increment on every release
+	VersionNum = 8, -- Increment on every release
 	VersionChecked = false, -- Prevent spam of "New Version" notice
 	Loaded = false,
 	VarVersion = 2,
@@ -55,6 +55,7 @@ local PM
 local RM
 local AC
 local DM
+local SM
 local log
 
 --- Initialize Command.
@@ -70,6 +71,7 @@ function C:Init()
 	RM = self.RollManager
 	AC = self.AddonComm
 	DM = self.DeathManager
+	SM = self.SummonManager
 	log = self.Logger
 	self:LoadSavedVars()
 	log:Normal(L("ADDON_LOAD"))
@@ -112,6 +114,7 @@ function C:LoadSavedVars()
 	RM:Init()
 	AC:Init()
 	DM:Init()
+	SM:Init()
 	Cmd:Init()
 	log:SetDebug(self.Settings.DEBUG)
 	self.Global.VERSION = self.VarVersion
