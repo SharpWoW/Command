@@ -124,7 +124,7 @@ local L = {
 	CM_SET_SM_ISENABLED = "SummonManager is enabled.",
 	CM_SET_SM_ISDISABLED = "SummonManager is disabled.",
 	CM_SET_SM_DELAY_CURRENT = "The current delay for summon announcements is %s.",
-	CM_SET_SM_DELAY_USAGE = "Usage: set sm delay <delay>"
+	CM_SET_SM_DELAY_USAGE = "Usage: set sm delay <delay>",
 	CM_SET_SM_USAGE = "Usage: set sm [enable|disable|toggle|delay]",
 
 	CM_LOCALE_HELP = "Change locale settings.",

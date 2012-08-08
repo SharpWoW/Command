@@ -39,7 +39,7 @@ local L = C.LocaleManager
 local SM = C.SummonManager
 local CM
 
-local MAX_TIME = 110 -- 1 minute 50 seconds, summons expire after 2 minutes (usually)
+local MAX_DELAY = 110 -- 1 minute 50 seconds, summons expire after 2 minutes (usually)
 
 local LastSummoner
 
@@ -165,7 +165,7 @@ function SM:GetDelay()
 		end
 		return ("%d:%s"):format(minutes, seconds)
 	end
-	return ("%d %s"):format(total, L("SECONDS"))
+	return ("%d %s"):format(total, L("SECONDS"):lower())
 end
 
 function SM:GetRawDelay()
@@ -188,7 +188,7 @@ function SM:SetDelay(amount)
 			end
 			return "SM_SETDELAY_SUCCESS", {("%d:%s"):format(minutes, seconds)}
 		else
-			return "SM_SETDELAY_SUCCESS", {("%d %s"):format(amount, L("SECONDS"))}
+			return "SM_SETDELAY_SUCCESS", {("%d %s"):format(amount, L("SECONDS"):lower())}
 		end
 	end
 	return "SM_SETDELAY_INSTANT"
