@@ -38,6 +38,7 @@ C.SummonManager = {}
 local L = C.LocaleManager
 local SM = C.SummonManager
 local CM
+local GT = C.GroupTools
 
 local MAX_DELAY = 110 -- 1 minute 50 seconds, summons expire after 2 minutes (usually)
 
@@ -107,7 +108,9 @@ function SM:Announce()
 
 	LastSummoner = name
 
-	CM:SendMessage(L("SM_ONSUMMON"):format(area, name, left), "SMART")
+	local channel = "SMART"
+	if not GT:InGroup() then channel = "WHISPER" end
+	CM:SendMessage(L("SM_ONSUMMON"):format(area, name, left), channel, name)
 end
 
 function SM:AcceptSummon()
