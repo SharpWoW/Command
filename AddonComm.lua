@@ -196,6 +196,8 @@ function AC:Receive(msgType, msg, channel, sender)
 end
 
 function AC:Send(msgType, msg, channel, target)
+	-- Don't send version update notices if this is a dev version
+	if msgType == self.Type.VersionUpdate and C.Version:lower() == "dev" and not C.OverrideACUpdateNotice then return end
 	channel = channel or "RAID"
 	if channel == "RAID" and not GT:IsRaid() then
 		if not GT:IsGroup() then return end
