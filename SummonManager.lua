@@ -26,10 +26,13 @@ local tostring = tostring
 local CreateFrame = CreateFrame
 local CancelSummon = CancelSummon
 local ConfirmSummon = ConfirmSummon
+local StaticPopup_Hide = StaticPopup_Hide
 local PlayerCanTeleport = PlayerCanTeleport
+local StaticPopup_Visible = StaticPopup_Visible
 local GetSummonConfirmSummoner = GetSummonConfirmSummoner
 local GetSummonConfirmAreaName = GetSummonConfirmAreaName
 local GetSummonConfirmTimeLeft = GetSummonConfirmTimeLeft
+
 
 local C = Command
 
@@ -109,7 +112,7 @@ function SM:Announce()
 	LastSummoner = name
 
 	local channel = "SMART"
-	if not GT:InGroup() then channel = "WHISPER" end
+	if not GT:IsGroup() then channel = "WHISPER" end
 	CM:SendMessage(L("SM_ONSUMMON"):format(area, name, left), channel, name)
 end
 
@@ -120,6 +123,10 @@ function SM:AcceptSummon()
 
 	ConfirmSummon()
 
+	if StaticPopup_Visible("CONFIRM_SUMMON") then
+		StaticPopup_Hide("CONFIRM_SUMMON")
+	end
+
 	return "SM_ACCEPTED", {LastSummoner}
 end
 
@@ -129,6 +136,10 @@ function SM:DeclineSummon()
 	end
 
 	CancelSummon()
+
+	if StaticPopup_Visible("CONFIRM_SUMMON") then
+		StaticPopup_Hide("CONFIRM_SUMMON")
+	end
 
 	return "SM_DECLINED", {LastSummoner}
 end
