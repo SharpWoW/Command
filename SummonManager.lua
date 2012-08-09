@@ -26,10 +26,13 @@ local tostring = tostring
 local CreateFrame = CreateFrame
 local CancelSummon = CancelSummon
 local ConfirmSummon = ConfirmSummon
+local StaticPopup_Hide = StaticPopup_Hide
 local PlayerCanTeleport = PlayerCanTeleport
+local StaticPopup_Visible = StaticPopup_Visible
 local GetSummonConfirmSummoner = GetSummonConfirmSummoner
 local GetSummonConfirmAreaName = GetSummonConfirmAreaName
 local GetSummonConfirmTimeLeft = GetSummonConfirmTimeLeft
+
 
 local C = Command
 
@@ -38,8 +41,9 @@ C.SummonManager = {}
 local L = C.LocaleManager
 local SM = C.SummonManager
 local CM
+local GT = C.GroupTools
 
-local MAX_TIME = 110 -- 1 minute 50 seconds, summons expire after 2 minutes (usually)
+local MAX_DELAY = 110 -- 1 minute 50 seconds, summons expire after 2 minutes (usually)
 
 local LastSummoner
 
@@ -107,7 +111,9 @@ function SM:Announce()
 
 	LastSummoner = name
 
-	CM:SendMessage(L("SM_ONSUMMON"):format(area, name, left), "SMART")
+	local channel = "SMART"
+	if not GT:IsGroup() then channel = "WHISPER" end
+	CM:SendMessage(L("SM_ONSUMMON"):format(area, name, left), channel, name)
 end
 
 function SM:AcceptSummon()
@@ -116,6 +122,10 @@ function SM:AcceptSummon()
 	end
 
 	ConfirmSummon()
+
+	if StaticPopup_Visible("CONFIRM_SUMMON") then
+		StaticPopup_Hide("CONFIRM_SUMMON")
+	end
 
 	return "SM_ACCEPTED", {LastSummoner}
 end
@@ -126,6 +136,10 @@ function SM:DeclineSummon()
 	end
 
 	CancelSummon()
+
+	if StaticPopup_Visible("CONFIRM_SUMMON") then
+		StaticPopup_Hide("CONFIRM_SUMMON")
+	end
 
 	return "SM_DECLINED", {LastSummoner}
 end
@@ -165,7 +179,7 @@ function SM:GetDelay()
 		end
 		return ("%d:%s"):format(minutes, seconds)
 	end
-	return ("%d %s"):format(total, L("SECONDS"))
+	return ("%d %s"):format(total, L("SECONDS"):lower())
 end
 
 function SM:GetRawDelay()
@@ -188,7 +202,7 @@ function SM:SetDelay(amount)
 			end
 			return "SM_SETDELAY_SUCCESS", {("%d:%s"):format(minutes, seconds)}
 		else
-			return "SM_SETDELAY_SUCCESS", {("%d %s"):format(amount, L("SECONDS"))}
+			return "SM_SETDELAY_SUCCESS", {("%d %s"):format(amount, L("SECONDS"):lower())}
 		end
 	end
 	return "SM_SETDELAY_INSTANT"
