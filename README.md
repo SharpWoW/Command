@@ -16,7 +16,7 @@ More information here when permission system is finished...
 
 === Command List ===
 
-Command list can be found on the [[https://github.com/F16Gaming/Command/wiki/Commands|wiki]].
+Command list can be found on the [https://github.com/F16Gaming/Command/wiki/Commands](wiki).
 
 === Limitations ===
 
@@ -26,6 +26,6 @@ As an example we can look at the !kick command, Blizzard does not allow an AddOn
 
 === Documentation ===
 
-Documentation of the AddOn is available on [[http://f16gaming.github.com/Command|GitHub Pages]] (**OUTDATED**).
+Documentation of the AddOn is available on [http://f16gaming.github.com/Command](GitHub Pages) (**OUTDATED**).
 
 In theory you could create a "plugin" for this AddOn by making sure your AddOn loads after Command and use the Register method in the CommandManager to register your commands. This, however, is not recommended. If the need arises and enough people want it, I might try to create a proper module system.
