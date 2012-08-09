@@ -22,6 +22,7 @@ local select = select
 
 -- API Upvalues
 local BNET_CLIENT_WOW = BNET_CLIENT_WOW
+local UnitFactionGroup = UnitFactionGroup
 
 local C = Command
 local CM = C.ChatManager
