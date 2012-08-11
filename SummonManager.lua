@@ -145,7 +145,7 @@ function SM:DeclineSummon()
 end
 
 function SM:HasSummon()
-	return PlayerCanTeleport()
+	return GetSummonConfirmTimeLeft() > 0 -- PlayerCanTeleport()
 end
 
 function SM:IsEnabled()

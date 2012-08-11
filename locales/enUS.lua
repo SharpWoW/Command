@@ -116,7 +116,7 @@ local L = {
 	CM_VERSION = "%s",
 
 	CM_SET_HELP = "Control the settings of Command.",
-	CM_SET_USAGE = "Usage: set cmdchar|groupinvite",
+	CM_SET_USAGE = "Usage: set cmdchar|groupinvite|deathmanager|summonmanager",
 	CM_SET_GROUPINVITE_USAGE = "Usage: set groupinvite enable|disable|<delay>",
 	CM_SET_DM_ISENABLED = "DeathManager is enabled.",
 	CM_SET_DM_ISDISABLED = "DeathManager is disabled.",
@@ -484,7 +484,7 @@ local L = {
 	-- SummonManager --
 	-------------------
 
-	SM_ERR_NOSUMMON = "I do not have an active summon request.",
+	SM_ERR_NOSUMMON = "I do not have an active summon request or it has expired.",
 
 	SM_ENABLED = "Summon Manager has been enabled!",
 
