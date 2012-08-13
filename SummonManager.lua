@@ -19,7 +19,7 @@
 
 -- Upvalues
 local type = type
-local floor = floor
+local floor = math.floor
 local tostring = tostring
 
 -- API Upvalues
@@ -27,7 +27,6 @@ local CreateFrame = CreateFrame
 local CancelSummon = CancelSummon
 local ConfirmSummon = ConfirmSummon
 local StaticPopup_Hide = StaticPopup_Hide
-local PlayerCanTeleport = PlayerCanTeleport
 local StaticPopup_Visible = StaticPopup_Visible
 local GetSummonConfirmSummoner = GetSummonConfirmSummoner
 local GetSummonConfirmAreaName = GetSummonConfirmAreaName
@@ -46,6 +45,17 @@ local GT = C.GroupTools
 local MAX_DELAY = 110 -- 1 minute 50 seconds, summons expire after 2 minutes (usually)
 
 local LastSummoner
+
+local function FormatSeconds(seconds)
+	-- Return plain seconds if less than 60 seconds
+	if seconds < 60 then return ("%d %s"):format(seconds, L("SECONDS"):lower()) end
+	local minutes = floor(seconds / 60) -- Get number of minutes
+	local secs = tostring(seconds - minutes * 60) -- Get number of remaining seconds
+	if not secs:match("%d%d") then -- Check if seconds > 9
+		secs = "0" .. secs -- Prefix a zero to make it look better
+	end
+	return ("%d:%s"):format(minutes, secs) -- Return in m:ss format
+end
 
 function SM:Init()
 	CM = C.ChatManager
@@ -96,18 +106,9 @@ function SM:Announce()
 	local area = GetSummonConfirmAreaName()
 	local left = GetSummonConfirmTimeLeft()
 
-	if left >= 60 then -- Convert to m:s format
-		local minutes = floor(left / 60)
-		local seconds = tostring(left - minutes * 60)
-		if not seconds:match("%d%d") then
-			seconds = "0" .. seconds
-		end
-		left = ("%d:%s"):format(minutes, seconds)
-	else
-		left = ("%d %s"):format(left, L("SECONDS"):lower())
-	end
+	if not name or not area or not left or left <= 0 then return end
 
-	if not name or not area or not left then return end
+	left = FormatSeconds(left)
 
 	LastSummoner = name
 
@@ -145,7 +146,7 @@ function SM:DeclineSummon()
 end
 
 function SM:HasSummon()
-	return GetSummonConfirmTimeLeft() > 0 -- PlayerCanTeleport()
+	return GetSummonConfirmTimeLeft() > 0
 end
 
 function SM:IsEnabled()
@@ -170,16 +171,7 @@ function SM:Toggle()
 end
 
 function SM:GetDelay()
-	local total = self:GetRawDelay()
-	if total >= 60 then
-		local minutes = floor(total / 60)
-		local seconds = tostring(total - minutes * 60)
-		if not seconds:match("%d%d") then
-			seconds = "0" .. seconds
-		end
-		return ("%d:%s"):format(minutes, seconds)
-	end
-	return ("%d %s"):format(total, L("SECONDS"):lower())
+	return FormatSeconds(self:GetRawDelay())
 end
 
 function SM:GetRawDelay()
@@ -194,16 +186,7 @@ function SM:SetDelay(amount)
 	end
 	self.Settings.DELAY = amount
 	if amount > 0 then
-		if amount >= 60 then
-			local minutes = floor(amount / 60)
-			local seconds = tostring(amount - minutes * 60)
-			if not seconds:match("%d%d") then
-				seconds = "0" .. seconds
-			end
-			return "SM_SETDELAY_SUCCESS", {("%d:%s"):format(minutes, seconds)}
-		else
-			return "SM_SETDELAY_SUCCESS", {("%d %s"):format(amount, L("SECONDS"):lower())}
-		end
+		return "SM_SETDELAY_SUCCESS", {FormatSeconds(amount)}
 	end
 	return "SM_SETDELAY_INSTANT"
 end
