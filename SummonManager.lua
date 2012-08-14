@@ -146,7 +146,7 @@ function SM:DeclineSummon()
 end
 
 function SM:HasSummon()
-	return GetSummonConfirmTimeLeft() > 0
+	return GetSummonConfirmTimeLeft() > 0 and StaticPopup_Visible("CONFIRM_SUMMON")
 end
 
 function SM:IsEnabled()
