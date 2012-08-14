@@ -36,6 +36,7 @@ local AC = C.AddonComm
 local DM = C.DeathManager
 local SM = C.SummonManager
 local IM = C.InviteManager
+local CDM = C.DuelManager
 
 --- Event handler for ADDON_LOADED
 -- @name Command.Events.ADDON_LOADED
@@ -154,4 +155,8 @@ end
 
 function C.Events.CONFIRM_SUMMON(self, ...)
 	SM:OnSummon()
+end
+
+function C.Events.DUEL_REQUESTED(self, ...)
+	CDM:OnDuel((select(1, ...)))
 end

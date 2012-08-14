@@ -116,7 +116,7 @@ local L = {
 	CM_VERSION = "%s",
 
 	CM_SET_HELP = "Ändra inställningarna i Command.",
-	CM_SET_USAGE = "Användning: set cmdchar|deathmanager|summonmanager|invitemanager",
+	CM_SET_USAGE = "Användning: set cmdchar|deathmanager|summonmanager|invitemanager|duelmanager",
 	CM_SET_DM_ISENABLED = "DeathManager is enabled.",
 	CM_SET_DM_ISDISABLED = "DeathManager is disabled.",
 	CM_SET_DM_USAGE = "Användning: set dm [enable|disable|toggle|enableress|disableress|toggleress|enablerel|disablerel|togglerel]",
@@ -132,6 +132,11 @@ local L = {
 	CM_SET_IM_GUILD_DELAY_CURRENT = "Guild announce delay is set to %d second(s).",
 	CM_SET_IM_GUILD_DELAY_USAGE = "Användning: set im guilddelay [delay]",
 	CM_SET_IM_USAGE = "Användning: set im [enable|disable|toggle|groupenable|groupdisable|grouptoggle|groupenableannounce|groupdisableannounce|grouptoggleannounce|groupdelay|groupdisabledelay|guildenable|guilddisable|guildtoggle|guildenableannounce|guilddisableannounce|guildtoggleannounce|guildenableoverride|guilddisableoverride|guildtoggleoverride|guilddelay|guilddisabledelay]",
+	CM_SET_CDM_ISENABLED = "DuelManager is enabled.",
+	CM_SET_CDM_ISDISABLED = "DuelManager is disabled.",
+	CM_SET_CDM_DELAY_CURRENT = "Announce delay is set to %d second(s).",
+	CM_SET_CDM_DELAY_USAGE = "Usage: set duelmanager delay [delay]",
+	CM_SET_CDM_USAGE = "Usage: set duelmanager [enable|disable|toggle|enableannounce|disableannounce|toggleannounce|delay]",
 
 	CM_LOCALE_HELP = "Change locale settings.",
 	CM_LOCALE_USAGE ="Användning: locale [set|reset|usemaster|playerindependent]",
@@ -290,6 +295,13 @@ local L = {
 	CM_ACCEPTSUMMON_HELP = "Player will accept a pending summon request.",
 
 	CM_DECLINESUMMON_HELP = "Player will decline a pending summon request.",
+
+	CM_ACCEPTDUEL_HELP = "Accepts a pending duel request.",
+
+	CM_DECLINEDUEL_HELP = "Declines a pending duel request or cancels an active duel.",
+
+	CM_STARTDUEL_HELP = "Challenges another player to a duel.",
+	CM_STARTDUEL_USAGE = "Usage: startduel <target>",
 
 	------------
 	-- Events --
@@ -540,6 +552,35 @@ local L = {
 	IM_GUILD_HASREP = "Unable to auto-accept guild invite, I still have reputation with my former guild that would be lost.",
 	IM_GUILD_ACCEPTED = "Accepted guild invite!",
 	IM_GUILD_DECLINED = "Declined guild invite.",
+
+	-----------------
+	-- DuelManager --
+	-----------------
+
+	CDM_ERR_NODUEL = "I do not currently have an active duel request.",
+
+	CDM_ANNOUNCE = "Type !acceptduel to make me accept the duel request or !decline duel to decline it!",
+
+	CDM_ACCEPETED = "Accepted duel request!",
+
+	CDM_DECLINED = "Declined duel request.",
+
+	CDM_CANCELLED = "Cancelled active duel (if any).",
+
+	CDM_CHALLENGED = "Sent a duel request to %s!",
+
+	CDM_ENABLED = "DuelManager has been enabled!",
+
+	CDM_DISABLED = "DuelManager has been disabled.",
+
+	CDM_ANNOUNCE_ENABLED = "DuelManager announce has been enabled!",
+
+	CDM_ANNOUNCE_DISABLED = "DuelManager announce has been disabled.",
+
+	CDM_DELAY_NUM = "Delay has to be a number.",
+	CDM_DELAY_OUTOFRANGE = "Delay has to be between 0 and %d seconds.",
+	CDM_DELAY_SET = "Announce delay set to %d second(s)!",
+	CDM_DELAY_DISABLED = "Announce delay has been disabled, will now announce immediately.",
 
 	-----------------
 	-- AuthManager --

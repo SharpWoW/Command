@@ -57,6 +57,7 @@ local AC
 local DM
 local SM
 local IM
+local CDM
 local log
 
 --- Initialize Command.
@@ -74,6 +75,7 @@ function C:Init()
 	DM = self.DeathManager
 	SM = self.SummonManager
 	IM = self.InviteManager
+	CDM = self.DuelManager
 	log = self.Logger
 	self:LoadSavedVars()
 	log:Normal(L("ADDON_LOAD"))
@@ -114,6 +116,7 @@ function C:LoadSavedVars()
 	DM:Init()
 	SM:Init()
 	IM:Init()
+	CDM:Init()
 	Cmd:Init()
 	log:SetDebug(self.Settings.DEBUG)
 	self.Global.VERSION = self.VarVersion

@@ -69,6 +69,7 @@ local AM = C.AuthManager
 local DM = C.DeathManager
 local SM = C.SummonManager
 local IM = C.InviteManager
+local CDM = C.DuelManager
 local Chat
 local CES = C.Extensions.String
 local CET = C.Extensions.Table
@@ -246,7 +247,7 @@ CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, i
 			return false, "CM_ERR_NOCMDCHAR"
 		end
 		return Chat:SetCmdChar(args[2])
-	elseif mod:match("^d") then -- DeathManager
+	elseif mod:match("^de") then -- DeathManager
 		if #args < 2 then
 			if C.DeathManager:IsEnabled() then
 				return "CM_SET_DM_ISENABLED"
@@ -370,6 +371,36 @@ CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, i
 			return IM:ToggleGroup()
 		end
 		return false, "CM_SET_IM_USAGE"
+	elseif mod:match("^d") then -- DuelManager
+		if #args < 2 then
+			if CDM:IsEnabled() then
+				return "CM_SET_CDM_ISENABLED"
+			end
+			return "CM_SET_CDM_ISDISABLED"
+		end
+		if isChat then -- Players are only allowed to check status of DuelManager
+			return false, "CM_ERR_NOCHAT"
+		end
+		local setting = args[2]:lower()
+		if setting:match("^[eay].*a") then -- Enable Announce
+			return CDM:EnableAnnounce()
+		elseif setting:match("^[dn].*a") then -- Disable Announce
+			return CDM:DisableAnnounce()
+		elseif setting:match("^a.*t") then -- Toggle Announce
+			return CDM:ToggleAnnounce()
+		elseif setting:match("^s.*d") or setting:match("^de") then -- Set Delay
+			if #args < 3 then
+				return "CM_SET_CDM_DELAY_CURRENT", {CDM:GetDelay()}
+			end
+			local newDelay = tonumber(args[3])
+			if not newDelay then return false, "CM_SET_CDM_DELAY_USAGE" end
+			return CDM:SetDelay(newDelay)
+		elseif setting:match("^[eay]") then -- Enable
+			return CDM:Enable()
+		elseif setting:match("^[dn]") then -- Disable
+			return CDM:Disable()
+		end
+		return false, "CM_SET_CDM_USAGE"
 	end
 	return false, "CM_SET_USAGE"
 end, "CM_SET_HELP")
@@ -1033,6 +1064,30 @@ CM:Register({"declinesummon", "ds", "declinesumm", "dsumm", "cancelsummon", "csu
 	end
 	return SM:DeclineSummon()
 end, "CM_DECLINESUMMON_HELP")
+
+CM:Register({"acceptduel", "acceptd"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not CDM:IsEnabled() then
+		return false, "CM_ERR_DISABLED"
+	end
+	return CDM:AcceptDuel()
+end, "CM_ACCEPTDUEL_HELP")
+
+CM:Register({"declineduel", "declined"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not CDM:IsEnabled() then
+		return false, "CM_ERR_DISABLED"
+	end
+	return CDM:DeclineDuel()
+end, "CM_DECLINEDUEL_HELP")
+
+CM:Register({"startduel", "startd", "challenge"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not CDM:IsEnabled() then
+		return false, "CM_ERR_DISABLED"
+	end
+	if #args < 1 then
+		return false, "CM_STARTDUEL_USAGE"
+	end
+	return CDM:Challenge(args[1])
+end, "CM_STARTDUEL_HELP")
 
 for i,v in ipairs(CM.Slash) do
 	_G["SLASH_" .. C.Name:upper() .. i] = "/" .. v
