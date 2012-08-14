@@ -35,6 +35,8 @@ local QM = C.QueueManager
 local AC = C.AddonComm
 local DM = C.DeathManager
 local SM = C.SummonManager
+local IM = C.InviteManager
+local CDM = C.DuelManager
 
 --- Event handler for ADDON_LOADED
 -- @name Command.Events.ADDON_LOADED
@@ -100,28 +102,15 @@ function C.Events.GROUP_ROSTER_UPDATE(self, ...)
 end
 
 function C.Events.PARTY_INVITE_REQUEST(self, ...)
-	if not self.Settings.GROUP_INVITE_ANNOUNCE then return end
+	if not IM.Settings.GROUP.ANNOUNCE then return end
 	local sender = (select(1, ...))
-	local locale = C.PlayerManager:GetOrCreatePlayer(sender).Settings.Locale
-	local msg = C.LocaleManager:GetLocale(locale, true)["E_GROUPINVITE"]
-	if self.Settings.GROUP_INVITE_ANNOUNCE_DELAY > 0 then
-		local f=CreateFrame("Frame") -- Create temporary frame
-		f.Time = 0 -- Current time
-		f.Delay = self.Settings.GROUP_INVITE_ANNOUNCE_DELAY -- Delay to wait
-		f.Sender = sender -- Name of player who sent invite
-		f.Message = msg -- Message to send
-		f:SetScript("OnUpdate", function(self, elapsed) -- The update script to delay sending of message
-			self.Time = self.Time + elapsed
-			if self.Time > self.Delay then
-				self:SetScript("OnUpdate", nil)
-				if StaticPopup_Visible("PARTY_INVITE") then -- Only send message if the invite popup is still showing
-					CM:SendMessage(self.Message, "WHISPER", self.Sender) -- Send the message!
-				end
-			end
-		end)
-	else
-		CM:SendMessage(msg, "WHISPER", sender)
-	end
+	IM:OnGroupInvite(sender)
+end
+
+function C.Events.GUILD_INVITE_REQUEST(self, ...)
+	if not IM.Settings.GUILD.ANNOUNCE then return end
+	local sender = (select(1, ...))
+	IM:OnGuildInvite(sender)
 end
 
 function C.Events.PARTY_LEADER_CHANGED(self, ...)
@@ -161,4 +150,8 @@ end
 
 function C.Events.CONFIRM_SUMMON(self, ...)
 	SM:OnSummon()
+end
+
+function C.Events.DUEL_REQUESTED(self, ...)
+	CDM:OnDuel((select(1, ...)))
 end

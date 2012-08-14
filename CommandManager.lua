@@ -68,6 +68,8 @@ local GT = C.GroupTools
 local AM = C.AuthManager
 local DM = C.DeathManager
 local SM = C.SummonManager
+local IM = C.InviteManager
+local CDM = C.DuelManager
 local Chat
 local CES = C.Extensions.String
 local CET = C.Extensions.Table
@@ -245,21 +247,7 @@ CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, i
 			return false, "CM_ERR_NOCMDCHAR"
 		end
 		return Chat:SetCmdChar(args[2])
-	elseif mod:match("^g") then -- Group invite (announce)
-		if #args < 2 then
-			return false, "CM_SET_GROUPINVITE_USAGE"
-		end
-		args[2] = args[2]:lower()
-		local delay = tonumber(args[2])
-		if delay then
-			return C:SetGroupInviteDelay(delay)
-		elseif args[2]:match("^[eay]") then -- Enable
-			return C:EnableGroupInvite()
-		elseif args[2]:match("^[dn]") then -- Disable
-			return C:DisableGroupInvite()
-		end
-		return false, "CM_SET_GROUPINVITE_USAGE"
-	elseif mod:match("^d") then -- DeathManager
+	elseif mod:match("^de") then -- DeathManager
 		if #args < 2 then
 			if C.DeathManager:IsEnabled() then
 				return "CM_SET_DM_ISENABLED"
@@ -316,6 +304,103 @@ CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, i
 			return SM:SetDelay(newDelay)
 		end
 		return false, "CM_SET_SM_USAGE"
+	elseif mod:match("^i") then -- InviteManager
+		if #args < 2 then
+			if IM:IsEnabled() then
+				return "CM_SET_IM_ISENABLED"
+			end
+			return "CM_SET_IM_ISDISABLED"
+		end
+		if isChat then -- Players are only allowed to check status of InviteManager
+			return false, "CM_ERR_NOCHAT"
+		end
+		local setting = args[2]:lower()
+		if setting:match("^[eay]") then -- Enable
+			return IM:Enable()
+		elseif setting:match("^[dn]") then -- Disable
+			return IM:Disable()
+		elseif setting:match("^t") then -- Toggle
+			return IM:Toggle()
+		elseif setting:match("^gu.*d") or setting:match("¨gu.*s.*d") then -- Set Guild Delay
+			if #args < 3 then
+				return "CM_SET_IM_GUILD_DELAY_CURRENT", {IM:GetGuildDelay()}
+			end
+			local newDelay = tonumber(args[3])
+			if not newDelay then return false, "CM_SET_IM_GUILD_DELAY_USAGE" end
+			return IM:SetGuildDelay(newDelay)
+		elseif setting:match("^gu.*[dn].*d") then -- Disable Guild Delay
+			return IM:DisableGuildDelay()
+		elseif setting:match("^gu.*[eay].*a") then -- Enable Guild Announce
+			return IM:EnableGuildAnnounce()
+		elseif setting:match("^gu.*[dn].*a") then -- Disable Guild Announce
+			return IM:DisableGuildAnnounce()
+		elseif setting:match("^gu.*t.*a") then -- Toggle Guild Announce
+			return IM:ToggleGuildAnnounce()
+		elseif setting:match("^gu.*[eay].*o") then -- Enable Guild Override
+			return IM:EnableGuildOverride()
+		elseif setting:match("^gu.*[dn].*o") then -- Disable Guild Override
+			return IM:DisableGuildOverride()
+		elseif setting:match("^gu.*t.*o") then -- Toggle Guild Override
+			return IM:ToggleGuildOverride()
+		elseif setting:match("^gu.*[eay]") then -- Enable Guild
+			return IM:EnableGuild()
+		elseif setting:match("^gu.*[dn]") then -- Disable Guild
+			return IM:DisableGuild()
+		elseif setting:match("^gu.*t") then -- Toggle Guild
+			return IM:ToggleGuild()
+		elseif setting:match("^g.*d") or setting:match("^g.*s.*d") then -- Set Group Delay
+			if #args < 3 then
+				return "CM_SET_IM_GROUP_DELAY_CURRENT", {IM:GetGroupDelay()}
+			end
+			local newDelay = tonumber(args[3])
+			if not newDelay then return false, "CM_SET_IM_GROUP_DELAY_USAGE" end
+			return IM:SetGroupDelay(newDelay)
+		elseif setting:match("^g.*[dn].*d") then -- Disable Group Delay
+			return IM:DisableGroupDelay()
+		elseif setting:match("^g.*[eay].*a") then -- Enable Group Announce
+			return IM:EnableGroupAnnounce()
+		elseif setting:match("^g.*[dn].*a") then -- Disable Group Announce
+			return IM:DisableGroupAnnounce()
+		elseif setting:match("^g.*t.*a") then -- Toggle Group Announce
+			return IM:ToggleGroupAnnounce()
+		elseif setting:match("^g.*[eay]") then -- Enable Group
+			return IM:EnableGroup()
+		elseif setting:match("^g.*[dn]") then -- Disable Group
+			return IM:DisableGroup()
+		elseif setting:match("^g.*t") then -- Toggle Group
+			return IM:ToggleGroup()
+		end
+		return false, "CM_SET_IM_USAGE"
+	elseif mod:match("^d") then -- DuelManager
+		if #args < 2 then
+			if CDM:IsEnabled() then
+				return "CM_SET_CDM_ISENABLED"
+			end
+			return "CM_SET_CDM_ISDISABLED"
+		end
+		if isChat then -- Players are only allowed to check status of DuelManager
+			return false, "CM_ERR_NOCHAT"
+		end
+		local setting = args[2]:lower()
+		if setting:match("^[eay].*a") then -- Enable Announce
+			return CDM:EnableAnnounce()
+		elseif setting:match("^[dn].*a") then -- Disable Announce
+			return CDM:DisableAnnounce()
+		elseif setting:match("^a.*t") then -- Toggle Announce
+			return CDM:ToggleAnnounce()
+		elseif setting:match("^s.*d") or setting:match("^de") then -- Set Delay
+			if #args < 3 then
+				return "CM_SET_CDM_DELAY_CURRENT", {CDM:GetDelay()}
+			end
+			local newDelay = tonumber(args[3])
+			if not newDelay then return false, "CM_SET_CDM_DELAY_USAGE" end
+			return CDM:SetDelay(newDelay)
+		elseif setting:match("^[eay]") then -- Enable
+			return CDM:Enable()
+		elseif setting:match("^[dn]") then -- Disable
+			return CDM:Disable()
+		end
+		return false, "CM_SET_CDM_USAGE"
 	end
 	return false, "CM_SET_USAGE"
 end, "CM_SET_HELP")
@@ -481,14 +566,32 @@ CM:Register({"authme", "authenticateme", "am"}, PM.Access.Groups.User.Level, fun
 end, "CM_AUTHME_HELP")
 
 CM:Register({"accept", "acceptinvite", "acceptinv", "join", "joingroup"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
-	if not StaticPopup_Visible("PARTY_INVITE") then
-		return false, "CM_ACCEPTINVITE_NOTACTIVE"
-	elseif GT:IsInGroup() then
-		return false, "CM_ACCEPTINVITE_EXISTS" -- This shouldn't happen
+	if not IM:IsEnabled() or not IM:IsGroupEnabled() then
+		return "CM_ERR_DISABLED"
 	end
-	AcceptGroup()
-	return "CM_ACCEPTINVITE_SUCCESS"
+	return IM:AcceptGroupInvite()
 end, "CM_ACCEPTINVITE_HELP")
+
+CM:Register({"decline", "declineinvite", "declineinv", "cancelinvite", "cancelinv"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not IM:IsEnabled() or not IM:IsGroupEnabled() then
+		return "CM_ERR_DISABLED"
+	end
+	return IM:DeclineGroupInvite()
+end, "CM_DECLINEINVITE_HELP")
+
+CM:Register({"acceptguildinvite", "acceptginvite", "acceptguildinv", "acceptginv"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not IM:IsEnabled() or not IM:IsGuildEnabled() then
+		return "CM_ERR_DISABLED"
+	end
+	return IM:AcceptGuildInvite()
+end, "CM_ACCEPTGUILDINVITE_HELP")
+
+CM:Register({"declineguildinvite", "declineginvite", "declineguildinv", "declineginv"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not IM:IsEnabled() or not IM:IsGuildEnabled() then
+		return "CM_ERR_DISABLED"
+	end
+	return IM:DeclineGuildInvite()
+end, "CM_DECLINEGUILDINVITE_HELP")
 
 CM:Register({"invite", "inv"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
 	if type(args[1]) == "string" then
@@ -961,6 +1064,30 @@ CM:Register({"declinesummon", "ds", "declinesumm", "dsumm", "cancelsummon", "csu
 	end
 	return SM:DeclineSummon()
 end, "CM_DECLINESUMMON_HELP")
+
+CM:Register({"acceptduel", "acceptd"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not CDM:IsEnabled() then
+		return false, "CM_ERR_DISABLED"
+	end
+	return CDM:AcceptDuel()
+end, "CM_ACCEPTDUEL_HELP")
+
+CM:Register({"declineduel", "declined"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not CDM:IsEnabled() then
+		return false, "CM_ERR_DISABLED"
+	end
+	return CDM:DeclineDuel()
+end, "CM_DECLINEDUEL_HELP")
+
+CM:Register({"startduel", "startd", "challenge"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+	if not CDM:IsEnabled() then
+		return false, "CM_ERR_DISABLED"
+	end
+	if #args < 1 then
+		return false, "CM_STARTDUEL_USAGE"
+	end
+	return CDM:Challenge(args[1])
+end, "CM_STARTDUEL_HELP")
 
 for i,v in ipairs(CM.Slash) do
 	_G["SLASH_" .. C.Name:upper() .. i] = "/" .. v

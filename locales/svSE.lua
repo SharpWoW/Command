@@ -116,16 +116,27 @@ local L = {
 	CM_VERSION = "%s",
 
 	CM_SET_HELP = "Ändra inställningarna i Command.",
-	CM_SET_USAGE = "Användning: set cmdchar|groupinvite|deathmanager|summonmanager",
-	CM_SET_GROUPINVITE_USAGE = "Användning: set groupinvite enable|disable|<fördröjning>",
+	CM_SET_USAGE = "Användning: set cmdchar|deathmanager|summonmanager|invitemanager|duelmanager",
 	CM_SET_DM_ISENABLED = "DeathManager is enabled.",
 	CM_SET_DM_ISDISABLED = "DeathManager is disabled.",
 	CM_SET_DM_USAGE = "Användning: set dm [enable|disable|toggle|enableress|disableress|toggleress|enablerel|disablerel|togglerel]",
 	CM_SET_SM_ISENABLED = "SummonManager is enabled.",
 	CM_SET_SM_ISDISABLED = "SummonManager is disabled.",
 	CM_SET_SM_DELAY_CURRENT = "The current delay for summon announcements is %s.",
-	CM_SET_SM_DELAY_USAGE = "Usage: set sm delay <delay>",
+	CM_SET_SM_DELAY_USAGE = "Användning: set sm delay <delay>",
 	CM_SET_SM_USAGE = "Användning: set sm [enable|disable|toggle|delay]",
+	CM_SET_IM_ISENABLED = "InviteManager is enabled.",
+	CM_SET_IM_ISDISABLED = "InviteManager is disabled.",
+	CM_SET_IM_GROUP_DELAY_CURRENT = "Group announce delay is set to %d second(s).",
+	CM_SET_IM_GROUP_DELAY_USAGE = "Användning: set im groupdelay [delay]",
+	CM_SET_IM_GUILD_DELAY_CURRENT = "Guild announce delay is set to %d second(s).",
+	CM_SET_IM_GUILD_DELAY_USAGE = "Användning: set im guilddelay [delay]",
+	CM_SET_IM_USAGE = "Användning: set im [enable|disable|toggle|groupenable|groupdisable|grouptoggle|groupenableannounce|groupdisableannounce|grouptoggleannounce|groupdelay|groupdisabledelay|guildenable|guilddisable|guildtoggle|guildenableannounce|guilddisableannounce|guildtoggleannounce|guildenableoverride|guilddisableoverride|guildtoggleoverride|guilddelay|guilddisabledelay]",
+	CM_SET_CDM_ISENABLED = "DuelManager is enabled.",
+	CM_SET_CDM_ISDISABLED = "DuelManager is disabled.",
+	CM_SET_CDM_DELAY_CURRENT = "Announce delay is set to %d second(s).",
+	CM_SET_CDM_DELAY_USAGE = "Usage: set duelmanager delay [delay]",
+	CM_SET_CDM_USAGE = "Usage: set duelmanager [enable|disable|toggle|enableannounce|disableannounce|toggleannounce|delay]",
 
 	CM_LOCALE_HELP = "Change locale settings.",
 	CM_LOCALE_USAGE ="Användning: locale [set|reset|usemaster|playerindependent]",
@@ -165,9 +176,9 @@ local L = {
 	CM_AUTHME_USAGE = "Användning: authme <password>",
 
 	CM_ACCEPTINVITE_HELP = "Accepterar en pågående gruppinbjudan.",
-	CM_ACCEPTINVITE_NOTACTIVE = "Inga aktiva inbjudningar just nu.",
-	CM_ACCEPTINVITE_EXISTS = "Jag är redan i en grupp.",
-	CM_ACCEPTINVITE_SUCCESS = "Accepterade gruppinbjudningen!",
+	CM_DECLINEINVITE_HELP = "Declines a pending group invite.",
+	CM_ACCEPTGUILDINVITE_HELP = "Accepts a pending guild invite.",
+	CM_DECLINEGUILDINVITE_HELP = "Declines a pending guild invite.",
 
 	CM_INVITE_HELP = "Bjuder in en användare till gruppen.",
 
@@ -285,6 +296,13 @@ local L = {
 
 	CM_DECLINESUMMON_HELP = "Player will decline a pending summon request.",
 
+	CM_ACCEPTDUEL_HELP = "Accepts a pending duel request.",
+
+	CM_DECLINEDUEL_HELP = "Declines a pending duel request or cancels an active duel.",
+
+	CM_STARTDUEL_HELP = "Challenges another player to a duel.",
+	CM_STARTDUEL_USAGE = "Usage: startduel <target>",
+
 	------------
 	-- Events --
 	------------
@@ -292,24 +310,12 @@ local L = {
 	E_LFGPROPOSAL = "Group has been found, type !accept to make me accept the invite.",
 	E_LFGFAIL = "LFG failed, use !queue <type> to requeue.",
 	E_READYCHECK = "%s issued a ready check, type !rc accept to make me accept it or !rc deny to deny it.",
-	E_GROUPINVITE = "Type !acceptinvite to make me accept the group invite.",
 
 	------------------
 	-- EventHandler --
 	------------------
 
 	EH_REGISTERED = "%q registered.",
-
-	----------------------------
-	-- GroupInvite (Core-Sub) --
-	----------------------------
-
-	GI_ENABLED = "Group Invite (Announce) enabled.",
-	GI_DISABLED = "Group Invite (Announce) disabled.",
-	GI_DELAY_NUM = "Delay has to be a number.",
-	GI_DELAY_MAX = "Delay cannot be greater than 50 seconds.",
-	GI_DELAY_SET = "Group Invite (Announce) delay set to %d seconds.",
-	GI_DELAY_DISABLED = "Group Invite (Announce) delay disabled.",
 
 	------------
 	-- Logger --
@@ -498,6 +504,83 @@ local L = {
 
 	SM_SETDELAY_SUCCESS = "Summon announce delay successfully set to %s!",
 	SM_SETDELAY_INSTANT = "Summons will now announce instantly when received.",
+
+	-------------------
+	-- InviteManager --
+	-------------------
+
+	IM_GUILD_CONFIRM_OVERRIDE_POPUP = "Enabling this will render users able to issue !acceptguild even if you have reputation with a former guild, in which case you lose that reputation.\nAre you sure you want to enable this setting?",
+
+	IM_ENABLED = "InviteManager has been enabled!",
+	IM_DISABLED = "InviteManager has been disabled!",
+
+	IM_GROUP_ENABLED = "InviteManager (Group) has been enabled!",
+	IM_GROUP_DISABLED = "InviteManager (Group) has been disabled!",
+
+	IM_GROUPANNOUNCE_ENABLED = "Group invite announcement has been enabled!",
+	IM_GROUPANNOUNCE_DISABLED = "Group invite announcement has been disabled!",
+
+	IM_GROUPDELAY_NUM = "Group announce delay must be a number.",
+	IM_GROUPDELAY_OUTOFRANGE = "Group announce delay must be between 0 and %d seconds.",
+	IM_GROUPDELAY_SET = "Group announce delay set to %d second(s)!",
+	IM_GROUPDELAY_DISABLED = "Group announce delay disabled, announcement will now be sent instantly!",
+
+	IM_GUILD_ENABLED = "InviteManager (Guild) has been enabled!",
+	IM_GUILD_DISABLED = "InviteManager (Guild) has been disabled!",
+
+	IM_GUILDANNOUNCE_ENABLED = "Guild invite announcement has been enabled!",
+	IM_GUILDANNOUNCE_DISABLED = "Guild invite announcement has been disabled!",
+
+	IM_GUILDOVERRIDE_PENDING = "The guild override setting is currently being modified, please finish modifying it before issuing this command again.",
+	IM_GUILDOVERRIDE_WAITING = "Waiting for user input on guild override setting popup...",
+	IM_GUILDOVERRIDE_ENABLED = "Guild override has been enabled, users will now be able to issue !acceptguildinvite even if you have reputation with a former guild. !! USE WITH CARE !!",
+	IM_GUILDOVERRIDE_DISABLED = "Guild override has been disabled, users will no longer be able to issue !acceptguildinvite if you have reputation with a former guild.",
+
+	IM_GUILDDELAY_NUM = "Guild announce delay must be a number.",
+	IM_GUILDDELAY_OUTOFRANGE = "Guild announce delay must be between 0 and %d seconds.",
+	IM_GUILDDElAY_SET = "Guild announce delay set to %d second(s)!",
+	IM_GUILDDELAY_DISABLED = "Guild announce delay disabled, announcement will now be sent instantly!",
+
+	IM_GROUP_ANNOUNCE = "Type !accept to make me accept the group invite or !decline to decline it!",
+	IM_GUILD_ANNOUNCE = "Type !acceptguildinvite to make me accept the guild invite or !declineguildinvite to declie it!",
+
+	IM_GROUP_NOINVITE = "I do not have an active group invite.",
+	IM_GROUP_ACCEPTED = "Accepted group invite!",
+	IM_GROUP_DECLINED = "Declined group invite.",
+
+	IM_GUILD_NOINVITE = "I do not have an active guild invite.",
+	IM_GUILD_HASREP = "Unable to auto-accept guild invite, I still have reputation with my former guild that would be lost.",
+	IM_GUILD_ACCEPTED = "Accepted guild invite!",
+	IM_GUILD_DECLINED = "Declined guild invite.",
+
+	-----------------
+	-- DuelManager --
+	-----------------
+
+	CDM_ERR_NODUEL = "I do not currently have an active duel request.",
+
+	CDM_ANNOUNCE = "Type !acceptduel to make me accept the duel request or !decline duel to decline it!",
+
+	CDM_ACCEPETED = "Accepted duel request!",
+
+	CDM_DECLINED = "Declined duel request.",
+
+	CDM_CANCELLED = "Cancelled active duel (if any).",
+
+	CDM_CHALLENGED = "Sent a duel request to %s!",
+
+	CDM_ENABLED = "DuelManager has been enabled!",
+
+	CDM_DISABLED = "DuelManager has been disabled.",
+
+	CDM_ANNOUNCE_ENABLED = "DuelManager announce has been enabled!",
+
+	CDM_ANNOUNCE_DISABLED = "DuelManager announce has been disabled.",
+
+	CDM_DELAY_NUM = "Delay has to be a number.",
+	CDM_DELAY_OUTOFRANGE = "Delay has to be between 0 and %d seconds.",
+	CDM_DELAY_SET = "Announce delay set to %d second(s)!",
+	CDM_DELAY_DISABLED = "Announce delay has been disabled, will now announce immediately.",
 
 	-----------------
 	-- AuthManager --
