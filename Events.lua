@@ -35,6 +35,7 @@ local QM = C.QueueManager
 local AC = C.AddonComm
 local DM = C.DeathManager
 local SM = C.SummonManager
+local IM = C.InviteManager
 
 --- Event handler for ADDON_LOADED
 -- @name Command.Events.ADDON_LOADED
@@ -97,16 +98,15 @@ function C.Events.RAID_ROSTER_UPDATE(self, ...)
 end
 
 function C.Events.PARTY_INVITE_REQUEST(self, ...)
-	if not self.Settings.GROUP_INVITE_ANNOUNCE then return end
+	if not IM.Settings.GROUP.ANNOUNCE then return end
 	local sender = (select(1, ...))
-	local locale = C.PlayerManager:GetOrCreatePlayer(sender).Settings.Locale
-	local msg = C.LocaleManager:GetLocale(locale, true)["E_GROUPINVITE"]
-	if self.Settings.GROUP_INVITE_ANNOUNCE_DELAY > 0 then
-		local f=CreateFrame("Frame")f.T=0;f.L=self.Settings.GROUP_INVITE_ANNOUNCE_DELAY;f.S=sender;f.M=msg
-		f:SetScript("OnUpdate",function(s,e)s.T=s.T+e;if(s.T>s.L)then s:SetScript("OnUpdate",nil)if(StaticPopup_Visible("PARTY_INVITE"))then CM:SendMessage(s.M,"WHISPER",s.S)end;end;end)
-	else
-		CM:SendMessage(msg, "WHISPER", sender)
-	end
+	IM:OnGroupInvite(sender)
+end
+
+function C.Events.GUILD_INVITE_REQUEST(self, ...)
+	if not IM.Settings.GUILD.ANNOUNCE then return end
+	local sender = (select(1, ...))
+	IM:OnGuildInvite(sender)
 end
 
 function C.Events.PARTY_MEMBERS_CHANGED(self, ...)

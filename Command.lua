@@ -37,10 +37,10 @@ local assert = assert
 Command = {
 	Name = "Command",
 	Version = GetAddOnMetadata("Command", "Version"),
-	VersionNum = 8, -- Increment on every release
+	VersionNum = 9, -- Increment on every release
 	VersionChecked = false, -- Prevent spam of "New Version" notice
 	Loaded = false,
-	VarVersion = 2,
+	VarVersion = 3,
 	Global = {},
 	Settings = {},
 	Events = {},
@@ -56,6 +56,7 @@ local RM
 local AC
 local DM
 local SM
+local IM
 local log
 
 --- Initialize Command.
@@ -72,6 +73,7 @@ function C:Init()
 	AC = self.AddonComm
 	DM = self.DeathManager
 	SM = self.SummonManager
+	IM = self.InviteManager
 	log = self.Logger
 	self:LoadSavedVars()
 	log:Normal(L("ADDON_LOAD"))
@@ -86,12 +88,13 @@ function C:LoadSavedVars()
 		_G["COMMAND"] = {}
 	elseif type(_G["COMMAND"]["VERSION"]) == "number" then
 		if _G["COMMAND"]["VERSION"] < self.VarVersion then
-			log:Normal(L("SVARS_OUTDATED"))
 			wipe(_G["COMMAND"])
 			_G["COMMAND"] = {}
 		end
 	end
+
 	self.Global = _G["COMMAND"]
+
 	if type(self.Global.SETTINGS) ~= "table" then
 		self.Global.SETTINGS = {}
 	end
@@ -102,12 +105,7 @@ function C:LoadSavedVars()
 	if type(self.Settings.ENABLED) ~= "bolean" then
 		self.Settings.ENABLED = true
 	end
-	if type(self.Settings.GROUP_INVITE_ANNOUNCE) ~= "boolean" then
-		self.Settings.GROUP_INVITE_ANNOUNCE = false
-	end
-	if type(self.Settings.GROUP_INVITE_ANNOUNCE_DELAY) ~= "number" then
-		self.Settings.GROUP_INVITE_ANNOUNCE_DELAY = 0
-	end
+
 	L:Init()
 	CM:Init()
 	PM:Init()
@@ -115,6 +113,7 @@ function C:LoadSavedVars()
 	AC:Init()
 	DM:Init()
 	SM:Init()
+	IM:Init()
 	Cmd:Init()
 	log:SetDebug(self.Settings.DEBUG)
 	self.Global.VERSION = self.VarVersion
@@ -188,43 +187,4 @@ end
 --
 function C:ToggleDebug()
 	return self:SetDebug(not self.Settings.DEBUG)
-end
-
-function C:SetGroupInvite(enabled)
-	self.Settings.GROUP_INVITE_ANNOUNCE = enabled
-	if self.Settings.GROUP_INVITE_ANNOUNCE then
-		return "GI_ENABLED"
-	end
-	return "GI_DISABLED"
-end
-
-function C:EnableGroupInvite()
-	return self:SetGroupInvite(true)
-end
-
-function C:DisableGroupInvite()
-	return self:SetGroupInvite(false)
-end
-
-function C:ToggleGroupInvite()
-	return self:SetGroupInvite(not self.Settings.GROUP_INVITE_ANNOUNCE)
-end
-
-function C:SetGroupInviteDelay(time)
-	if type(time) ~= "number" then
-		return false, "GI_DELAY_NUM"
-	end
-	time = math.ceil(time)
-	if time > 50 then
-		return false, "GI_DELAY_MAX"
-	end
-	self.Settings.GROUP_INVITE_ANNOUNCE_DELAY = time
-	if self.Settings.GROUP_INVITE_ANNOUNCE_DELAY > 0 then
-		return "GI_DELAY_SET", {self.Settings.GROUP_INVITE_ANNOUNCE_DELAY}
-	end
-	return "GI_DELAY_DISABLED"
-end
-
-function C:DisableGroupInviteDelay()
-	return self:SetGroupInviteDelay(0)
 end
