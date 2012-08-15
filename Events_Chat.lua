@@ -79,7 +79,7 @@ function C.Events.CHAT_MSG_BN_WHISPER(self, event, ...)
 	local toon = BNT:GetToon(id)
 	if not toon then return end
 	if toon.Client ~= BNET_CLIENT_WOW then return end
-	if toon.Realm:lower() == GetRealmName():lower() and toon.FactionString:lower() == (select(1, UnitFactionGroup("player"))):lower() then
+	if toon.Realm:lower() == GetRealmName():lower() and toon.Faction:lower() == (select(1, UnitFactionGroup("player"))):lower() then
 		CM:HandleMessage(msg, toon.Name, chan, id, chan, true, id)
 	end
 end

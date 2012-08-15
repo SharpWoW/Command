@@ -38,14 +38,16 @@ local CET = C.Extensions.Table
 local CES = C.Extensions.String
 
 local FRIEND_RETURN_ARGC = 16
-local TOON_RETURN_ARGC = 16
+local TOON_RETURN_ARGC = 17
 
 local function ParseBNFriendResult(...)
 	local argc = select("#", ...)
+
 	if argc ~= FRIEND_RETURN_ARGC then
-		error("ParseBNFriendResult expected 15 arguments, got " .. argc)
+		error("ParseBNFriendResult expected " .. FRIEND_RETURN_ARGC .. " arguments, got " .. argc)
 		return nil
 	end
+
 	local id, pName, bTag, isBTagPresence, tName, tId, client, online, last, afk, dnd, bText, note, friend, bTime, sor = ...
 	local f = {
 		PresenceID = id,
@@ -65,15 +67,18 @@ local function ParseBNFriendResult(...)
 		BroadcastTime = bTime,
 		CanSoR = sor
 	}
+
 	return f
 end
 
 local function ParseBNToonResult(...)
 	local argc = select("#", ...)
+
 	if argc ~= TOON_RETURN_ARGC then
-		error("ParseBNToonResult expected 16 arguments, got " .. argc)
+		error("ParseBNToonResult expected " .. TOON_RETURN_ARGC .. " arguments, got " .. argc)
 		return nil
 	end
+
 	local focus, name, client, realm, realmId, faction, race, class, guild, zone, lvl, text, bText, bTime, online, id = ...
 	local t = {
 		HasFocus = focus,
@@ -93,12 +98,53 @@ local function ParseBNToonResult(...)
 		IsOnline = online,
 		PresenceID = id
 	}
-	if t.Faction == 0 then
-		t.FactionString = "Horde"
-	elseif t.Faction == 1 then
-		t.FactionString = "Alliance"
+
+	if t.Faction == FACTION_HORDE then
+		t.FactionID = 0
+	elseif t.Faction == FACTION_ALLIANCE then
+		t.FactionID = 1
+	else
+		t.FactionID = -1
 	end
 	return t
+end
+
+local function ParseBNFriendToonResult(...)
+	local argc = select("#", ...)
+
+	if argc ~= FRIENDTOON_RETURN_ARGC then
+		error("ParseBNFriendToonResult expected " .. FRIENDTOON_RETURN_ARGC .. " arguments, got " .. argc)
+		return nil
+	end
+
+	local focus, name, client, realm, realmId, faction, race, class, guild, zone, lvl, text, bText, unknown, bTime, canSoR, id = ...
+	local ft = {
+		HasFocus = focus,
+		Name = name,
+		Client = client,
+		Realm = realm,
+		RealmID = realmId,
+		Faction = faction,
+		Race = race,
+		Class = class,
+		Guild = guild,
+		Zone = zone,
+		Level = lvl,
+		GameText = text,
+		BroadcastText = bText,
+		Unknown = unknown,
+		BroadcastTime = bTime,
+		CanSoR = canSoR,
+		ToonID = id
+	}
+
+	if ft.Faction == FACTION_HORDE then
+		ft.FactionID = 0
+	elseif ft.Faction == FACTION_ALLIANCE then
+		ft.FactionID = 1
+	else
+		ft.FactionID = -1
+	end
 end
 
 function BNT:GetFriend(index)
