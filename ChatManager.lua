@@ -68,6 +68,7 @@ local PM = C.PlayerManager
 local L = C.LocaleManager
 local GT = C.GroupTools
 local AC = C.AddonComm
+local BNT = C.BattleNetTools
 local CCM = C.CommandManager
 local CES = C.Extensions.String
 
@@ -211,8 +212,19 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 			table.insert(t, args[i])
 		end
 	end
-	local player = PM:GetOrCreatePlayer(sender)
-	local result, arg, errArg = CCM:HandleCommand(cmd, t, sourceChannel, player)
+	local realm = GetRealmName()
+	local bnetInfo
+	if isBN then
+		local toon = BNT:GetToon(pID)
+		if toon then
+			realm = toon.Realm
+		end
+		bnetInfo = {
+			PresenceID = pID
+		}
+	end
+	local player = PM:GetOrCreatePlayer(sender, realm)
+	local result, arg, errArg = CCM:HandleCommand(cmd, t, sourceChannel, player, bnetInfo)
 	if isBN then
 		target = pID
 		sender = pID

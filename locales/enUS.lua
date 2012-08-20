@@ -394,8 +394,8 @@ local L = {
 	PM_KICK_NOPRIV = "Unable to kick %s from group. Not group leader or assistant.",
 	PM_KICK_TARGETASSIST = "Unable to kick %s, assistants cannot kick other assistants from group.",
 
-	PM_PLAYER_CREATE = "Created player %q with default settings.",
-	PM_PLAYER_UPDATE = "Updated player %q.",
+	PM_PLAYER_CREATE = "Created player %q (%s) with default settings.",
+	PM_PLAYER_UPDATE = "Updated player %q (%s).",
 
 	PM_GA_REMOVED = "%q removed from group %s.",
 	PM_GA_EXISTSALLOW = "%q already has that command on the allow list.",

@@ -167,10 +167,11 @@ end
 -- @param args Table with arguments for the command.
 -- @param isChat Is the command called from chat?
 -- @param player Player object of the calling player (if chat)
+-- @param bnetInfo Information about the B.Net sender (if called from B.Net chat)
 -- @return If successfull, returns result, otherwise false.
 -- @return Error message if not successful, otherwise nil.
 --
-function CM:HandleCommand(command, args, isChat, player)
+function CM:HandleCommand(command, args, isChat, player, bnetInfo)
 	command = tostring(command):lower()
 	local cmd = self:GetCommand(command)
 	if cmd then
@@ -181,7 +182,7 @@ function CM:HandleCommand(command, args, isChat, player)
 				return false, "CM_ERR_NOACCESS", {player.Info.Name, cmd.Access, PM:GetAccess(player)}
 			end
 		end
-		return cmd.Call(args, player, isChat)
+		return cmd.Call(args, player, isChat, bnetInfo)
 	else
 		return false, "CM_ERR_NOTREGGED", {tostring(command)}
 	end
@@ -205,7 +206,7 @@ function CM:GetHelp(cmd)
 end
 
 
-CM:Register({"__DEFAULT__"}, PM.Access.Local, function(args, sender, isChat)
+CM:Register({"__DEFAULT__"}, PM.Access.Local, function(args, sender, isChat, bnetInfo)
 	if isChat then
 		return "CM_DEFAULT_CHAT"
 	end
@@ -214,7 +215,7 @@ CM:Register({"__DEFAULT__"}, PM.Access.Local, function(args, sender, isChat)
 	return "CM_DEFAULT_END"
 end, "CM_DEFAULT_HELP")
 
-CM:Register({"help", "h"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"help", "h"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 0 then
 		if isChat then
 			return "CM_DEFAULT_CHAT"
@@ -224,7 +225,7 @@ CM:Register({"help", "h"}, PM.Access.Groups.User.Level, function(args, sender, i
 	return CM:GetHelp(tostring(args[1]):lower())
 end, "CM_HELP_HELP")
 
-CM:Register({"commands", "cmds", "cmdlist", "listcmds", "listcommands", "commandlist"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"commands", "cmds", "cmdlist", "listcmds", "listcommands", "commandlist"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	local all
 	if #args > 0 then
 		all = args[1] == "all"
@@ -233,11 +234,11 @@ CM:Register({"commands", "cmds", "cmdlist", "listcmds", "listcommands", "command
 	return "RAW_TABLE_OUTPUT", CES:Fit(cmds, 240, ", ") -- Max length is 255, "[Command] " takes up 10. This leaves us with 5 characters grace.
 end, "CM_COMMANDS_HELP")
 
-CM:Register({"version", "ver", "v"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"version", "ver", "v"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	return "CM_VERSION", {C.Version}
 end, "CM_VERSION_HELP")
 
-CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 0 then
 		return false, "CM_SET_USAGE"
 	end
@@ -405,7 +406,7 @@ CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, i
 	return false, "CM_SET_USAGE"
 end, "CM_SET_HELP")
 
-CM:Register({"locale", "loc"}, PM.Access.Local, function(args, sender, isChat)
+CM:Register({"locale", "loc"}, PM.Access.Local, function(args, sender, isChat, bnetInfo)
 	if isChat then return false, "CM_ERR_NOCHAT" end
 	if #args <= 0 then
 		return "CM_LOCALE_CURRENT", {L.Settings.LOCALE}
@@ -432,7 +433,7 @@ CM:Register({"locale", "loc"}, PM.Access.Local, function(args, sender, isChat)
 	return false, "CM_LOCALE_USAGE"
 end, "CM_LOCALE_HELP")
 
-CM:Register({"mylocale", "ml"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"mylocale", "ml"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not isChat then
 		return false, "CM_ERR_CHATONLY"
 	end
@@ -451,7 +452,7 @@ CM:Register({"mylocale", "ml"}, PM.Access.Groups.User.Level, function(args, send
 	end
 end, "CM_MYLOCALE_HELP")
 
-CM:Register({"lock", "lockdown"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+CM:Register({"lock", "lockdown"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat, bnetInfo)
 	if type(args[1]) == "string" then
 		return PM:SetLocked(PM:GetOrCreatePlayer(args[1]), true)
 	else
@@ -459,7 +460,7 @@ CM:Register({"lock", "lockdown"}, PM.Access.Groups.Admin.Level, function(args, s
 	end
 end, "CM_LOCK_HELP")
 
-CM:Register({"unlock", "open"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+CM:Register({"unlock", "open"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat, bnetInfo)
 	if type(args[1]) == "string" then
 		return PM:SetLocked(PM:GetOrCreatePlayer(args[1]), false)
 	else
@@ -467,7 +468,7 @@ CM:Register({"unlock", "open"}, PM.Access.Groups.Admin.Level, function(args, sen
 	end
 end, "CM_UNLOCK_HELP")
 
-CM:Register({"getaccess"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"getaccess"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if type(args[1]) == "string" then
 		local player = PM:GetOrCreatePlayer(args[1])
 		return "CM_GETACCESS_STRING", {player.Info.Name, PM.Access.Groups[player.Info.Group].Level, player.Info.Group}
@@ -476,7 +477,7 @@ CM:Register({"getaccess"}, PM.Access.Groups.User.Level, function(args, sender, i
 	end
 end, "CM_GETACCESS_HELP")
 
-CM:Register({"setaccess"}, PM.Access.Local, function(args, sender, isChat)
+CM:Register({"setaccess"}, PM.Access.Local, function(args, sender, isChat, bnetInfo)
 	if #args < 1 then
 		return false, "CM_SETACCESS_USAGE"
 	end
@@ -488,7 +489,7 @@ CM:Register({"setaccess"}, PM.Access.Local, function(args, sender, isChat)
 	end
 end, "CM_SETACCESS_HELP")
 
-CM:Register({"owner"}, PM.Access.Local, function(args, sender, isChat)
+CM:Register({"owner"}, PM.Access.Local, function(args, sender, isChat, bnetInfo)
 	if isChat then
 		return false, "CM_ERR_NOCHAT"
 	end
@@ -496,7 +497,7 @@ CM:Register({"owner"}, PM.Access.Local, function(args, sender, isChat)
 	return PM:SetOwner(player)
 end, "CM_OWNER_HELP")
 
-CM:Register({"admin"}, PM.Access.Groups.Owner.Level, function(args, sender, isChat)
+CM:Register({"admin"}, PM.Access.Groups.Owner.Level, function(args, sender, isChat, bnetInfo)
 	if isChat then
 		return false, "CM_ERR_NOCHAT"
 	end
@@ -507,7 +508,7 @@ CM:Register({"admin"}, PM.Access.Groups.Owner.Level, function(args, sender, isCh
 	return PM:SetAdmin(player)
 end, "CM_ADMIN_HELP")
 
-CM:Register({"op"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+CM:Register({"op"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat, bnetInfo)
 	if type(args[1]) == "string" then
 		local player = PM:GetOrCreatePlayer(args[1])
 		return PM:SetOp(player)
@@ -516,7 +517,7 @@ CM:Register({"op"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
 	end
 end, "CM_OP_HELP")
 
-CM:Register({"user"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+CM:Register({"user"}, PM.Access.Groups.Op.Level, function(args, sender, isChat, bnetInfo)
 	if type(args[1]) == "string" then
 		local player = PM:GetOrCreatePlayer(args[1])
 		return PM:SetUser(player)
@@ -525,7 +526,7 @@ CM:Register({"user"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	end
 end, "CM_USER_HELP")
 
-CM:Register({"ban"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+CM:Register({"ban"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 0 then
 		return false, "CM_BAN_USAGE"
 	end
@@ -533,7 +534,7 @@ CM:Register({"ban"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat
 	return PM:BanUser(player)
 end, "CM_BAN_HELP")
 
-CM:Register({"auth", "authenticate", "a"}, PM.Access.Local, function(args, sender, isChat)
+CM:Register({"auth", "authenticate", "a"}, PM.Access.Local, function(args, sender, isChat, bnetInfo)
 	if isChat and isChat ~= "WHISPER" then return false, "CM_ERR_NOCHAT" end
 	if #args < 2 then return false, "CM_AUTH_USAGE" end
 	local arg = tostring(args[1]):lower()
@@ -558,72 +559,76 @@ CM:Register({"auth", "authenticate", "a"}, PM.Access.Local, function(args, sende
 	return false, "CM_AUTH_USAGE"
 end, "CM_AUTH_HELP")
 
-CM:Register({"authme", "authenticateme", "am"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"authme", "authenticateme", "am"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not isChat then return false, "CM_ERR_CHATONLY" end
 	if #args <= 0 then return false, "CM_AUTHME_USAGE" end
 	local pass = tostring(args[1])
 	return AM:Authenticate(sender.Info.Name, pass)
 end, "CM_AUTHME_HELP")
 
-CM:Register({"accept", "acceptinvite", "acceptinv", "join", "joingroup"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"accept", "acceptinvite", "acceptinv", "join", "joingroup"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not IM:IsEnabled() or not IM:IsGroupEnabled() then
 		return "CM_ERR_DISABLED"
 	end
 	return IM:AcceptGroupInvite()
 end, "CM_ACCEPTINVITE_HELP")
 
-CM:Register({"decline", "declineinvite", "declineinv", "cancelinvite", "cancelinv"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"decline", "declineinvite", "declineinv", "cancelinvite", "cancelinv"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not IM:IsEnabled() or not IM:IsGroupEnabled() then
 		return "CM_ERR_DISABLED"
 	end
 	return IM:DeclineGroupInvite()
 end, "CM_DECLINEINVITE_HELP")
 
-CM:Register({"acceptguildinvite", "acceptginvite", "acceptguildinv", "acceptginv"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"acceptguildinvite", "acceptginvite", "acceptguildinv", "acceptginv"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not IM:IsEnabled() or not IM:IsGuildEnabled() then
 		return "CM_ERR_DISABLED"
 	end
 	return IM:AcceptGuildInvite()
 end, "CM_ACCEPTGUILDINVITE_HELP")
 
-CM:Register({"declineguildinvite", "declineginvite", "declineguildinv", "declineginv"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"declineguildinvite", "declineginvite", "declineguildinv", "declineginv"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not IM:IsEnabled() or not IM:IsGuildEnabled() then
 		return "CM_ERR_DISABLED"
 	end
 	return IM:DeclineGuildInvite()
 end, "CM_DECLINEGUILDINVITE_HELP")
 
-CM:Register({"invite", "inv"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"invite", "inv"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
+	local pID
+	if bnetInfo then pID = bnetInfo.PresenceID end
 	if type(args[1]) == "string" then
 		local player = PM:GetOrCreatePlayer(args[1])
-		return PM:Invite(player, sender)
+		return PM:Invite(player, sender, pID)
 	else
-		return PM:Invite(sender, sender)
+		return PM:Invite(sender, sender, pID)
 	end
 end, "CM_INVITE_HELP")
 
-CM:Register({"inviteme", "invme"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"inviteme", "invme"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not isChat then
 		return false, "CM_ERR_CHATONLY"
 	end
-	return PM:Invite(sender, sender)
+	local pID
+	if bnetInfo then pID = bnetInfo.PresenceID end
+	return PM:Invite(sender, sender, pID)
 end, "CM_INVITEME_HELP")
 
-CM:Register({"blockinvites", "blockinvite", "denyinvites", "denyinvite"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"blockinvites", "blockinvite", "denyinvites", "denyinvite"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not isChat then
 		return false, "CM_ERR_CHATONLY"
 	end
 	return PM:DenyInvites(sender, isChat == "WHISPER" or isChat == "BNET")
 end, "CM_DENYINVITE_HELP")
 
-CM:Register({"allowinvites", "allowinvite"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"allowinvites", "allowinvite"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not isChat then
 		return false, "CM_ERR_CHATONLY"
 	end
 	return PM:AllowInvites(sender, isChat == "WHISPER" or isChat == "BNET")
 end, "CM_ALLOWINVITE_HELP")
 
-CM:Register({"kick"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+CM:Register({"kick"}, PM.Access.Groups.Op.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 0 then
 		return false, "CM_KICK_USAGE"
 	end
@@ -637,28 +642,28 @@ CM:Register({"kick"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
 	return PM:Kick(player, sender, reason, override)
 end, "CM_KICK_HELP")
 
-CM:Register({"kingme", "givelead"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+CM:Register({"kingme", "givelead"}, PM.Access.Groups.Op.Level, function(args, sender, isChat, bnetInfo)
 	if not isChat then
 		return false, "CM_ERR_CHATONLY"
 	end
 	return PM:PromoteToLeader(sender)
 end, "CM_KINGME_HELP")
 
-CM:Register({"opme", "assistant", "assist"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+CM:Register({"opme", "assistant", "assist"}, PM.Access.Groups.Op.Level, function(args, sender, isChat, bnetInfo)
 	if not isChat then
 		return false, "CM_ERR_CHATONLY"
 	end
 	return PM:PromoteToAssistant(sender)
 end, "CM_OPME_HELP")
 
-CM:Register({"deopme", "deassistant", "deassist"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+CM:Register({"deopme", "deassistant", "deassist"}, PM.Access.Groups.Op.Level, function(args, sender, isChat, bnetInfo)
 	if not isChat then
 		return false, "CM_ERR_CHATONLY"
 	end
 	return PM:DemoteAssistant(sender)
 end, "CM_DEOPME_HELP")
 
-CM:Register({"leader", "lead"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+CM:Register({"leader", "lead"}, PM.Access.Groups.Op.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 0 then
 		return false, "CM_LEADER_USAGE"
 	end
@@ -666,7 +671,7 @@ CM:Register({"leader", "lead"}, PM.Access.Groups.Op.Level, function(args, sender
 	return PM:PromoteToLeader(player)
 end, "CM_LEADER_HELP")
 
-CM:Register({"promote"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+CM:Register({"promote"}, PM.Access.Groups.Op.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 0 then
 		return false, "CM_PROMOTE_USAGE"
 	end
@@ -674,7 +679,7 @@ CM:Register({"promote"}, PM.Access.Groups.Op.Level, function(args, sender, isCha
 	return PM:PromoteToAssistant(player)
 end, "CM_PROMOTE_HELP")
 
-CM:Register({"demote"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+CM:Register({"demote"}, PM.Access.Groups.Op.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 0 then
 		return false, "CM_DEMOTE_USAGE"
 	end
@@ -682,7 +687,7 @@ CM:Register({"demote"}, PM.Access.Groups.Op.Level, function(args, sender, isChat
 	return PM:DemoteAssistant(player)
 end, "CM_DEMOTE_HELP")
 
-CM:Register({"queue", "q"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"queue", "q"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 0 then
 		return false, "CM_QUEUE_USAGE"
 	end
@@ -703,7 +708,7 @@ CM:Register({"queue", "q"}, PM.Access.Groups.User.Level, function(args, sender, 
 	return QM:Queue(index)
 end, "CM_QUEUE_HELP")
 
-CM:Register({"leavelfg", "cancellfg", "cancel", "leavelfd", "cancellfd"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"leavelfg", "cancellfg", "cancel", "leavelfd", "cancellfd"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not QM.QueuedByCommand then
 		return false, "CM_LEAVELFG_FAIL"
 	end
@@ -712,7 +717,7 @@ end, "CM_LEAVELFG_HELP")
 
 -- So apparently Blizzard does not allow accepting invites without HW event... Making this command useless...
 -- I'm keeping this command here for the future, if there will ever be a way to make this work.
-CM:Register({"acceptlfg", "acceptlfd", "joinlfg", "joinlfd"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"acceptlfg", "acceptlfd", "joinlfg", "joinlfd"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not C.Settings.DEBUG then
 		return false, "CM_ERR_PERMDISABLED"
 	end
@@ -725,7 +730,7 @@ CM:Register({"acceptlfg", "acceptlfd", "joinlfg", "joinlfd"}, PM.Access.Groups.U
 	return QM:Accept()
 end, "CM_ACCEPTLFG_HELP")
 
-CM:Register({"convert", "conv"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+CM:Register({"convert", "conv"}, PM.Access.Groups.Op.Level, function(args, sender, isChat, bnetInfo)
 	if GT:IsLFGGroup() then
 		return false, "CM_CONVERT_LFG"
 	elseif not GT:IsGroup() then
@@ -754,18 +759,18 @@ CM:Register({"convert", "conv"}, PM.Access.Groups.Op.Level, function(args, sende
 	return false, "CM_CONVERT_INVALID"
 end, "CM_CONVERT_HELP")
 
-CM:Register({"list"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+CM:Register({"list"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat, bnetInfo)
 	if not args[1] then
 		return false, "CM_LIST_USAGE"
 	end
 	return PM:ListToggle(args[1]:lower())
 end, "CM_LIST_HELP")
 
-CM:Register({"listmode", "lm", "lmode"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+CM:Register({"listmode", "lm", "lmode"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat, bnetInfo)
 	return PM:ToggleListMode()
 end, "CM_LISTMODE_HELP")
 
-CM:Register({"groupallow", "gallow"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+CM:Register({"groupallow", "gallow"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 1 then
 		return false, "CM_GROUPALLOW_USAGE"
 	end
@@ -774,7 +779,7 @@ CM:Register({"groupallow", "gallow"}, PM.Access.Groups.Admin.Level, function(arg
 	return PM:GroupAccess(group, cmd, true)
 end, "CM_GROUPALLOW_HELP")
 
-CM:Register({"groupdeny", "gdeny", "deny"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+CM:Register({"groupdeny", "gdeny", "deny"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 1 then
 		return false, "CM_GROUPDENY_USAGE"
 	end
@@ -783,7 +788,7 @@ CM:Register({"groupdeny", "gdeny", "deny"}, PM.Access.Groups.Admin.Level, functi
 	return PM:GroupAccess(group, cmd, false)
 end, "CM_GROUPDENY_HELP")
 
-CM:Register({"resetgroupaccess", "groupaccessreset", "removegroupaccess", "groupaccessremove", "rga", "gar"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+CM:Register({"resetgroupaccess", "groupaccessreset", "removegroupaccess", "groupaccessremove", "rga", "gar"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 1 then
 		return false, "CM_RESETGROUPACCESS_USAGE"
 	end
@@ -792,7 +797,7 @@ CM:Register({"resetgroupaccess", "groupaccessreset", "removegroupaccess", "group
 	return PM:GroupAccessRemove(group, cmd)
 end, "CM_RESETGROUPACCESS_HELP")
 
-CM:Register({"userallow", "uallow"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+CM:Register({"userallow", "uallow"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 1 then
 		return false, "CM_USERALLOW_USAGE"
 	end
@@ -801,7 +806,7 @@ CM:Register({"userallow", "uallow"}, PM.Access.Groups.Admin.Level, function(args
 	return PM:PlayerAccess(player, cmd, true)
 end, "CM_USERALLOW_HELP")
 
-CM:Register({"userdeny", "udeny"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+CM:Register({"userdeny", "udeny"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 1 then
 		return false, "CM_USERDENY_USAGE"
 	end
@@ -810,7 +815,7 @@ CM:Register({"userdeny", "udeny"}, PM.Access.Groups.Admin.Level, function(args, 
 	return PM:PlayerAccess(player, cmd, false)
 end, "CM_USERDENY_HELP")
 
-CM:Register({"resetuseraccess", "useraccessreset", "removeuseraccess", "useraccessremove", "rua", "uar"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat)
+CM:Register({"resetuseraccess", "useraccessreset", "removeuseraccess", "useraccessremove", "rua", "uar"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 1 then
 		return false, "CM_RESETUSERACCESS_USAGE"
 	end
@@ -819,21 +824,21 @@ CM:Register({"resetuseraccess", "useraccessreset", "removeuseraccess", "useracce
 	return PM:PlayerAccessRemove(player, cmd)
 end, "CM_RESETUSERACCESS_HELP")
 
-CM:Register({"toggle", "t"}, PM.Access.Local, function(args, sender, isChat)
+CM:Register({"toggle", "t"}, PM.Access.Local, function(args, sender, isChat, bnetInfo)
 	if isChat then
 		return false, "CM_ERR_NOCHAT"
 	end
 	return C:Toggle()
 end, "CM_TOGGLE_HELP")
 
-CM:Register({"toggledebug", "td", "debug", "d"}, PM.Access.Local, function(args, sender, isChat)
+CM:Register({"toggledebug", "td", "debug", "d"}, PM.Access.Local, function(args, sender, isChat, bnetInfo)
 	if isChat then
 		return false, "CM_ERR_NOCHAT"
 	end
 	return C:ToggleDebug()
 end, "CM_TOGGLEDEBUG_HELP")
 
-CM:Register({"readycheck", "rc"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"readycheck", "rc"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 0 then
 		if PM:GetAccess(sender) > PM.Access.Groups.Op.Level then
 			return "CM_ERR_NOACCESS", {sender.Info.Name, PM.Access.Groups.Op.Level, PM:GetAccess(sender)}
@@ -873,7 +878,7 @@ CM:Register({"readycheck", "rc"}, PM.Access.Groups.User.Level, function(args, se
 	return false, "CM_READYCHECK_FAIL"
 end, "CM_READYCHECK_HELP")
 
-CM:Register({"loot", "l"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+CM:Register({"loot", "l"}, PM.Access.Groups.Op.Level, function(args, sender, isChat, bnetInfo)
 	if GT:IsLFGGroup() then
 		return false, "CM_LOOT_LFG"
 	end
@@ -916,7 +921,7 @@ CM:Register({"loot", "l"}, PM.Access.Groups.Op.Level, function(args, sender, isC
 	return false, usage
 end, "CM_LOOT_HELP")
 
-CM:Register({"roll", "r"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+CM:Register({"roll", "r"}, PM.Access.Groups.Op.Level, function(args, sender, isChat, bnetInfo)
 	if #args <= 0 then
 		return RM:StartRoll(sender.Info.Name)
 	end
@@ -978,7 +983,7 @@ CM:Register({"roll", "r"}, PM.Access.Groups.Op.Level, function(args, sender, isC
 	return false, "CM_LOOT_USAGE"
 end, "CM_LOOT_HELP")
 
-CM:Register({"raidwarning", "rw", "raid_warning"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"raidwarning", "rw", "raid_warning"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not GT:IsRaid() then
 		return false, "CM_RAIDWARNING_NORAID"
 	elseif not GT:IsRaidLeaderOrAssistant() then
@@ -999,7 +1004,7 @@ CM:Register({"raidwarning", "rw", "raid_warning"}, PM.Access.Groups.User.Level, 
 	return "CM_RAIDWARNING_SENT"
 end, "CM_RAIDWARNING_HELP")
 
-CM:Register({"dungeondifficulty", "dungeondiff", "dd", "dungeonmode", "dm"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"dungeondifficulty", "dungeondiff", "dd", "dungeonmode", "dm"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if #args < 1 then
 		return GT:GetDungeonDifficultyString()
 	end
@@ -1016,7 +1021,7 @@ CM:Register({"dungeondifficulty", "dungeondiff", "dd", "dungeonmode", "dm"}, PM.
 	return GT:SetDungeonDifficulty(diff)
 end, "CM_DUNGEONMODE_HELP")
 
-CM:Register({"raiddifficulty", "raiddiff", "rd", "raidmode", "rm"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"raiddifficulty", "raiddiff", "rd", "raidmode", "rm"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if #args < 1 then
 		return GT:GetRaidDifficultyString()
 	end
@@ -1037,49 +1042,49 @@ CM:Register({"raiddifficulty", "raiddiff", "rd", "raidmode", "rm"}, PM.Access.Gr
 	return GT:SetRaidDifficulty(diff)
 end, "CM_RAIDMODE_HELP")
 
-CM:Register({"release", "rel"}, PM.Access.Groups.Op.Level, function(args, sender, isChat)
+CM:Register({"release", "rel"}, PM.Access.Groups.Op.Level, function(args, sender, isChat, bnetInfo)
 	if not DM:IsEnabled() or not DM:IsReleaseEnabled() then
 		return false, "CM_ERR_DISABLED"
 	end
 	return DM:Release()
 end, "CM_RELEASE_HELP")
 
-CM:Register({"resurrect", "ressurrect", "ress", "res"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"resurrect", "ressurrect", "ress", "res"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not DM:IsEnabled() or not DM:IsResurrectEnabled() then
 		return false, "CM_ERR_DISABLED"
 	end
 	return DM:Resurrect()
 end, "CM_RESURRECT_HELP")
 
-CM:Register({"acceptsummon", "as", "acceptsumm", "asumm"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"acceptsummon", "as", "acceptsumm", "asumm"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not SM:IsEnabled() then
 		return false, "CM_ERR_DISABLED"
 	end
 	return SM:AcceptSummon()
 end, "CM_ACCEPTSUMMON_HELP")
 
-CM:Register({"declinesummon", "ds", "declinesumm", "dsumm", "cancelsummon", "csumm"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"declinesummon", "ds", "declinesumm", "dsumm", "cancelsummon", "csumm"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not SM:IsEnabled() then
 		return false, "CM_ERR_DISABLED"
 	end
 	return SM:DeclineSummon()
 end, "CM_DECLINESUMMON_HELP")
 
-CM:Register({"acceptduel", "acceptd"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"acceptduel", "acceptd"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not CDM:IsEnabled() then
 		return false, "CM_ERR_DISABLED"
 	end
 	return CDM:AcceptDuel()
 end, "CM_ACCEPTDUEL_HELP")
 
-CM:Register({"declineduel", "declined"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"declineduel", "declined"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not CDM:IsEnabled() then
 		return false, "CM_ERR_DISABLED"
 	end
 	return CDM:DeclineDuel()
 end, "CM_DECLINEDUEL_HELP")
 
-CM:Register({"startduel", "startd", "challenge"}, PM.Access.Groups.User.Level, function(args, sender, isChat)
+CM:Register({"startduel", "startd", "challenge"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not CDM:IsEnabled() then
 		return false, "CM_ERR_DISABLED"
 	end
