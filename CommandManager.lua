@@ -70,6 +70,7 @@ local DM = C.DeathManager
 local SM = C.SummonManager
 local IM = C.InviteManager
 local CDM = C.DuelManager
+local CRM = C.RoleManager
 local Chat
 local CES = C.Extensions.String
 local CET = C.Extensions.Table
@@ -182,7 +183,11 @@ function CM:HandleCommand(command, args, isChat, player, bnetInfo)
 				return false, "CM_ERR_NOACCESS", {player.Info.Name, cmd.Access, PM:GetAccess(player)}
 			end
 		end
-		return cmd.Call(args, player, isChat, bnetInfo)
+		local result, arg, errArg = cmd.Call(args, player, isChat, bnetInfo)
+		if type(result) == "nil" then
+			return "CM_ERR_UNKNOWN"
+		end
+		return result, arg, errArg
 	else
 		return false, "CM_ERR_NOTREGGED", {tostring(command)}
 	end
@@ -1004,7 +1009,7 @@ CM:Register({"raidwarning", "rw", "raid_warning"}, PM.Access.Groups.User.Level, 
 	return "CM_RAIDWARNING_SENT"
 end, "CM_RAIDWARNING_HELP")
 
-CM:Register({"dungeondifficulty", "dungeondiff", "dd", "dungeonmode", "dm"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
+CM:Register({"dungeondifficulty", "dungeondiff", "dd"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if #args < 1 then
 		return GT:GetDungeonDifficultyString()
 	end
@@ -1021,7 +1026,7 @@ CM:Register({"dungeondifficulty", "dungeondiff", "dd", "dungeonmode", "dm"}, PM.
 	return GT:SetDungeonDifficulty(diff)
 end, "CM_DUNGEONMODE_HELP")
 
-CM:Register({"raiddifficulty", "raiddiff", "rd", "raidmode", "rm"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
+CM:Register({"raiddifficulty", "raiddiff", "rd"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if #args < 1 then
 		return GT:GetRaidDifficultyString()
 	end
@@ -1093,6 +1098,40 @@ CM:Register({"startduel", "startd", "challenge"}, PM.Access.Groups.User.Level, f
 	end
 	return CDM:Challenge(args[1])
 end, "CM_STARTDUEL_HELP")
+
+CM:Register({"role", "rm"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
+	if not CRM:IsEnabled() then
+		return false, "CM_ERR_DISABLED"
+	end
+	if #args < 1 then
+		return "CM_ROLE_CURRENT", {CRM.Roles[CRM:GetRole()]}
+	end
+	local arg = args[1]:lower()
+	if arg:match("^st") or arg:match("^i") then -- Start/Initiate/Issue
+		return CRM:Start()
+	elseif arg:match("^[sa]") then -- Set/Assign (Role)
+		if #args < 2 then
+			return false, "CM_ROLE_SET_USAGE"
+		end
+		local role = args[2]:lower()
+		if role:match("^[thd]") then
+			return CRM:SetRole(role)
+		end
+		return false, "CM_ROLE_SET_USAGE"
+	elseif arg:match("^c") then -- Confirm (Role)
+		if #args >= 2 then -- Role supplied as argument #2
+			local role = args[2]:lower()
+			if role:match("^[thd]") then
+				return CRM:SetRole(role)
+			end
+			return false, "CM_ROLE_CONFIRM_USAGE"
+		else -- No role specified
+			-- Confirm the role last chosen by the player
+			return CRM:ConfirmRole()
+		end
+	end
+	return false, "CM_ROLE_USAGE"
+end, "CM_ROLE_HELP")
 
 for i,v in ipairs(CM.Slash) do
 	_G["SLASH_" .. C.Name:upper() .. i] = "/" .. v

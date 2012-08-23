@@ -36,6 +36,7 @@ local AC = C.AddonComm
 local DM = C.DeathManager
 local SM = C.SummonManager
 local IM = C.InviteManager
+local RM = C.RoleManager
 local CDM = C.DuelManager
 
 --- Event handler for ADDON_LOADED
@@ -159,4 +160,8 @@ end
 
 function C.Events.DUEL_REQUESTED(self, ...)
 	CDM:OnDuel((select(1, ...)))
+end
+
+function C.Events.ROLE_POLL_BEGIN(self, ...)
+	RM:OnRoleCheck()
 end

@@ -43,22 +43,12 @@ local L = C.LocaleManager
 local SM = C.SummonManager
 local CM
 local GT = C.GroupTools
+local CEN = C.Extensions.Number
 
 local DEFAULT_DELAY = 5
 local MAX_DELAY = 110 -- 1 minute 50 seconds, summons expire after 2 minutes (usually)
 
 local LastSummoner
-
-local function FormatSeconds(seconds)
-	-- Return plain seconds if less than 60 seconds
-	if seconds < 60 then return ("%d %s"):format(seconds, L("SECONDS"):lower()) end
-	local minutes = floor(seconds / 60) -- Get number of minutes
-	local secs = tostring(seconds - minutes * 60) -- Get number of remaining seconds
-	if not secs:match("%d%d") then -- Check if seconds > 9
-		secs = "0" .. secs -- Prefix a zero to make it look better
-	end
-	return ("%d:%s"):format(minutes, secs) -- Return in m:ss format
-end
 
 function SM:Init()
 	CM = C.ChatManager
@@ -195,7 +185,7 @@ function SM:SetDelay(amount)
 	end
 	self.Settings.DELAY = amount
 	if amount > 0 then
-		return "SM_SETDELAY_SUCCESS", {FormatSeconds(amount)}
+		return "SM_SETDELAY_SUCCESS", {CEN:FormatSeconds(amount)}
 	end
 	return "SM_SETDELAY_INSTANT"
 end
