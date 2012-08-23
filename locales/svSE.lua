@@ -90,6 +90,7 @@ local L = {
 	-- CommandManager --
 	--------------------
 
+	CM_ERR_UNKNOWN = "Okänt fel inträffade, kontakta addonskapare.",
 	CM_ERR_NOTALLOWED = "%s är inte tillåtet att användas, %s.",
 	CM_ERR_NOACCESS = "Du har inte tillåtelse att använda det kommandot, %s. Behörighet som krävs: %d. Din behörighet: %d.",
 	CM_ERR_NOTREGGED = "%q är inte ett registrerat kommando.",
@@ -303,6 +304,12 @@ local L = {
 	CM_STARTDUEL_HELP = "Challenges another player to a duel.",
 	CM_STARTDUEL_USAGE = "Usage: startduel <target>",
 
+	CM_ROLE_HELP = "Provides various commands for controlling role assignment.",
+	CM_ROLE_USAGE = "Användning: role start|set|confirm",
+	CM_ROLE_CURRENT = "My current role is %s.",
+	CM_ROLE_SET_USAGE = "Användning: role set tank|healer|dps",
+	CM_ROLE_CONFIRM_USAGE = "Usage: role confirm [tank|healer|dps]",
+
 	------------
 	-- Events --
 	------------
@@ -394,8 +401,8 @@ local L = {
 	PM_KICK_NOPRIV = "Unable to kick %s from group. Not group leader or assistant.",
 	PM_KICK_TARGETASSIST = "Unable to kick %s, assistants cannot kick other assistants from group.",
 
-	PM_PLAYER_CREATE = "Created player %q with default settings.",
-	PM_PLAYER_UPDATE = "Updated player %q.",
+	PM_PLAYER_CREATE = "Created player %q (%s) with default settings.",
+	PM_PLAYER_UPDATE = "Updated player %q (%s).",
 
 	PM_GA_REMOVED = "%q removed from group %s.",
 	PM_GA_EXISTSALLOW = "%q already has that command on the allow list.",
@@ -581,6 +588,33 @@ local L = {
 	CDM_DELAY_OUTOFRANGE = "Delay has to be between 0 and %d seconds.",
 	CDM_DELAY_SET = "Announce delay set to %d second(s)!",
 	CDM_DELAY_DISABLED = "Announce delay has been disabled, will now announce immediately.",
+
+	-----------------
+	-- RoleManager --
+	-----------------
+
+	CRM_ENABLED = "RoleManager enabled.",
+	CRM_DISABLED = "RoleManager disabled.",
+
+
+	CRM_TANK = "Tank",
+	CRM_HEALER = "Healer",
+	CRM_DAMAGE = "DPS",
+	CRM_UNDEFINED = "Undefined",
+
+	CRM_ANNOUNCE_HASROLE = "Role check started! Confirm my current role (%s) with !role confirm or set a new one with !role confirm tank|healer|dps",
+	CRM_ANNOUNCE_NOROLE = "Role check started! Set my role with !role confirm tank|healer|dps",
+
+	CRM_SET_INVALID = "I cannot fulfill the role of %s, please specify another role.",
+	CRM_SET_SUCCESS = "Successfully set my role to %s!",
+
+	CRM_CONFIRM_NOROLE = "No role set, confirmation needed with role confirm tank|healer|dps",
+
+	CRM_START_ACTIVE = "A role check is already pending, please wait until it has ended.",
+	CRM_START_NOPRIV = "Unable to start role check, not leader or assistant.",
+
+	CRM_STARTDELAY_SUCCESS = "RoleManager announce delay set to %s!",
+	CRM_STARTDELAY_INSTANT = "RoleManager now announces instantly.",
 
 	-----------------
 	-- AuthManager --

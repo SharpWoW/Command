@@ -19,6 +19,7 @@
 
 -- Upvalues
 local select = select
+local tinsert = table.insert
 local tonumber = tonumber
 
 -- API Upvalues
@@ -158,30 +159,50 @@ function BNT:GetFriendById(id)
 	return ParseBNFriendResult(BNGetFriendInfoByID(id))
 end
 
-function BNT:GetFriendByName(name)
+function BNT:GetFriendByName(name, startIndex)
 	local n = BNGetNumFriends()
 	if n <= 0 then return nil end
-	for i = 1, n do
+	for i = startIndex or 1, n do
 		local friend = ParseBNFriendResult(BNGetFriendInfo(i))
 		if (friend.ToonName or ""):lower() == name:lower() then
-			return friend
+			return friend, i
 		end
 	end
 	return nil
+end
+
+function BNT:GetAllFriendsByName(name)
+	local result = {}
+	local friend, lastIndex
+	repeat
+		friend, lastIndex = self:GetFriendByName(name, (lastIndex or 0) + 1)
+		if friend then tinsert(result, friend) end
+	until friend == nil
+	return result
 end
 
 function BNT:GetToon(id)
 	return ParseBNToonResult(BNGetToonInfo(id))
 end
 
-function BNT:GetToonByName(name)
+function BNT:GetToonByName(name, startIndex)
 	local numF = BNGetNumFriends()
 	if numF <= 0 then return nil end
-	for i = 1, numF do
+	for i = startIndex or 1, numF do
 		for t = 1, BNGetNumFriendToons(i) do
 			local toon = ParseBNToonResult(BNGetFriendToonInfo(i, t))
-			if not CES:IsNullOrEmpty(toon.Name) and toon.Name:lower() == name:lower() then return toon end
+			if not CES:IsNullOrEmpty(toon.Name) and toon.Name:lower() == name:lower() then return toon, i end
 		end
 	end
 	return nil
+end
+
+function BNT:GetAllToonsByName(name)
+	local result = {}
+	local toon, lastIndex
+	repeat
+		toon, lastIndex = self:GetToonByName(name, (lastIndex or 0) + 1)
+		if toon then tinsert(result, toon) end
+	until toon == nil
+	return result
 end

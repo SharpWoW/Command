@@ -23,6 +23,7 @@
 	<Script file="Table.lua" />
 	<Script file="String.lua" />
 	<Include file="LocaleLoader.xml" />
+	<Script file="Number.lua" />
 	<Script file="Logger.lua" />
 	<Script file="BattleNetTools.lua" />
 	<Script file="GroupTools.lua" />
@@ -36,6 +37,7 @@
 	<Script file="SummonManager.lua" />
 	<Script file="InviteManager.lua" />
 	<Script file="DuelManager.lua" />
+	<Script file="RoleManager.lua" />
 	<Script file="CommandManager.lua" />
 	<Script file="ChatManager.lua" />
 	<Script file="Events.lua" />

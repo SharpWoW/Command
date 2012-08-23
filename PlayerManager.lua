@@ -232,6 +232,18 @@ function PM:LoadSavedVars()
 	end
 	Players = self.Data.PLAYERS[GetRealmName()]
 	List = self.Data.LIST
+
+	self:UpdatePlayerData()
+end
+
+function PM:UpdatePlayerData()
+	for realm,players in pairs(self.Data.PLAYERS) do
+		for name,player in pairs(players) do
+			if not player.Info.Realm then
+				player.Info.Realm = realm
+			end
+		end
+	end
 end
 
 function PM:ParseMessage(message)
@@ -261,20 +273,22 @@ end
 -- @param name Name of player.
 -- @return Player from list of players if exists, otherwise a new player object.
 --
-function PM:GetOrCreatePlayer(name)
+function PM:GetOrCreatePlayer(name, realm)
 	name = (name or UnitName("player")):lower():gsub("^%l", string.upper)
-	if CET:HasKey(Players, name) then
-		return Players[name]
+	realm = realm or GetRealmName()
+	if CET:HasKey(self.Data.PLAYERS[realm], name) then
+		return self.Data.PLAYERS[realm][name]
 	else
 		local player = CET:Copy(Player)
 		player.Info.Name = name
+		player.Info.Realm = realm
 		if player.Info.Name == UnitName("player") then
 			player.Info.Group = self.Access.Groups.Owner.Name
 		else
 			player.Info.Group = self.Access.Groups.User.Name
 		end
-		Players[player.Info.Name] = player
-		log:Normal(L("PM_PLAYER_CREATE"):format(player.Info.Name))
+		self.Data.PLAYERS[realm][player.Info.Name] = player
+		log:Normal(L("PM_PLAYER_CREATE"):format(player.Info.Name, player.Info.Realm))
 		return player
 	end
 end
@@ -283,8 +297,8 @@ end
 -- @param player Player object to update.
 --
 function PM:UpdatePlayer(player)
-	Players[player.Info.Name] = player
-	log:Normal(L("PM_PLAYER_UPDATE"):format(player.Info.Name))
+	self.Data.PLAYERS[player.Info.Realm][player.Info.Name] = player
+	log:Normal(L("PM_PLAYER_UPDATE"):format(player.Info.Name, player.Info.Realm))
 end
 
 --- Completely remove a command from a group's access list.
@@ -603,10 +617,11 @@ end
 -- Also sends a message to the invited player about the event.
 -- @param player Player object of player to invite.
 -- @param sender Player object of the inviting player.
+-- @param pID Presence ID if this was an Invite(Me) command from B.Net chat
 -- @return String stating the result of the invite, false if error.
 -- @return Error message if unsuccessful, nil otherwise.
 --
-function PM:Invite(player, sender)
+function PM:Invite(player, sender, pID)
 	if not sender then sender = self:GetOrCreatePlayer(UnitName("player")) end
 	if player.Info.Name == UnitName("player") then
 		return false, "PM_INVITE_SELF"
@@ -619,7 +634,11 @@ function PM:Invite(player, sender)
 		if self.Invites[player.Info.Name] then
 			return false, "PM_INVITE_ACTIVE", {player.Info.Name}
 		elseif player.Info.Name == sender.Info.Name then
-			InviteUnit(player.Info.Name)
+			if player.Info.Realm == GetRealmName() or not pID then
+				InviteUnit(player.Info.Name)
+			else -- Invite(Me) command sent from B.Net chat
+				BNInviteFriend(pID)
+			end
 			return "PM_INVITE_NOTIFYTARGET"
 		elseif player.Settings.Invite then
 			InviteUnit(player.Info.Name)

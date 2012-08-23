@@ -96,6 +96,14 @@ function GT:IsLFGGroup()
 	return false
 end
 
+--- Check if player is in a party.
+-- (Returns false if raid)
+-- @return True if player is in a party, false otherwise.
+--
+function GT:IsParty()
+	return UnitExists("party1") and not self:IsRaid() and not self:IsLFGGroup()
+end
+
 --- Check if player is in a raid.
 -- @return True if the player is in a raid, false otherwise.
 --

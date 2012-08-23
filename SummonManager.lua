@@ -35,27 +35,20 @@ local GetSummonConfirmTimeLeft = GetSummonConfirmTimeLeft
 
 local C = Command
 
-C.SummonManager = {}
+C.SummonManager = {
+	VarVersion = 1
+}
 
 local L = C.LocaleManager
 local SM = C.SummonManager
 local CM
 local GT = C.GroupTools
+local CEN = C.Extensions.Number
 
+local DEFAULT_DELAY = 5
 local MAX_DELAY = 110 -- 1 minute 50 seconds, summons expire after 2 minutes (usually)
 
 local LastSummoner
-
-local function FormatSeconds(seconds)
-	-- Return plain seconds if less than 60 seconds
-	if seconds < 60 then return ("%d %s"):format(seconds, L("SECONDS"):lower()) end
-	local minutes = floor(seconds / 60) -- Get number of minutes
-	local secs = tostring(seconds - minutes * 60) -- Get number of remaining seconds
-	if not secs:match("%d%d") then -- Check if seconds > 9
-		secs = "0" .. secs -- Prefix a zero to make it look better
-	end
-	return ("%d:%s"):format(minutes, secs) -- Return in m:ss format
-end
 
 function SM:Init()
 	CM = C.ChatManager
@@ -70,22 +63,28 @@ function SM:LoadSavedVars()
 
 	self.Settings = C.Global["SUMMON_MANAGER"]
 
+	if not self.Settings.VERSION or self.Settings.VERSION < self.VarVersion then
+		wipe(self.Settings)
+	end
+
 	if type(self.Settings.ENABLED) ~= "boolean" then
 		self.Settings.ENABLED = true
 	end
 
-	if type(self.Settings.TIME) ~= "number" then
-		self.Settings.TIME = 0
+	if type(self.Settings.DELAY) ~= "number" then
+		self.Settings.DELAY = DEFAULT_DELAY
 	end
+
+	self.Settings.VERSION = self.VarVersion
 end
 
 function SM:OnSummon()
 	if self.DelayActive then return end
-	if self.Settings.TIME > 0 then
+	if self.Settings.DELAY > 0 then
 		self.DelayActive = true
 		local frame = CreateFrame("Frame")
 		frame.Time = 0 -- Current time
-		frame.Delay = self.Settings.TIME -- Delay to wait
+		frame.Delay = self.Settings.DELAY -- Delay to wait
 		frame:SetScript("OnUpdate", function(self, elapsed)
 			self.Time = self.Time + elapsed
 			if self.Time >= self.Delay then
@@ -186,7 +185,7 @@ function SM:SetDelay(amount)
 	end
 	self.Settings.DELAY = amount
 	if amount > 0 then
-		return "SM_SETDELAY_SUCCESS", {FormatSeconds(amount)}
+		return "SM_SETDELAY_SUCCESS", {CEN:FormatSeconds(amount)}
 	end
 	return "SM_SETDELAY_INSTANT"
 end
