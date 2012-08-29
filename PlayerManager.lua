@@ -629,6 +629,8 @@ function PM:Invite(player, sender, pID)
 		return false, "PM_INVITE_INGROUP", {player.Info.Name}
 	elseif GT:IsGroupFull() then
 		return false, "PM_INVITE_FULL"
+	elseif GT:IsLFGGroup() then
+		return false, "PM_INVITE_LFG"
 	end
 	if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() or not GT:IsGroup() then
 		if self.Invites[player.Info.Name] then
