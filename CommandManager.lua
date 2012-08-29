@@ -28,6 +28,7 @@ local tonumber = tonumber
 -- API Upvalues
 local SetCVar = SetCVar
 local UnitName = UnitName
+local FollowUnit = FollowUnit
 local ShowUIPanel = ShowUIPanel
 local HideUIPanel = HideUIPanel
 local AcceptGroup = AcceptGroup
@@ -58,9 +59,9 @@ C.CommandManager = {
 	Commands = {}
 }
 
+local L = C.LocaleManager
 local CM = C.CommandManager
 local PM = C.PlayerManager
-local L = C.LocaleManager
 local QM = C.QueueManager
 local RM = C.RollManager
 local LM = C.LootManager
@@ -295,7 +296,13 @@ CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, i
 			return false, "CM_ERR_NOCHAT"
 		end
 		local setting = args[2]:lower()
-		if setting:match("^[eay]") then -- Enable
+		if setting:match("^[eay].*a") then -- Enable Announce
+			return SM:EnableAnnounce()
+		elseif setting:match("^[dn].*a") then -- Disable Announce
+			return SM:DisableAnnounce()
+		elseif setting:match("^a.*t") or setting:match("^t.*a") then -- Toggle Announce
+			return SM:ToggleAnnounce()
+		elseif setting:match("^[eay]") then -- Enable
 			return SM:Enable()
 		elseif setting:match("^di") or setting:match("^n") then -- Disable
 			return SM:Disable()
@@ -405,6 +412,38 @@ CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, i
 			return CDM:Enable()
 		elseif setting:match("^[dn]") then -- Disable
 			return CDM:Disable()
+		end
+		return false, "CM_SET_CDM_USAGE"
+	elseif mod:match("^r") then -- RoleManager
+		if #args < 2 then
+			if CRM:IsEnabled() then
+				return "CM_SET_CRM_ISENABLED"
+			end
+			return "CM_SET_CRM_ISDISABLED"
+		end
+		if isChat then -- Players are only allowed to check the status of RoleManager
+			return false, "CM_ERR_NOCHAT"
+		end
+		local setting = args[2]:lower()
+		if setting:match("^[eay].*a") then -- Enable Announce
+			return CRM:EnableAnnounce()
+		elseif setting:match("^[dn].*a") then -- Disable Announce
+			return CRM:DisableAnnounce()
+		elseif setting:match("^a.*t") or setting:match("^t.*a") then -- Toggle Announce
+			return CRM:ToggleAnnounce()
+		elseif setting:match("^s.*d") or setting:match("^de") then -- (Set) Delay
+			if #args < 3 then
+				return "CM_SET_CRM_DELAY_CURRENT", {CRM:GetDelay()}
+			end
+			local newDelay = tonumber(args[3])
+			if not newDelay then return false, "CM_SET_CRM_DELAY_USAGE" end
+			return CRM:SetDelay(newDelay)
+		elseif setting:match("^[eay]") then -- Enable
+			return CRM:Enable()
+		elseif setting:match("^[dn]") then -- Disable
+			return CRM:Disable()
+		elseif setting:match("^t") then -- Toggle
+			return CRM:Toggle()
 		end
 		return false, "CM_SET_CDM_USAGE"
 	end
@@ -1132,6 +1171,20 @@ CM:Register({"role", "rm"}, PM.Access.Groups.User.Level, function(args, sender, 
 	end
 	return false, "CM_ROLE_USAGE"
 end, "CM_ROLE_HELP")
+
+CM:Register({"follow", "f"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
+	local name = args[1]
+	if name then
+		name = PM:GetOrCreatePlayer(name).Info.Name
+	else
+		name = sender.Info.Name
+	end
+	if name == UnitName("player") then
+		return false, "CM_FOLLOW_SELF"
+	end
+	FollowUnit(name)
+	return "CM_FOLLOW_STARTED", {name}
+end, "CM_FOLLOW_HELP")
 
 for i,v in ipairs(CM.Slash) do
 	_G["SLASH_" .. C.Name:upper() .. i] = "/" .. v

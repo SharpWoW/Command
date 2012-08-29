@@ -85,7 +85,7 @@ function DM:OnDuel(sender)
 end
 
 function DM:Announce(sender)
-	if not self:HasDuel() then return end
+	if not self:HasDuel() or not self.Settings.ANNOUNCE then return end
 	local locale = PM:GetOrCreatePlayer(sender).Settings.locale
 	local msg = L(locale, "CDM_ANNOUNCE", true)
 	CM:SendMessage(msg, "WHISPER", sender)

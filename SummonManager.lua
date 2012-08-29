@@ -71,6 +71,10 @@ function SM:LoadSavedVars()
 		self.Settings.ENABLED = true
 	end
 
+	if type(self.Settings.ANNOUNCE) ~= "boolean" then
+		self.Settings.ANNOUNCE = true
+	end
+
 	if type(self.Settings.DELAY) ~= "number" then
 		self.Settings.DELAY = DEFAULT_DELAY
 	end
@@ -99,7 +103,7 @@ function SM:OnSummon()
 end
 
 function SM:Announce()
-	if not self:HasSummon() then return end
+	if not self:HasSummon() or not self.Settings.ANNOUNCE then return end
 
 	local name = GetSummonConfirmSummoner()
 	local area = GetSummonConfirmAreaName()
@@ -107,7 +111,7 @@ function SM:Announce()
 
 	if not name or not area or not left or left <= 0 then return end
 
-	left = FormatSeconds(left)
+	left = CEN:FormatSeconds(left)
 
 	LastSummoner = name
 
@@ -167,6 +171,27 @@ function SM:Toggle()
 		return self:Disable()
 	end
 	return self:Enable()
+end
+
+function SM:EnableAnnounce()
+	self.Settings.ANNOUNCE = true
+	return "SM_ANNOUNCE_ENABLED"
+end
+
+function SM:DisableAnnounce()
+	self.Settings.ANNOUNCE = false
+	return "SM_ANNOUNCE_DISABLED"
+end
+
+function SM:ToggleAnnounce()
+	if self:IsAnnounceEnabled() then
+		return self:DisableAnnounce()
+	end
+	return self:EnableAnnounce()
+end
+
+function SM:IsAnnounceEnabled()
+	return self.Settings.ANNOUNCE
 end
 
 function SM:GetDelay()
