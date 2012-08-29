@@ -67,6 +67,10 @@ function RM:LoadSavedVars()
 		self.Settings.ENABLED = true
 	end
 
+	if type(self.Settings.ANNOUNCE) ~= "boolean" then
+		self.Settings.ANNOUNCE = true
+	end
+
 	if type(self.Settings.DELAY) ~= "number" then
 		self.Settings.DELAY = DEFAULT_DELAY
 	end
@@ -90,7 +94,7 @@ function RM:OnRoleCheck()
 end
 
 function RM:Announce()
-	if not self:RolePollActive() then return end
+	if not self:RolePollActive() or not self.Settings.ANNOUNCE then return end
 	local current = self:GetRole()
 	local msg
 	if current ~= self.Roles.Undefined then
@@ -166,10 +170,12 @@ function RM:Start()
 	if self:RolePollActive() then
 		return false, "CRM_START_ACTIVE"
 	elseif (GT:IsParty() and GT:IsGroupLeader()) or (GT:IsRaid() and GT:IsRaidLeaderOrAssistant()) then
-
-	else
-		return false, "CRM_START_NOPRIV"
+		InitiateRolePoll()
+		return "CRM_START_SUCCESS"
+	elseif not GT:IsGroup() then
+		return false, "CRM_START_NOGROUP"
 	end
+	return false, "CRM_START_NOPRIV"
 end
 
 function RM:Enable()
@@ -191,6 +197,22 @@ end
 
 function RM:IsEnabled()
 	return self.Settings.ENABLED
+end
+
+function RM:EnableAnnounce()
+
+end
+
+function RM:DisableAnnounce()
+
+end
+
+function RM:ToggleAnnounce()
+
+end
+
+function RM:IsAnnounceEnabled()
+
 end
 
 function RM:GetDelay()

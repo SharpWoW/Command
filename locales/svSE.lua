@@ -138,6 +138,11 @@ local L = {
 	CM_SET_CDM_DELAY_CURRENT = "Announce delay is set to %d second(s).",
 	CM_SET_CDM_DELAY_USAGE = "Usage: set duelmanager delay [delay]",
 	CM_SET_CDM_USAGE = "Usage: set duelmanager [enable|disable|toggle|enableannounce|disableannounce|toggleannounce|delay]",
+	CM_SET_CRM_ISENABLED = "RoleManager is enabled.",
+	CM_SET_CRM_ISDISABLED = "RoleManager is disabled.",
+	CM_SET_CRM_DELAY_CURRENT = "Announce delay is set to %s.",
+	CM_SET_CRM_DELAY_USAGE = "Usage: set rm delay [delay]",
+	CM_SET_CRM_USAGE = "Usage: set rm [enable|disable|toggle|enableannounce|disableannounce|toggleannounce|setdelay]",
 
 	CM_LOCALE_HELP = "Change locale settings.",
 	CM_LOCALE_USAGE ="Användning: locale [set|reset|usemaster|playerindependent]",
@@ -310,6 +315,10 @@ local L = {
 	CM_ROLE_SET_USAGE = "Användning: role set tank|healer|dps",
 	CM_ROLE_CONFIRM_USAGE = "Usage: role confirm [tank|healer|dps]",
 
+	CM_FOLLOW_HELP = "Starts following the specified player (or sender if no player specified).",
+	CM_FOLLOW_STARTED = "Started following %s!",
+	CM_FOLLOW_SELF = "I cannot follow myself.",
+
 	------------
 	-- Events --
 	------------
@@ -422,6 +431,7 @@ local L = {
 	PM_INVITE_SELF = "Cannot invite myself to group.",
 	PM_INVITE_INGROUP = "%s is already in the group.",
 	PM_INVITE_FULL = "The group is already full.",
+	PM_INVITE_LFG = "Cannot invite players to an LFG group.",
 	PM_INVITE_ACTIVE = "%s already has an active invite.",
 	PM_INVITE_DECLINED = "%s has declined the group invite.",
 	PM_INVITE_INOTHERGROUP = "%s is already in a group.",
@@ -612,6 +622,7 @@ local L = {
 
 	CRM_START_ACTIVE = "A role check is already pending, please wait until it has ended.",
 	CRM_START_NOPRIV = "Unable to start role check, not leader or assistant.",
+	CRM_START_NOGROUP = "Role checks can only be started when in a group.",
 
 	CRM_STARTDELAY_SUCCESS = "RoleManager announce delay set to %s!",
 	CRM_STARTDELAY_INSTANT = "RoleManager now announces instantly.",
