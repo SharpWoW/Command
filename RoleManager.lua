@@ -51,6 +51,8 @@ local CEN = C.Extensions.Number
 local DEFAULT_DELAY = 5
 local MAX_DELAY = 60 -- Arbitrary max delay, unknown if there is an existing delay
 
+local AnnouncePending = false
+
 function RM:Init()
 	CM = C.ChatManager
 	self:LoadSavedVars()
@@ -77,7 +79,9 @@ function RM:LoadSavedVars()
 end
 
 function RM:OnRoleCheck()
+	if AnnouncePending then return end
 	if self.Settings.DELAY > 0 then
+		AnnouncePending = true
 		local frame = CreateFrame("Frame")
 		frame.Time = 0
 		frame.Delay = self.Settings.DELAY
@@ -85,6 +89,7 @@ function RM:OnRoleCheck()
 			self.Time = self.Time + elapsed
 			if self.Time >= self.Delay then
 				self:SetScript("OnUpdate", nil)
+				AnnouncePending = false
 				RM:Announce()
 			end
 		end)
