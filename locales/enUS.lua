@@ -262,13 +262,7 @@ local L = {
 	CM_TOGGLEDEBUG_HELP = "Toggle debugging mode on and off.",
 
 	CM_READYCHECK_HELP = "Respond to ready check or initiate a new one.",
-	CM_READYCHECK_ISSUED = "%s issued a ready check!",
-	CM_READYCHECK_NOPRIV = "Cannot initiate ready check when not leader or assistant.",
-	CM_READYCHECK_INACTIVE = "Ready check not running or I have already responded.",
-	CM_READYCHECK_ACCEPTED = "Accepted ready check.",
-	CM_READYCHECK_DECLINED = "Declined ready check.",
-	CM_READYCHECK_INVALID = "Invalid argument: %s",
-	CM_READYCHECK_FAIL = "Failed to accept or decline ready check.",
+	CM_READYCHECK_USAGE = "Usage: rc [accept|decline]",
 
 	CM_LOOT_HELP = "Provides various loot functions.",
 	CM_LOOT_USAGE = "Usage: loot type||threshold||master||pass",
@@ -626,6 +620,29 @@ local L = {
 
 	CRM_STARTDELAY_SUCCESS = "RoleManager announce delay set to %s!",
 	CRM_STARTDELAY_INSTANT = "RoleManager now announces instantly.",
+
+	-----------------------
+	-- ReadyCheckManager --
+	-----------------------
+	RCM_INACTIVE = "No ready check is currently running.",
+	RCM_RESPONDED = "I have already responded to the ready check.",
+
+	RCM_ENABLED = "ReadyCheckManager has been enabled.",
+	RCM_DISABLED = "ReadyCheckManager has been disabled.",
+
+	RCM_ANNOUNCE = "%s has started a ready check! Type !rc accept to make me accept or !rc deny to deny it.",
+
+	RCM_ACCEPTED = "Accepted the ready check!",
+	RCM_DECLINED = "Declined the ready check!",
+
+	RCM_START_ISSUED = "%s has started a ready check!",
+	RCM_START_NOPRIV = "Unable to start ready check, not leader or assistant.",
+
+	RCM_ANNOUNCE_ENABLED = "ReadyCheckManager will now announce received ready checks.",
+	RCM_ANNOUNCE_DISABLED = "ReadyCheckManager will no longer announce recevied ready checks.",
+
+	RCM_SETDELAY_SUCCESS = "ReadyCheckManager announce delay set to %d second(s)!",
+	RCM_SETDELAY_INSTANT = "ReadyCheckManager will now announce instantly!",
 
 	-----------------
 	-- AuthManager --

@@ -38,6 +38,7 @@ local SM = C.SummonManager
 local IM = C.InviteManager
 local RM = C.RoleManager
 local CDM = C.DuelManager
+local RCM = C.ReadyCheckManager
 
 --- Event handler for ADDON_LOADED
 -- @name Command.Events.ADDON_LOADED
@@ -83,15 +84,11 @@ function C.Events.LFG_PROPOSAL_FAILED(self, ...)
 end
 
 function C.Events.READY_CHECK(self, ...)
-	if C.Data.ReadyCheckRunning then return end
-	local name = tostring(select(1, ...))
-	if name == UnitName("player") then return end
-	C.Data.ReadyCheckRunning = true
-	CM:SendMessage(L("E_READYCHECK"):format(name), "SMART")
+	RCM:OnReadyCheck(tostring(select(1, ...)))
 end
 
 function C.Events.READY_CHECK_FINISHED(self, ...)
-	C.Data.ReadyCheckRunning = false
+	RCM:OnReadyCheckEnd()
 end
 
 function C.Events.GROUP_ROSTER_UPDATE(self, ...)

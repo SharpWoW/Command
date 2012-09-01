@@ -886,40 +886,17 @@ CM:Register({"readycheck", "rc"}, PM.Access.Groups.User.Level, function(args, se
 	if #args <= 0 then
 		if PM:GetAccess(sender) > PM.Access.Groups.Op.Level then
 			return "CM_ERR_NOACCESS", {sender.Info.Name, PM.Access.Groups.Op.Level, PM:GetAccess(sender)}
-		elseif GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() then
-			C.Data.ReadyCheckRunning = true
-			local name = tostring(sender.Info.Name)
-			DoReadyCheck()
-			return "CM_READYCHECK_ISSUED", {name}
 		else
-			return false, "CM_READYCHECK_NOPRIV"
+			return RCM:Start(sender.Info.Name)
 		end
-	end
-	local status = GetReadyCheckStatus("player")
-	if (status ~= "waiting" and status ~= nil) or GetReadyCheckTimeLeft() <= 0 or not C.Data.ReadyCheckRunning then
-		return false, "CM_READYCHECK_INACTIVE"
 	end
 	local arg = tostring(args[1]):lower()
-	if arg:match("^[ay]") then -- Accept
-		C.Data.ReadyCheckRunning = false
-		if ReadyCheckFrameYesButton then
-			ReadyCheckFrameYesButton:Click()
-		end
-		ConfirmReadyCheck(true)
-		status = GetReadyCheckStatus("player")
-		return "CM_READYCHECK_ACCEPTED"
+	if arg:match("^[ayr]") then -- Accept / Ready
+		return RCM:Accept()
 	elseif arg:match("^[dn]") then -- Decline
-		C.Data.ReadyCheckRunning = false
-		if ReadyCheckFrameNoButton then
-			ReadyCheckFrameNoButton:Click()
-		end
-		ConfirmReadyCheck(false)
-		status = GetReadyCheckStatus("player")
-		return "CM_READYCHECK_DECLINED"
-	else
-		return false, "CM_READYCHECK_INVALID", {tostring(arg)}
+		return RCM:Decline()
 	end
-	return false, "CM_READYCHECK_FAIL"
+	return false, "CM_READYCHECK_USAGE"
 end, "CM_READYCHECK_HELP")
 
 CM:Register({"loot", "l"}, PM.Access.Groups.Op.Level, function(args, sender, isChat, bnetInfo)

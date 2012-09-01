@@ -38,6 +38,7 @@
 	<Script file="InviteManager.lua" />
 	<Script file="DuelManager.lua" />
 	<Script file="RoleManager.lua" />
+	<Script file="ReadyCheckManager.lua" />
 	<Script file="CommandManager.lua" />
 	<Script file="ChatManager.lua" />
 	<Script file="Events.lua" />
