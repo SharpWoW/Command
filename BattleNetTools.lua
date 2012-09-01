@@ -39,7 +39,8 @@ local CET = C.Extensions.Table
 local CES = C.Extensions.String
 
 local FRIEND_RETURN_ARGC = 16
-local TOON_RETURN_ARGC = 17
+local TOON_RETURN_ARGC = 16
+local FRIENDTOON_RETURN_ARGC = 17
 
 local function ParseBNFriendResult(...)
 	local argc = select("#", ...)
