@@ -34,6 +34,7 @@ C.ReadyCheckManager = {}
 
 local L = C.LocaleManager
 local RCM = C.ReadyCheckManager
+local CM
 
 local MAX_DELAY = 55
 local DEFAULT_DELAY = 5
@@ -41,6 +42,7 @@ local DEFAULT_DELAY = 5
 local AnnouncePending = false
 
 function RCM:Init()
+	CM = C.ChatManager
 	self:LoadSavedVars()
 end
 
