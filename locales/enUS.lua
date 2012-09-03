@@ -714,7 +714,7 @@ local L = {
 
 	RM_SET_MINFAIL = "Minimum roll number cannot be higher than maximum roll number!",
 	RM_SET_MINSUCCESS = "Successfully set minimum roll number to %d!",
-	RM_SET_MAXFAIL = "Maximum roll number cannot be higher than minimum roll number!",
+	RM_SET_MAXFAIL = "Maximum roll number cannot be lower than minimum roll number!",
 	RM_SET_MAXSUCCESS = "Successfully set maximum roll number to %d!",
 	RM_SET_TIMEFAIL = "Amount must be larger than zero (0).",
 	RM_SET_TIMESUCCESS = "Successfully set default roll time to %d!",
