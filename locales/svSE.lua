@@ -672,6 +672,7 @@ local L = {
 
 	GT_DUNGEON_NORMAL = "Normal",
 	GT_DUNGEON_HEROIC = "Heroic",
+	GT_DUNGEON_CHALLENGE = "Challenge",
 	GT_RAID_N10 = "Normal (10)",
 	GT_RAID_N25 = "Normal (25)",
 	GT_RAID_H10 = "Heroic (10)",

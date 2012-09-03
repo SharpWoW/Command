@@ -1034,6 +1034,8 @@ CM:Register({"dungeondifficulty", "dungeondiff", "dd"}, PM.Access.Groups.User.Le
 		diff = GT.Difficulty.Dungeon.Normal
 	elseif diff:match("^h") then
 		diff = GT.Difficulty.Dungeon.Heroic
+	elseif diff:match("^c") then
+		diff = GT.Difficulty.Dungeon.Challenge
 	elseif tonumber(diff) then
 		diff = tonumber(diff)
 	else

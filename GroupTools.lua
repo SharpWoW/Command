@@ -32,9 +32,9 @@ local GetRaidRosterInfo = GetRaidRosterInfo
 local UnitIsGroupLeader = UnitIsGroupLeader
 local GetNumGroupMembers = GetNumGroupMembers
 local UnitIsGroupAssistant = UnitIsGroupAssistant
-local GetDungeonDifficulty = GetDungeonDifficulty
-local SetDungeonDifficulty = SetDungeonDifficulty
 local GetNumSubGroupMembers = GetNumSubgroupMembers
+local GetDungeonDifficultyID = GetDungeonDifficultyID
+local SetDungeonDifficultyID = SetDungeonDifficultyID
 
 local C = Command
 local L = C.LocaleManager
@@ -53,8 +53,10 @@ C.GroupTools = {
 		Dungeon = {
 			[1] = "GT_DUNGEON_NORMAL",
 			[2] = "GT_DUNGEON_HEROIC",
+			[3] = "GT_DUNGEON_CHALLENGE",
 			Normal = 1,
-			Heroic = 2
+			Heroic = 2,
+			Challenge = 3
 		},
 		Raid = {
 			[1] = "GT_RAID_N10",
@@ -203,13 +205,13 @@ function GT:SetDungeonDifficulty(diff)
 	diff = tonumber(diff)
 	if not diff then return false, "GT_DIFF_INVALID", {tostring(diff)} end
 	if not CET:HasValue(self.Difficulty.Dungeon, diff) then return false, "GT_DIFF_INVALID", {tostring(diff)} end
-	if diff == GetDungeonDifficulty() then return false, "GT_DD_DUPE", {self:GetFriendlyDungeonDifficulty(diff)} end
-	SetDungeonDifficulty(diff)
+	if diff == GetDungeonDifficultyID() then return false, "GT_DD_DUPE", {self:GetFriendlyDungeonDifficulty(diff)} end
+	SetDungeonDifficultyID(diff)
 	return "GT_DD_SUCCESS", {self:GetFriendlyDungeonDifficulty(diff)}
 end
 
 function GT:GetDungeonDifficultyString(diff)
-	return self.Difficulty.Dungeon[tonumber(diff) or GetDungeonDifficulty()]
+	return self.Difficulty.Dungeon[tonumber(diff) or GetDungeonDifficultyID()]
 end
 
 --- Get a string representation of the dungeon difficulty.
@@ -217,7 +219,7 @@ end
 -- @return String representation of dungeon difficulty.
 --
 function GT:GetFriendlyDungeonDifficulty(diff)
-	return L(self.Difficulty.Dungeon[tonumber(diff) or GetDungeonDifficulty()])
+	return L(self.Difficulty.Dungeon[tonumber(diff) or GetDungeonDifficultyID()])
 end
 
 --- Set the raid difficulty.
