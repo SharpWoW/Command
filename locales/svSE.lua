@@ -386,10 +386,10 @@ local L = {
 	PM_ERR_LOCKED = "Markerad spelare är låst och kan ej modifieras.",
 	PM_ERR_NOTINGROUP = "%s är inte i gruppen.",
 
-	PM_MATCH_INVITEACCEPTED_PARTY = "(%w+) går med i gruppen.",
-	PM_MATCH_INVITEACCEPTED_RAID = "(%w+) går med i raidgruppen.",
-	PM_MATCH_INVITEDECLINED = "(%w+) avböjde din gruppinbjudan.",
-	PM_MATCH_INGROUP = "(%w+) är redan i en grupp.",
+	PM_MATCH_INVITEACCEPTED_PARTY = "(%w+) joins the party.",
+	PM_MATCH_INVITEACCEPTED_RAID = "(%w+) has joined the raid group.",
+	PM_MATCH_INVITEDECLINED = "(%w+) declines your group invitation.",
+	PM_MATCH_INGROUP = "(%w+) is already in a group.",
 
 	PM_ACCESS_ALLOWED = "%q är beviljad åtkomst till %s.",
 	PM_ACCESS_DENIED = "%q är nekad åtkomst till %s.",

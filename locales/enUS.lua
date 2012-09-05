@@ -145,7 +145,7 @@ local L = {
 	CM_SET_CRM_USAGE = "Usage: set rm [enable|disable|toggle|enableannounce|disableannounce|toggleannounce|setdelay]",
 
 	CM_LOCALE_HELP = "Change locale settings.",
-	CM_LOCALE_USAGE ="Usage: locale [set|reset|usemaster|playerindependent]",
+	CM_LOCALE_USAGE = "Usage: locale [set|reset|usemaster|playerindependent]",
 	CM_LOCALE_CURRENT = "Current locale: %s.",
 	CM_LOCALE_SET_USAGE = "Usage: locale set <locale>",
 

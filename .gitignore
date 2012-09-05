@@ -1,3 +1,6 @@
 ss_*.png
 *_ss.png
+locales/*.xml
+*.exe
+locales/locale.template
 
