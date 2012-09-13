@@ -75,6 +75,7 @@ local CRM = C.RoleManager
 local Chat
 local CES = C.Extensions.String
 local CET = C.Extensions.Table
+local CEN = C.Extensions.Number
 
 --- Initialize CommandManager.
 --
@@ -256,7 +257,7 @@ CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, i
 		return Chat:SetCmdChar(args[2])
 	elseif mod:match("^de") then -- DeathManager
 		if #args < 2 then
-			if C.DeathManager:IsEnabled() then
+			if DM:IsEnabled() then
 				return "CM_SET_DM_ISENABLED"
 			end
 			return "CM_SET_DM_ISDISABLED"
@@ -265,24 +266,50 @@ CM:Register({"set", "s"}, PM.Access.Groups.Admin.Level, function(args, sender, i
 			return false, "CM_ERR_NOCHAT"
 		end
 		local setting = args[2]:lower()
-		if setting:match("^[eay].*rel") then -- Enable release
-			return C.DeathManager:EnableRelease()
+		if setting:match("^(s.*)?rel.*d") then -- (Set) release delay
+			if #args < 3 then
+				return "CM_SET_DM_RELEASEDELAY_CURRENT", {CEN:FormatSeconds(DM:GetReleaseDelay())}
+			end
+			local newDelay = tonumber(args[3])
+			if not newDelay then return false, "CM_SET_DM_RELEASEDELAY_USAGE" end
+			return DM:SetReleaseDelay(newDelay)
+		elseif setting:match("^[eay].*rel.*a") then -- Enable release announce
+			return DM:EnableReleaseAnnounce()
+		elseif setting:match("^[dn].*rel.*a") then -- Disable release announce
+			return DM:DisableReleaseAnnounce()
+		elseif setting:match("^[eay].*rel") then -- Enable release
+			return DM:EnableRelease()
 		elseif setting:match("^[dn].*rel") then -- Disable release
-			return C.DeathManager:DisableRelease()
+			return DM:DisableRelease()
+		elseif setting:match("^(s?.*)r.*d") then -- (Set) ress delay
+			if #args < 3 then
+				return "CM_SET_DM_RESURRECTDELAY_CURRENT", {CEN:FormatSeconds(DM:GetResurrectDelay())}
+			end
+			local newDelay = tonumber(args[3])
+			if not newDelay then return false, "CM_SET_DM_RESURRECTDELAY_USAGE" end
+			return DM:SetResurrectDelay(newDelay)
+		elseif setting:match("^[eay].*r.*a") then -- Enable ress announce
+			return DM:EnableResurrectAnnounce()
+		elseif setting:match("^[dn].*r.*a") then -- Disable ress announce
+			return DM:DisableResurrectAnnounce()
 		elseif setting:match("^[eay].*r") then -- Enable ress
-			return C.DeathManager:EnableResurrect()
+			return DM:EnableResurrect()
 		elseif setting:match("^[dn].*r") then -- Disable ress
-			return C.DeathManager:DisableResurrect()
+			return DM:DisableResurrect()
 		elseif setting:match("^[eay]") then -- Enable
-			return C.DeathManager:Enable()
+			return DM:Enable()
 		elseif setting:match("^[dn]") then -- Disable
-			return C.DeathManager:Disable()
+			return DM:Disable()
+		elseif setting:match("^t.*rel.*a") then -- Toggle release announce
+			return DM:ToggleReleaseAnnounce()
 		elseif setting:match("^t.*rel") then -- Toggle release
-			return C.DeathManager:ToggleRelease()
+			return DM:ToggleRelease()
+		elseif setting:match("^t.*r.*a") then -- Toggle resurrect announce
+			return DM:ToggleResurrectAnnounce()
 		elseif setting:match("^t.*r") then -- Toggle resurrect
-			return C.DeathManager:ToggleResurrect()
+			return DM:ToggleResurrect()
 		elseif setting:match("^t") then -- Toggle
-			return C.DeathManager:Toggle()
+			return DM:Toggle()
 		end
 		return false, "CM_SET_DM_USAGE"
 	elseif mod:match("^s") then -- SummonManager
