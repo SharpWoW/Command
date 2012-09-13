@@ -135,7 +135,7 @@ function C.Events.RESURRECT_REQUEST(self, ...)
 end
 
 function C.Events.PLAYER_ALIVE(self, ...)
-	if not UnitIsDeadOrGhost("player") then return end -- Return if player released to graveyard
+	if UnitIsDeadOrGhost("player") then return end -- Return if player released to graveyard
 	-- Player has accepted a ress before releasing spirit
 	DM.Dead = false
 	DM.Resurrection = false
