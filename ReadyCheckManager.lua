@@ -94,7 +94,7 @@ function RCM:OnReadyCheckEnd()
 end
 
 function RCM:Announce(sender)
-	if not self:ReadyCheckPending() then return end
+	if not self:ReadyCheckPending() or self:HasResponded() then return end
 	CM:SendMessage(L("RCM_ANNOUNCE"):format(sender), "SMART")
 end
 
