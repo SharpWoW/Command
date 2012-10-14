@@ -1,3 +1,4 @@
+--$GITINFO_PREFIX$C.GitInfo
 --[[
 	* Copyright (c) 2011-2012 by Adam Hellberg.
 	*
@@ -44,7 +45,8 @@ Command = {
 	Global = {},
 	Settings = {},
 	Events = {},
-	Data = {}
+	Data = {},
+	GitInfo = {}
 }
 
 local C = Command
@@ -61,6 +63,10 @@ local CDM
 local CRM
 local RCM
 local log
+
+-- :BEGIN: Automatic insertion of git information
+--$WRITE_GITINFO$
+-- :END: Automatic insertion of git information
 
 --- Initialize Command.
 --
