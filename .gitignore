@@ -3,4 +3,4 @@ ss_*.png
 locales/*.xml
 *.exe
 locales/locale.template
-
+*.zip
