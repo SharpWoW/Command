@@ -22,6 +22,8 @@ local type = type
 local pairs = pairs
 local ipairs = ipairs
 local unpack = unpack
+local select = select
+local tinsert = table.insert
 local tostring = tostring
 local tonumber = tonumber
 
@@ -72,6 +74,7 @@ local SM = C.SummonManager
 local IM = C.InviteManager
 local CDM = C.DuelManager
 local CRM = C.RoleManager
+local RCM = C.ReadyCheckManager
 local Chat
 local CES = C.Extensions.String
 local CET = C.Extensions.Table
@@ -107,7 +110,7 @@ function CM:Register(names, access, func, help)
 	}
 	if #names > 1 then
 		for i=2,#names do
-			table.insert(entry.Alias, names[i]:lower())
+			tinsert(entry.Alias, names[i]:lower())
 		end
 	end
 	self.Commands[names[1]] = entry
@@ -154,11 +157,11 @@ function CM:GetCommands(all) -- NOTE: Only returns the NAMES, not the actual com
 	local t = {}
 	for k,v in pairs(self.Commands) do
 		if k ~= "__DEFAULT__" or all then
-			table.insert(t, k)
+			tinsert(t, k)
 		end
 		if all and #v.Alias > 0 then
 			for _,a in pairs(v.Alias) do
-				table.insert(t, a)
+				tinsert(t, a)
 			end
 		end
 	end
@@ -1203,7 +1206,7 @@ SlashCmdList[C.Name:upper()] = function(msg, editBox)
 	local t = {}
 	if #args > 1 then
 		for i=2,#args do
-			table.insert(t, args[i])
+			tinsert(t, args[i])
 		end
 	end
 	local result, arg, errArg = CM:HandleCommand(cmd, t, false, PM:GetOrCreatePlayer(UnitName("player")))
