@@ -34,6 +34,7 @@ C.ReadyCheckManager = {}
 
 local L = C.LocaleManager
 local RCM = C.ReadyCheckManager
+local GT = C.GroupTools
 local CM
 
 local MAX_DELAY = 55
