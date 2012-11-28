@@ -112,12 +112,14 @@ end
 -- @param isBN Is this message targeted to a BNet friend?
 -- @param smartSay Fallback to SAY instead of local logging if not in group
 --
-function CM:SendMessage(msg, channel, target, isBN, smartSay)
+function CM:SendMessage(msg, channel, target, isBN, smartSay, raw)
 	isBN = isBN or false
 	if not self.Settings.LOCAL_ONLY then
 		-- Sanitize message
 		--msg = msg:gsub("|*", "|") -- First make sure every pipe char is alone (This is probably not needed)
-		msg = tostring(msg):gsub("|", "||") -- Escape the pipe characters
+		if not raw then
+			msg = tostring(msg):gsub("|", "||") -- Escape the pipe characters
+		end
 		msg = ("[%s] %s"):format(C.Name, msg)
 		if channel == "SMART" then
 			if GT:IsRaid() then
@@ -224,7 +226,8 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 		}
 	end
 	local player = PM:GetOrCreatePlayer(sender, realm)
-	local result, arg, errArg = CCM:HandleCommand(cmd, t, sourceChannel, player, bnetInfo)
+	local result, arg, errArg, extra = CCM:HandleCommand(cmd, t, sourceChannel, player, bnetInfo)
+	local raw = (extra and type(errArg) == "table") or (errArg and type(arg) == "table") or (arg and type(arg ~= "table"))
 	if isBN then
 		target = pID
 		sender = pID
@@ -243,7 +246,7 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 					if type(v[2]) == "table" then
 						s = s:format(unpack(v[2]))
 					end
-					self:SendMessage(s, channel, target, isBN)
+					self:SendMessage(s, channel, target, isBN, nil, raw)
 				end
 			end
 		elseif result == "RAW_TABLE_OUTPUT" then
@@ -252,20 +255,20 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 				return
 			end
 			for _,v in ipairs(arg) do
-				self:SendMessage(tostring(v), channel, target, isBN)
+				self:SendMessage(tostring(v), channel, target, isBN, nil, raw)
 			end
 		else
 			local s = l[result]
 			if type(arg) == "table" then
 				s = s:format(unpack(arg))
 			end
-			self:SendMessage(s, channel, target, isBN)
+			self:SendMessage(s, channel, target, isBN, nil, raw)
 		end
 	elseif arg then
 		local s = l[arg]
 		if type(errArg) == "table" then
 			s = s:format(unpack(errArg))
 		end
-		self:SendMessage(s, "WHISPER", sender, isBN)
+		self:SendMessage(s, "WHISPER", sender, isBN, nil, raw)
 	end
 end

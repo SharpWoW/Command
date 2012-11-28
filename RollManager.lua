@@ -150,7 +150,7 @@ function RM:StartRoll(sender, item, time)
 	if item then
 		self.Item = item
 		RollTimer.Frame:SetScript("OnUpdate", RollTimerUpdate)
-		return "RM_START_SUCCESSITEM", {self.Sender, self.Item, time, self.Settings.MIN_ROLL, self.Settings.MAX_ROLL}
+		return "RM_START_SUCCESSITEM", {self.Sender, self.Item, time, self.Settings.MIN_ROLL, self.Settings.MAX_ROLL}, true
 	else
 		RollTimer.Frame:SetScript("OnUpdate", RollTimerUpdate)
 		return "RM_START_SUCCESS", {self.Sender, time, self.Settings.MIN_ROLL, self.Settings.MAX_ROLL}

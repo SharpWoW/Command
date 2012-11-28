@@ -979,7 +979,7 @@ CM:Register({"roll", "r"}, PM.Access.Groups.Op.Level, function(args, sender, isC
 	args[1] = args[1]:lower()
 	if args[1]:match("^sta") then
 		if #args < 2 then
-			return false, "CM_LOOT_START_USAGE"
+			return false, "CM_ROLL_START_USAGE"
 		end
 		local time = tonumber(args[2])
 		local item
@@ -1018,7 +1018,7 @@ CM:Register({"roll", "r"}, PM.Access.Groups.Op.Level, function(args, sender, isC
 		end
 	elseif args[1]:match("^se") then -- Set
 		if #args < 3 then
-			return false, "CM_LOOT_SET_USAGE"
+			return false, "CM_ROLL_SET_USAGE"
 		end
 		args[2] = args[2]:lower()
 		if args[2]:match("^mi") then
@@ -1028,11 +1028,11 @@ CM:Register({"roll", "r"}, PM.Access.Groups.Op.Level, function(args, sender, isC
 		elseif args[2]:match("^t") then
 			return RM:SetTime(tonumber(args[3]))
 		else
-			return false, "CM_LOOT_SET_USAGE"
+			return false, "CM_ROLL_SET_USAGE"
 		end
 	end
-	return false, "CM_LOOT_USAGE"
-end, "CM_LOOT_HELP")
+	return false, "CM_ROLL_USAGE"
+end, "CM_ROLL_HELP")
 
 CM:Register({"raidwarning", "rw", "raid_warning"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	if not GT:IsRaid() then
