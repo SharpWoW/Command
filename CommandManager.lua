@@ -64,6 +64,7 @@ C.CommandManager = {
 local L = C.LocaleManager
 local CM = C.CommandManager
 local PM = C.PlayerManager
+local EM = C.EmoteManager
 local QM = C.QueueManager
 local RM = C.RollManager
 local LM = C.LootManager
@@ -1194,6 +1195,19 @@ CM:Register({"follow", "f"}, PM.Access.Groups.User.Level, function(args, sender,
 	FollowUnit(name)
 	return "CM_FOLLOW_STARTED", {name}
 end, "CM_FOLLOW_HELP")
+
+CM:Register({"emote", "em", "e"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
+	if #args < 1 then
+		return false, "CM_EMOTE_USAGE"
+	end
+
+	return EM:DoEmote(args[1])
+end, "CM_EMOTE_HELP")
+
+-- Alias for !emote sit
+CM:Register({"sit"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
+	return EM:DoEmote(EM.Emotes.Sit)
+end, "CM_SIT_HELP")
 
 for i,v in ipairs(CM.Slash) do
 	_G["SLASH_" .. C.Name:upper() .. i] = "/" .. v

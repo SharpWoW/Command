@@ -317,6 +317,11 @@ local L = {
 	CM_FOLLOW_STARTED = "Started following %s!",
 	CM_FOLLOW_SELF = "I cannot follow myself.",
 
+	CM_EMOTE_HELP = "Performs an emote",
+	CM_EMOTE_USAGE = "Usage: emote <emote> (E.g: 'emote sit')",
+
+	CM_SIT_HELP = "Alias for 'emote sit'",
+
 	------------
 	-- Events --
 	------------
@@ -470,6 +475,19 @@ local L = {
 	PM_LIST_REMOVEBLACK = "Removed %s from blacklist.",
 	PM_LIST_SETWHITE = "Now using list as whitelist.",
 	PM_LIST_SETBLACK = "Now using list as blacklist.",
+
+	------------------
+	-- EmoteManager --
+	------------------
+
+	EM_ERR_UNKNOWN = "Unknown emote: %s",
+	EM_ERR_CANNOT = "Unable to perform emote %q: %s",
+
+	EM_SUCCESS = "Successfully executed the %s emote!",
+
+	EM_VALIDATOR_ERR_MOVEMENT = "Cannot perform that emote while moving",
+	EM_VALIDATOR_ERR_FLYING = "Cannot perform that emote while flying",
+	EM_VALIDATOR_ERR_COMBAT = "Cannot perform that emote while in combat",
 
 	------------------
 	-- DeathManager --

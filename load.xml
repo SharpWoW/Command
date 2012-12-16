@@ -29,6 +29,7 @@
 	<Script file="GroupTools.lua" />
 	<Script file="AuthManager.lua" />
 	<Script file="PlayerManager.lua" />
+	<Script file="EmoteManager.lua" />
 	<Script file="QueueManager.lua" />
 	<Script file="RollManager.lua" />
 	<Script file="LootManager.lua" />
