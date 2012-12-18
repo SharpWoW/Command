@@ -73,6 +73,7 @@ local AM = C.AuthManager
 local DM = C.DeathManager
 local SM = C.SummonManager
 local IM = C.InviteManager
+local FM = C.FactsManager
 local CDM = C.DuelManager
 local CRM = C.RoleManager
 local RCM = C.ReadyCheckManager
@@ -242,7 +243,7 @@ CM:Register({"commands", "cmds", "cmdlist", "listcmds", "listcommands", "command
 		all = args[1] == "all"
 	end
 	local cmds = CM:GetCommands(all)
-	return "RAW_TABLE_OUTPUT", CES:Fit(cmds, 240, ", ") -- Max length is 255, "[Command] " takes up 10. This leaves us with 5 characters grace.
+	return Chat.SpecialOutput.RawTable, CES:Fit(cmds, 240, ", ") -- Max length is 255, "[Command] " takes up 10. This leaves us with 5 characters grace.
 end, "CM_COMMANDS_HELP")
 
 CM:Register({"version", "ver", "v"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
@@ -1200,7 +1201,6 @@ CM:Register({"emote", "em", "e"}, PM.Access.Groups.User.Level, function(args, se
 	if #args < 1 then
 		return false, "CM_EMOTE_USAGE"
 	end
-
 	return EM:DoEmote(args[1])
 end, "CM_EMOTE_HELP")
 
@@ -1208,6 +1208,49 @@ end, "CM_EMOTE_HELP")
 CM:Register({"sit"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
 	return EM:DoEmote(EM.Emotes.Sit)
 end, "CM_SIT_HELP")
+
+CM:Register({"fact", "facts"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
+	if #args < 1 then
+		return false, "CM_FACT_USAGE"
+	end
+	return FM:AnnounceFact(args[1])
+end, "CM_FACT_HELP")
+
+-- Alias for !fact cat
+CM:Register({"cat", "c", "meow"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
+	return FM:AnnounceFact("cat")
+end, "CM_CAT_HELP")
+
+CM:Register({"factsettings", "factsetting", "factset"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat, bnetInfo)
+	if #args < 1 then
+		if FM:IsEnabled() then
+			return "CM_FACTSETTINGS_ENABLED"
+		end
+		return "CM_FACTSETTINGS_DISABLED"
+	end
+	local option = args[1]:lower()
+	if option:match("^no") then -- NoDupe
+		if sub:match("^[eay]") then -- Enable NoDupe
+			return FM:EnableNoDupe()
+		elseif sub:match("^[dnc]") then -- Disable NoDupe
+			return FM:DisableNoDupe()
+		elseif sub:match("^t") then -- Toggle NoDupe
+			return FM:ToggleNoDupe()
+		else
+			if FM:IsNoDupeEnabled() then
+				return "CM_FACTSETTINGS_NODUPE_ENABLED"
+			end
+			return "CM_FACTSETTINGS_NODUPE_DISABLED"
+		end
+	elseif option:match("^[eay]") then -- Enable
+		return FM:Enable()
+	elseif option:match("^[dnc][^o]") then -- Disable
+		return FM:Disable()
+	elseif option:match("^t") then -- Toggle
+		return FM:Toggle()
+	end
+	return false, "CM_FACTSETTINGS_USAGE"
+end, "CM_FACTSETTINGS_HELP")
 
 for i,v in ipairs(CM.Slash) do
 	_G["SLASH_" .. C.Name:upper() .. i] = "/" .. v
@@ -1236,10 +1279,12 @@ SlashCmdList[C.Name:upper()] = function(msg, editBox)
 					C.Logger:Normal(s)
 				end
 			end
-		elseif result == "RAW_TABLE_OUTPUT" then
+		elseif result == Chat.SpecialOutput.RawTable then
 			for _,v in ipairs(arg) do
 				C.Logger:Normal(tostring(v))
 			end
+		elseif result == Chat.SpecialOutput.Raw then
+			C.Logger:Normal(tostring(arg))
 		else
 			local s = l[result]
 			if type(arg) == "table" then

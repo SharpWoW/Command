@@ -60,6 +60,10 @@ C.ChatManager = {
 		CHAT_MSG_SAY					= "WHISPER",
 		CHAT_MSG_WHISPER				= "WHISPER",
 		CHAT_MSG_YELL					= "WHISPER"
+	},
+	SpecialOutput = {
+		Raw = 1,
+		RawTable = 2
 	}
 }
 
@@ -111,6 +115,7 @@ end
 -- @param target Player or channel index to send message to.
 -- @param isBN Is this message targeted to a BNet friend?
 -- @param smartSay Fallback to SAY instead of local logging if not in group
+-- @param raw If true, do not escape pipe characters
 --
 function CM:SendMessage(msg, channel, target, isBN, smartSay, raw)
 	isBN = isBN or false
@@ -227,7 +232,7 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 	end
 	local player = PM:GetOrCreatePlayer(sender, realm)
 	local result, arg, errArg, extra = CCM:HandleCommand(cmd, t, sourceChannel, player, bnetInfo)
-	local raw = (extra and type(errArg) == "table") or (errArg and type(arg) == "table") or (arg and type(arg ~= "table"))
+	local raw = (extra and type(errArg) == "table") or (errArg and type(arg) == "table") or (arg and type(arg) ~= "table")
 	if isBN then
 		target = pID
 		sender = pID
@@ -249,7 +254,7 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 					self:SendMessage(s, channel, target, isBN, nil, raw)
 				end
 			end
-		elseif result == "RAW_TABLE_OUTPUT" then
+		elseif result == self.SpecialOutput.RawTable then
 			if type(arg) ~= "table" then
 				error("Received RAW_TABLE_OUTPUT request, but arg was of type '" .. type(arg) .. "', expected 'table', aborting...")
 				return
@@ -257,6 +262,12 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 			for _,v in ipairs(arg) do
 				self:SendMessage(tostring(v), channel, target, isBN, nil, raw)
 			end
+		elseif result == self.SpecialOutput.Raw then
+			if type(arg) ~= "string" then
+				error("Received RAW_OUTPUT request, but arg was of type '" .. type(arg) .."', expected 'string', aborting...")
+				return
+			end
+			self:SendMessage(arg, channel, target, isBN, nil, raw)
 		else
 			local s = l[result]
 			if type(arg) == "table" then

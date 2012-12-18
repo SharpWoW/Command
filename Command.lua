@@ -59,6 +59,7 @@ local AC
 local DM
 local SM
 local IM
+local FM
 local CDM
 local CRM
 local RCM
@@ -83,6 +84,7 @@ function C:Init()
 	DM = self.DeathManager
 	SM = self.SummonManager
 	IM = self.InviteManager
+	FM = self.FactsManager
 	CDM = self.DuelManager
 	CRM = self.RoleManager
 	RCM = self.ReadyCheckManager
@@ -126,6 +128,7 @@ function C:LoadSavedVars()
 	DM:Init()
 	SM:Init()
 	IM:Init()
+	FM:Init()
 	CDM:Init()
 	CRM:Init()
 	RCM:Init()
