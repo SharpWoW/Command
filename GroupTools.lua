@@ -26,8 +26,8 @@ local GetLFGMode = GetLFGMode
 local UnitInRaid = UnitInRaid
 local UnitInParty = UnitInParty
 local UnitIsConnected = UnitIsConnected
-local GetRaidDifficulty = GetRaidDifficulty
-local SetRaidDifficulty = SetRaidDifficulty
+local GetRaidDifficultyID = GetRaidDifficultyID
+local SetRaidDifficultyID = SetRaidDifficultyID
 local GetRaidRosterInfo = GetRaidRosterInfo
 local UnitIsGroupLeader = UnitIsGroupLeader
 local GetNumGroupMembers = GetNumGroupMembers
@@ -230,8 +230,8 @@ function GT:SetRaidDifficulty(diff)
 	diff = tonumber(diff)
 	if not diff then return false, "GT_DIFF_INVALID", {tostring(diff)} end
 	if not CET:HasValue(self.Difficulty.Raid, diff) then return false, "GT_DIFF_INVALID", {tostring(diff)} end
-	if diff == GetRaidDifficulty() then return false, "GT_RD_DUPE", {self:GetFriendlyRaidDifficulty(diff)} end
-	SetRaidDifficulty(diff)
+	if diff == GetRaidDifficultyID() then return false, "GT_RD_DUPE", {self:GetFriendlyRaidDifficulty(diff)} end
+	SetRaidDifficultyID(diff)
 	return "GT_RD_SUCCESS", {self:GetFriendlyRaidDifficulty(diff)}
 end
 
@@ -240,7 +240,7 @@ end
 -- @return String representation of raid difficulty.
 --
 function GT:GetRaidDifficultyString(diff)
-	return self.Difficulty.Raid[tonumber(diff) or GetRaidDifficulty()]
+	return self.Difficulty.Raid[tonumber(diff) or GetRaidDifficultyID()]
 end
 
 --- Get a string representation of the raid difficulty.
@@ -248,5 +248,5 @@ end
 -- @return String representation of raid difficulty.
 --
 function GT:GetFriendlyRaidDifficulty(diff)
-	return L(self.Difficulty.Raid[tonumber(diff) or GetRaidDifficulty()])
+	return L(self.Difficulty.Raid[tonumber(diff) or GetRaidDifficultyID()])
 end
