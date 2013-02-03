@@ -192,7 +192,7 @@ function CM:HandleCommand(command, args, isChat, player, bnetInfo)
 		end
 		local result, arg, errArg = cmd.Call(args, player, isChat, bnetInfo)
 		if type(result) == "nil" then
-			return "CM_ERR_UNKNOWN"
+			return nil
 		end
 		return result, arg, errArg
 	else
@@ -675,7 +675,7 @@ CM:Register({"invite", "inv"}, PM.Access.Groups.User.Level, function(args, sende
 	if bnetInfo then pID = bnetInfo.PresenceID end
 	if type(args[1]) == "string" then
 		local player = PM:GetOrCreatePlayer(args[1])
-		return PM:Invite(player, sender, pID)
+		return PM:Invite(player, sender, pID, tostring(args[2]):lower():match("^f"))
 	else
 		return PM:Invite(sender, sender, pID)
 	end
@@ -687,7 +687,7 @@ CM:Register({"inviteme", "invme"}, PM.Access.Groups.User.Level, function(args, s
 	end
 	local pID
 	if bnetInfo then pID = bnetInfo.PresenceID end
-	return PM:Invite(sender, sender, pID)
+	return PM:Invite(sender, sender, pID, tostring(args[2]):lower():match("^f"))
 end, "CM_INVITEME_HELP")
 
 CM:Register({"blockinvites", "blockinvite", "denyinvites", "denyinvite"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
@@ -1213,13 +1213,20 @@ CM:Register({"fact", "facts"}, PM.Access.Groups.User.Level, function(args, sende
 	if #args < 1 then
 		return false, "CM_FACT_USAGE"
 	end
-	return FM:AnnounceFact(args[1])
+	return FM:AnnounceFact(args[1], tonumber(args[2]))
 end, "CM_FACT_HELP")
 
 -- Alias for !fact cat
 CM:Register({"cat", "c", "meow"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
-	return FM:AnnounceFact("cat")
+	return FM:AnnounceFact("cat", tonumber(args[1]))
 end, "CM_CAT_HELP")
+
+CM:Register({"factstats", "factstat", "fstat", "fs"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
+	if #args < 1 then
+		return FM:AnnounceLoadedTopics()
+	end
+	return FM:AnnounceTopicInfo(args[1])
+end, "CM_FACTSTATS_HELP")
 
 CM:Register({"factsettings", "factsetting", "factset"}, PM.Access.Groups.Admin.Level, function(args, sender, isChat, bnetInfo)
 	if #args < 1 then

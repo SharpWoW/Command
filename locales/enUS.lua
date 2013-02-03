@@ -322,6 +322,20 @@ local L = {
 
 	CM_SIT_HELP = "Alias for 'emote sit'",
 
+	CM_FACT_HELP = "Returns a random or specific fact from the specified topic",
+	CM_FACT_USAGE = "Usage: fact <topic> [index]",
+
+	CM_CAT_HELP = "Returns a random or specific cat fact (Usage: cat [index])",
+
+	CM_FACTSTATS_HELP = "Return info about all fact topics or a specific one (Usage: factstats [topic])",
+
+	CM_FACTSETTINGS_HELP = "Configure FactsManager",
+	CM_FACTSETTINGS_USAGE = "factsettings [enable|disable|toggle|nodupe [enable|disable|toggle]]",
+	CM_FACTSETTINGS_ENABLED = "FactsManager is enabled.",
+	CM_FACTSETTINGS_DISABLED = "FactsManager is disabled",
+	CM_FACTSETTINGS_NODUPE_ENABLED = "FactsManager (No Duplicates) is enabled.",
+	CM_FACTSETTINGS_NODUPE_DISABLED = "FactsManager (No Duplicates) is disabled.",
+
 	------------
 	-- Events --
 	------------
@@ -396,6 +410,8 @@ local L = {
 	PM_MATCH_INVITEACCEPTED_RAID = "(%w+) has joined the raid group.",
 	PM_MATCH_INVITEDECLINED = "(%w+) declines your group invitation.",
 	PM_MATCH_INGROUP = "(%w+) is already in a group.",
+	PM_MATCH_NOTFOUND = "Cannot find player '(%w+)'.",
+	PM_MATCH_NOTPLAYING = "No player named '(%w+)' is currently playing.",
 
 	PM_ACCESS_ALLOWED = "%q is now allowed for %s.",
 	PM_ACCESS_DENIED = "%q is now denied for %s.",
@@ -438,6 +454,7 @@ local L = {
 	PM_INVITE_ACTIVE = "%s already has an active invite.",
 	PM_INVITE_DECLINED = "%s has declined the group invite.",
 	PM_INVITE_INOTHERGROUP = "%s is already in a group.",
+	PM_INVITE_NOTFOUND = "Unable to find player %s.",
 	PM_INVITE_NOTIFYTARGET = "Invited you to the group.",
 	PM_INVITE_NOTIFY = "%s invited you to the group, %s. Whisper !blockinvites to block these invites.",
 	PM_INVITE_SUCCESS = "Invited %s to group.",
@@ -772,7 +789,27 @@ local L = {
 	RM_ANNOUNCE_WINITEM = "The winner is: %s! With a roll of %d for %s.",
 	RM_ANNOUNCE_MULTIPLE = "There are multiple winners:",
 	RM_ANNOUNCE_MULTIPLEITEM = "There are multiple winners for %s:",
-	RM_ANNOUNCE_WINNER = "%s with a roll of %d."
+	RM_ANNOUNCE_WINNER = "%s with a roll of %d.",
+
+	------------------
+	-- FactsManager --
+	------------------
+
+	FM_ERR_TOPIC_NOT_FOUND = "Unable to find the specified topic: %s.",
+	FM_ERR_TOPIC_EMPTY = "The specified topic, %s, is empty.",
+	FM_ERR_NO_TOPICS_FOUND = "FactsManager was unable to find any topics.",
+	FM_ERR_TOPIC_EMPTY = "The randomly selected topic, %s, is empty.",
+	FM_ERR_DISABLED = "FactsManager is disabled.",
+	FM_ERR_FACT_NOT_FOUND = "Could not find %s fact #%d.",
+
+	FM_ENABLED = "FactsManager has been enabled.",
+	FM_DISABLED = "FactsManager has been disabled.",
+
+	FM_NODUPE_ENABLED = "FactsManager (No Duplicates) has been enabled.",
+	FM_NODUPE_DISABLED = "FactsManager (No Duplicates) has been disabled.",
+
+	FM_LOADED_FORMAT = "Loaded topics: %s",
+	FM_INFO_FORMAT = "Topic %q has %d loaded facts."
 }
 
 Command.LocaleManager:Register("enUS", L)

@@ -21,4 +21,6 @@
 ..\FrameXML\UI.xsd">
 	<Script file="FactsManager.lua" />
 	<Script file="facts\cat.lua" />
+	<Script file="facts\rules.lua" />
+	<Script file="facts\chuck.lua" />
 </Ui>

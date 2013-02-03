@@ -267,6 +267,13 @@ function PM:ParseMessage(message)
 		CM:SendMessage(L("PM_INVITE_DECLINED"):format(name), "WHISPER", self.Invites[name][1])
 		self.Invites[name] = nil
 	end
+	name = message:match(L("PM_MATCH_NOTFOUND"))
+	if not name then name = message:match(L("PM_MATCH_NOTPLAYING")) end
+	if name then
+		if not self.Invites[name] then return end
+		CM:SendMessage(L("PM_INVITE_NOTFOUND"):format(name), "WHISPER", self.Invites[name][1])
+		self.Invites[name] = nil
+	end
 end
 
 --- Get or create a player.
@@ -618,10 +625,11 @@ end
 -- @param player Player object of player to invite.
 -- @param sender Player object of the inviting player.
 -- @param pID Presence ID if this was an Invite(Me) command from B.Net chat
+-- @param force Force an invite call, used when the active invite system fails
 -- @return String stating the result of the invite, false if error.
 -- @return Error message if unsuccessful, nil otherwise.
 --
-function PM:Invite(player, sender, pID)
+function PM:Invite(player, sender, pID, force)
 	if not sender then sender = self:GetOrCreatePlayer(UnitName("player")) end
 	if player.Info.Name == UnitName("player") then
 		return false, "PM_INVITE_SELF"
@@ -633,7 +641,7 @@ function PM:Invite(player, sender, pID)
 		return false, "PM_INVITE_LFG"
 	end
 	if GT:IsGroupLeader() or GT:IsRaidLeaderOrAssistant() or not GT:IsGroup() then
-		if self.Invites[player.Info.Name] then
+		if self.Invites[player.Info.Name] and not force then
 			return false, "PM_INVITE_ACTIVE", {player.Info.Name}
 		elseif player.Info.Name == sender.Info.Name then
 			if player.Info.Realm == GetRealmName() or not pID then
