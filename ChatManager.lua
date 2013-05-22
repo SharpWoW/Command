@@ -201,7 +201,7 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 	isBN = isBN or false
 	pID = pID or nil
 	target = target or sender
-	local raw = msg
+	local rawMsg = msg
 	msg = CES:Trim(msg)
 	local args = self:ParseMessage(msg)
 	if not self:IsCommand(args[1]) then return end
@@ -232,7 +232,7 @@ function CM:HandleMessage(msg, sender, channel, target, sourceChannel, isBN, pID
 	end
 	local player = PM:GetOrCreatePlayer(sender, realm)
 	local result, arg, errArg, extra = CCM:HandleCommand(cmd, t, sourceChannel, player, bnetInfo)
-	local raw = (extra and type(errArg) == "table") or (errArg and type(arg) == "table") or (arg and type(arg) ~= "table")
+	local raw = (extra and type(errArg) == "table") or (errArg and type(arg) == "table") -- or (arg and type(arg) ~= "table")
 	if isBN then
 		target = pID
 		sender = pID
