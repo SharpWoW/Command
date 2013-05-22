@@ -315,6 +315,7 @@ local L = {
 	CM_ROLE_CURRENT = "Min nuvarande roll är %s.",
 	CM_ROLE_SET_USAGE = "Användning: role set tank|healer|dps",
 	CM_ROLE_CONFIRM_USAGE = "Användning: role confirm [tank|healer|dps]",
+	CM_ROLE_NOT_ACTIVE = "Roll check is not active, did you mean to use !role set?",
 
 	CM_FOLLOW_HELP = "Börjar följa specificerade spelaren(eller sändaren om ingen spelare angiven).",
 	CM_FOLLOW_STARTED = "Börjat följa %s!",

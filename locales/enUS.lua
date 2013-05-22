@@ -312,6 +312,7 @@ local L = {
 	CM_ROLE_CURRENT = "My current role is %s.",
 	CM_ROLE_SET_USAGE = "Usage: role set tank|healer|dps",
 	CM_ROLE_CONFIRM_USAGE = "Usage: role confirm [tank|healer|dps]",
+	CM_ROLE_NOT_ACTIVE = "Roll check is not active, did you mean to use !role set?",
 
 	CM_FOLLOW_HELP = "Starts following the specified player (or sender if no player specified).",
 	CM_FOLLOW_STARTED = "Started following %s!",

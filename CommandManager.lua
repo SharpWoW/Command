@@ -1154,7 +1154,7 @@ CM:Register({"role", "rm"}, PM.Access.Groups.User.Level, function(args, sender, 
 		return false, "CM_ERR_DISABLED"
 	end
 	if #args < 1 then
-		return "CM_ROLE_CURRENT", {CRM.Roles[CRM:GetRole()]}
+		return "CM_ROLE_CURRENT", {L(CRM.Roles[CRM:GetRole()])}
 	end
 	local arg = args[1]:lower()
 	if arg:match("^st") or arg:match("^i") then -- Start/Initiate/Issue
@@ -1169,7 +1169,9 @@ CM:Register({"role", "rm"}, PM.Access.Groups.User.Level, function(args, sender, 
 		end
 		return false, "CM_ROLE_SET_USAGE"
 	elseif arg:match("^c") then -- Confirm (Role)
-		if #args >= 2 then -- Role supplied as argument #2
+		if not CRM:RolePollActive() then
+			return false, "CM_ROLE_NOT_ACTIVE"
+		elseif #args >= 2 then -- Role supplied as argument #2
 			local role = args[2]:lower()
 			if role:match("^[thd]") then
 				return CRM:SetRole(role)
