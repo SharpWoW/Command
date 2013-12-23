@@ -29,9 +29,7 @@ local CM = C.ChatManager
 local AC = C.AddonComm
 local BNT = C.BattleNetTools
 
-function C.Events.CHAT_MSG_SYSTEM(self, event, ...)
-	local message = (select(1, ...))
-
+function C.Events.CHAT_MSG_SYSTEM(self, event, message, ...)
 	if C.RollManager.Running then
 		C.RollManager:ParseMessage(message)
 	end
@@ -39,12 +37,8 @@ function C.Events.CHAT_MSG_SYSTEM(self, event, ...)
 	C.PlayerManager:ParseMessage(message)
 end
 
-function C.Events.CHAT_MSG_ADDON(self, event, ...)
-	local msgType = (select(1, ...))
-	local msg = (select(2, ...))
-	local channel = (select(3, ...))
-	local sender = (select(4, ...))
-	AC:Receive(msgType, msg, channel, sender)
+function C.Events.CHAT_MSG_ADDON(self, event, type, msg, channel, sender)
+	AC:Receive(type, msg, channel, sender)
 end
 
 --[[
@@ -72,10 +66,9 @@ end
 -- @param event Full name of event.
 -- @param ... Event arguments.
 --
-function C.Events.CHAT_MSG_BN_WHISPER(self, event, ...)
+function C.Events.CHAT_MSG_BN_WHISPER(self, event, msg, ...)
 	local chan = "BNET"
-	local msg = (select(1, ...))
-	local id = (select(13, ...))
+	local id = (select(12, ...))
 	local toon = BNT:GetToon(id)
 	if not toon then return end
 	if toon.Client ~= BNET_CLIENT_WOW then return end
@@ -106,10 +99,8 @@ end
 -- @param event Full name of event.
 -- @param ... Event arguments.
 --
-function C.Events.CHAT_MSG_GUILD(self, event, ...)
+function C.Events.CHAT_MSG_GUILD(self, event, msg, sender, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
-	local msg = (select(1, ...))
-	local sender = (select(2, ...))
 	CM:HandleMessage(msg, sender, chan, nil, "GUILD")
 end
 
@@ -119,10 +110,8 @@ end
 -- @param event Full name of event.
 -- @param ... Event arguments.
 --
-function C.Events.CHAT_MSG_OFFICER(self, event, ...)
+function C.Events.CHAT_MSG_OFFICER(self, event, msg, sender, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
-	local msg = (select(1, ...))
-	local sender = (select(2, ...))
 	CM:HandleMessage(msg, sender, chan, nil, "GUILD")
 end
 
@@ -132,10 +121,8 @@ end
 -- @param event Full name of event.
 -- @param ... Event arguments.
 --
-function C.Events.CHAT_MSG_PARTY(self, event, ...)
+function C.Events.CHAT_MSG_PARTY(self, event, msg, sender, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
-	local msg = (select(1, ...))
-	local sender = (select(2, ...))
 	CM:HandleMessage(msg, sender, chan, nil, "PARTY")
 end
 
@@ -145,10 +132,8 @@ end
 -- @param event Full name of event.
 -- @param ... Event arguments.
 --
-function C.Events.CHAT_MSG_PARTY_LEADER(self, event, ...)
+function C.Events.CHAT_MSG_PARTY_LEADER(self, event, msg, sender, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
-	local msg = (select(1, ...))
-	local sender = (select(2, ...))
 	CM:HandleMessage(msg, sender, chan, nil, "PARTY")
 end
 
@@ -158,10 +143,8 @@ end
 -- @param event Full name of event.
 -- @param ... Event arguments.
 --
-function C.Events.CHAT_MSG_RAID(self, event, ...)
+function C.Events.CHAT_MSG_RAID(self, event, msg, sender, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
-	local msg = (select(1, ...))
-	local sender = (select(2, ...))
 	CM:HandleMessage(msg, sender, chan, nil, "RAID")
 end
 
@@ -171,10 +154,8 @@ end
 -- @param event Full name of event.
 -- @param ... Event arguments.
 --
-function C.Events.CHAT_MSG_RAID_LEADER(self, event, ...)
+function C.Events.CHAT_MSG_RAID_LEADER(self, event, msg, sender, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
-	local msg = (select(1, ...))
-	local sender = (select(2, ...))
 	CM:HandleMessage(msg, sender, chan, nil, "RAID")
 end
 
@@ -184,11 +165,14 @@ end
 -- @param event Full name of event.
 -- @param ... Event arguments.
 --
-function C.Events.CHAT_MSG_RAID_WARNING(self, event, ...)
+function C.Events.CHAT_MSG_RAID_WARNING(self, event, msg, sender, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
-	local msg = (select(1, ...))
-	local sender = (select(2, ...))
 	CM:HandleMessage(msg, sender, chan, nil, "RAID")
+end
+
+function C.Events.CHAT_MSG_INSTANCE_CHAT(self, event, msg, sender, ...)
+	local chan = CM:GetRespondChannelByEvent(event)
+	CM:HandleMessage(msg, sender, chan, nil, "INSTANCE_CHAT")
 end
 
 --- Event handler for CHAT_MSG_SAY.
@@ -197,10 +181,8 @@ end
 -- @param event Full name of event.
 -- @param ... Event arguments.
 --
-function C.Events.CHAT_MSG_SAY(self, event, ...)
+function C.Events.CHAT_MSG_SAY(self, event, msg, sender, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
-	local msg = (select(1, ...))
-	local sender = (select(2, ...))
 	CM:HandleMessage(msg, sender, chan, nil, "SAY")
 end
 
@@ -210,12 +192,9 @@ end
 -- @param event Full name of event.
 -- @param ... Event arguments.
 --
-function C.Events.CHAT_MSG_WHISPER(self, event, ...)
+function C.Events.CHAT_MSG_WHISPER(self, event, msg, sender, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
-	local msg = (select(1, ...))
-	local sender = (select(2, ...))
-	local target = sender
-	CM:HandleMessage(msg, sender, chan, target, "WHISPER")
+	CM:HandleMessage(msg, sender, chan, sender, "WHISPER")
 end
 
 --- Event handler for CHAT_MSG_YELL.
@@ -224,9 +203,7 @@ end
 -- @param event Full name of event.
 -- @param ... Event arguments.
 --
-function C.Events.CHAT_MSG_YELL(self, event, ...)
+function C.Events.CHAT_MSG_YELL(self, event, msg, sender, ...)
 	local chan = CM:GetRespondChannelByEvent(event)
-	local msg = (select(1, ...))
-	local sender = (select(2, ...))
 	CM:HandleMessage(msg, sender, chan, nil, "YELL")
 end

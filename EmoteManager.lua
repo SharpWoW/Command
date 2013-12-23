@@ -31,7 +31,13 @@ local L = C.LocaleManager
 
 C.EmoteManager = {
 	Emotes = {
-		Sit = "sit"
+		Sit = "sit",
+        Stand = "stand",
+        Wave = "wave",
+        Sleep = "sleep",
+        Lie = "lie",
+        Kiss = "kiss",
+        Slap = "slap"
 	},
 	EmoteValidators = {}
 }
@@ -50,6 +56,17 @@ EM.EmoteValidators[EM.Emotes.Sit] = function()
 	end
 	return true
 end
+
+EM.EmoteValidators[EM.Emotes.Stand] = EM.EmoteValidators[EM.Emotes.Sit]
+EM.EmoteValidators[EM.Emotes.Sleep] = EM.EmoteValidators[EM.Emotes.Sit]
+EM.EmoteValidators[EM.Emotes.Lie] = EM.EmoteValidators[EM.Emotes.Sit]
+
+EM.EmoteValidators[EM.Emotes.Wave] = function()
+    return not UnitAffectingCombat("player")
+end
+
+EM.EmoteValidators[EM.Emotes.Kiss] = EM.EmoteValidators[EM.Emotes.Wave]
+EM.EmoteValidators[EM.Emotes.Slap] = EM.EmoteValidators[EM.Emotes.Wave]
 
 function EM:Init()
 

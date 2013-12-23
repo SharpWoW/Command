@@ -337,6 +337,13 @@ local L = {
 	CM_FACTSETTINGS_NODUPE_ENABLED = "FactsManager (No Duplicates) is enabled.",
 	CM_FACTSETTINGS_NODUPE_DISABLED = "FactsManager (No Duplicates) is disabled.",
 
+    CM_COINFLIP_HELP = "Flips a coin",
+    CM_COINFLIP_HEADS = "The coin landed heads up!",
+    CM_COINFLIP_TAILS = "The coin landed face down for tails!",
+    
+    CM_SLAP_HELP = "Slaps someone around",
+    CM_SLAP = "%s slaps %s around a bit with a large trout.",
+    
 	------------
 	-- Events --
 	------------

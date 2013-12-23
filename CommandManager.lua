@@ -125,8 +125,8 @@ end
 function CM:HasCommand(command)
 	command = command:lower()
 	if self.Commands[command] then return true end
-	for _,v in pairs(self.Commands) do
-		if CET:HasValue(v.Alias, command) then return true end
+	for k,v in pairs(self.Commands) do
+        if command:match(k) or CET:HasValue(v.Alias, command) then return true end
 	end
 	return false
 end
@@ -140,8 +140,8 @@ function CM:GetCommand(command)
 	if self.Commands[command] then
 		return self.Commands[command]
 	end
-	for _,v in pairs(self.Commands) do
-		if CET:HasValue(v.Alias, command) then return v end
+	for k,v in pairs(self.Commands) do
+		if command:match(k) or CET:HasValue(v.Alias, command) then return v end
 	end
 	return self.Commands.__DEFAULT__ or nil -- We don't really need "or nil" here.
 end
@@ -150,7 +150,7 @@ function CM:GetRealName(name)
 	name = name:lower()
 	if self.Commands[name] then return name end
 	for k,v in pairs(self.Commands) do
-		if CET:HasValue(v.Alias, name) then return k end
+		if name:match(k) or CET:HasValue(v.Alias, name) then return k end
 	end
 	return nil
 end
@@ -1260,6 +1260,16 @@ CM:Register({"factsettings", "factsetting", "factset"}, PM.Access.Groups.Admin.L
 	end
 	return false, "CM_FACTSETTINGS_USAGE"
 end, "CM_FACTSETTINGS_HELP")
+
+CM:Register({"coinflip", "flip", "cf", "coin"}, PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
+    local flip = math.random(0, 1)
+    return flip == 0 and "CM_COINFLIP_HEADS" or "CM_COINFLIP_TAILS"
+end, "CM_COINFLIP_HELP")
+
+CM:Register("slap", PM.Access.Groups.User.Level, function(args, sender, isChat, bnetInfo)
+    local target = args[1] or "everyone"
+    return "CM_SLAP", {(UnitName("player")), target}
+end, "CM_SLAP_HELP")
 
 for i,v in ipairs(CM.Slash) do
 	_G["SLASH_" .. C.Name:upper() .. i] = "/" .. v

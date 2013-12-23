@@ -59,7 +59,8 @@ C.ChatManager = {
 		CHAT_MSG_RAID_WARNING			= "RAID_WARNING",
 		CHAT_MSG_SAY					= "WHISPER",
 		CHAT_MSG_WHISPER				= "WHISPER",
-		CHAT_MSG_YELL					= "WHISPER"
+		CHAT_MSG_YELL					= "WHISPER",
+		CHAT_MSG_INSTANCE_CHAGE         = "INSTANCE_CHAT"
 	},
 	SpecialOutput = {
 		Raw = 1,
@@ -127,7 +128,9 @@ function CM:SendMessage(msg, channel, target, isBN, smartSay, raw)
 		end
 		msg = ("[%s] %s"):format(C.Name, msg)
 		if channel == "SMART" then
-			if GT:IsRaid() then
+			if GT:IsInstance() then
+				channel = "INSTANCE_CHAT"
+			elseif GT:IsRaid() then
 				channel = "RAID"
 			elseif GT:IsGroup() then
 				channel = "PARTY"

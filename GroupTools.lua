@@ -21,6 +21,8 @@
 local select = select
 
 -- API Upvalues
+local IsInRaid = IsInRaid
+local IsInGroup = IsInGroup
 local UnitExists = UnitExists
 local GetLFGMode = GetLFGMode
 local UnitInRaid = UnitInRaid
@@ -103,14 +105,18 @@ end
 -- @return True if player is in a party, false otherwise.
 --
 function GT:IsParty()
-	return UnitExists("party1") and not self:IsRaid() and not self:IsLFGGroup()
+	return IsInGroup() and not self:IsRaid() and not self:IsLFGGroup() --UnitExists("party1")
 end
 
 --- Check if player is in a raid.
 -- @return True if the player is in a raid, false otherwise.
 --
 function GT:IsRaid()
-	return UnitInRaid("player")
+	return IsInRaid() --UnitInRaid("player")
+end
+
+function GT:IsInstance()
+	return IsInGroup(LE_PARTY_CATEGORY_INSTANCE)
 end
 
 --- Check if the unit is the group leader.

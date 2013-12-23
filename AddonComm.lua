@@ -27,6 +27,7 @@ local tonumber = tonumber
 
 -- API Upvalues
 local UnitName = UnitName
+local GetRealmName = GetRealmName
 local SendAddonMessage = SendAddonMessage
 local GetNumGuildMembers = GetNumGuildMembers
 local GetGuildRosterInfo = GetGuildRosterInfo
@@ -176,6 +177,9 @@ function AC:Receive(msgType, msg, channel, sender)
 		wipe(self.GuildMembers)
 		for _,v in ipairs(t) do
 			if v then
+				if not v:match("%w+-%w+") then
+					v = ("%s-%s"):format(v, GetRealmName())
+				end
 				table.insert(self.GuildMembers, v)
 			end
 		end
@@ -184,6 +188,9 @@ function AC:Receive(msgType, msg, channel, sender)
 	elseif msgType == self.Type.GuildAdd then
 		if channel ~= "WHISPER" then return end
 		if self.GuildMembers[1] ~= UnitName("player") then return end
+		if not msg:match("%w+-%w+") then
+			msg = ("%s-%s"):format(msg, GetRealmName())
+		end
 		if not CET:HasValue(self.GuildMembers, msg) then
 			table.insert(self.GuildMembers, msg)
 		end
@@ -268,6 +275,7 @@ function AC:UpdateGroup()
 end
 
 function AC:UpdateGuild()
+	local playerName = ("%s-%s"):format(UnitName("player"), GetRealmName())
 	if self.GuildRunning then return end
 	if not IsInGuild() then
 		self.InGuild = false
@@ -285,9 +293,9 @@ function AC:UpdateGuild()
 			return
 		end
 		self.InGuild = true
-		if self.GuildMembers[1] == UnitName("player") or not self.GuildMembers[1] then
+		if self.GuildMembers[1] == playerName or not self.GuildMembers[1] then
 			self.GuildMaster = true
-			self.GuildMembers[1] = UnitName("player")
+			self.GuildMembers[1] = playerName
 			self:Send(self.Type.GuildUpdate, table.concat(self.GuildMembers, ";"), "GUILD")
 		else
 			self.GuildMaster = false
@@ -295,7 +303,7 @@ function AC:UpdateGuild()
 		end
 	else -- Already in guild
 		self:CheckGuildRoster()
-		if self.GuildMembers[1] == UnitName("player") then
+		if self.GuildMembers[1] == playerName then
 			self.GuildMaster = true
 			self:Send(self.Type.GuildUpdate, table.concat(self.GuildMembers, ";"), "GUILD")
 		else
@@ -312,8 +320,9 @@ function AC:CheckGroupMembers()
 end
 
 function AC:CheckGuildMembers()
-	if not CET:HasValue(self.GuildMembers, UnitName("player")) and self.GuildMembers[1] then
-		self:Send(self.Type.GuildAdd, UnitName("player"), "WHISPER", self.GuildMembers[1])
+	local playerName = ("%s-%s"):format(UnitName("player"), GetRealmName())
+	if not CET:HasValue(self.GuildMembers, playerName) and self.GuildMembers[1] then
+		self:Send(self.Type.GuildAdd, playerName, "WHISPER", self.GuildMembers[1])
 	end
 end
 
@@ -330,6 +339,7 @@ function AC:CheckGroupRoster()
 end
 
 function AC:CheckGuildRoster()
+	local playerName = ("%s-%s"):format(UnitName("player"), GetRealmName())
 	local g = {}
 	for i=1, (select(1, GetNumGuildMembers())) do
 		local name = tostring((select(1, GetGuildRosterInfo(i))))
@@ -340,7 +350,7 @@ function AC:CheckGuildRoster()
 		if not g[v] then
 			table.remove(self.GuildMembers, i)
 		end
-		if self.GuildMembers[1] == UnitName("player") then
+		if self.GuildMembers[1] == playerName then
 			self.GuildMaster = true
 		end
 	end
@@ -365,7 +375,7 @@ function AC:IsController(channel)
 		return self.GroupMembers[1] == UnitName("player")
 	elseif channel == "GUILD" then
 		self:CheckGuildRoster()
-		return self.GuildMembers[1] == UnitName("player")
+		return self.GuildMembers[1] == ("%s-%s"):format(UnitName("player"), GetRealmName())
 	end
 	return true
 end
